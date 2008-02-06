@@ -18,11 +18,14 @@ bin_PROGRAMS = \
 vpmnd_SOURCES = 
 
 udpsrv_SOURCES = \
-	srvthread.c\
-	srvthread.h \
 	udpsrv.c \
 	debug.c \
-	debug.h
+	debug.h \
+	peer.h \
+	udpsrvsession.c \
+	udpsrvsession.h \
+	udpsrvthread.c \
+	udpsrvthread.h
 
 udpsrv_LDFLAGS = \
 	-lpthread
