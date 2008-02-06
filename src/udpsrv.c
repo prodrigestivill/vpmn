@@ -36,8 +36,7 @@
 #include "debug.h"
 
 int num_threads = 4;
-int udp_port = 1090;
-int buffer_size = 1024;
+int port_udp = 1090;
 
 void
 udpsrv ()
@@ -54,15 +53,15 @@ udpsrv ()
 	  break;
 	}
     }
-  sleep (1);
+  sleep (2);
   log_debug ("Starting...\n");
   int sd_udp;
   struct sockaddr_in bind_addr;
-  sd_udp = socket (PF_INET, SOCK_DGRAM, 0);
   bzero (&bind_addr, sizeof (bind_addr));
+  sd_udp = socket (PF_INET, SOCK_DGRAM, 0);
   bind_addr.sin_family = AF_INET;
-  bind_addr.sin_port = htons (udp_port);
-  bind_addr.sin_addr.s_addr = INADDR_ANY;
+  bind_addr.sin_addr.s_addr = htonl (INADDR_ANY);
+  bind_addr.sin_port = htons (port_udp);
   if (bind (sd_udp, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
     log_error ("Bind error\n");
   log_debug ("Listening...\n");
@@ -76,16 +75,14 @@ udpsrv ()
 	      log_debug (" selected.\n");
 	      udpsrvthreads[th].addr_len = sizeof (udpsrvthreads[th].addr);
 	      bzero (&udpsrvthreads[th].addr, udpsrvthreads[th].addr_len);
-	      udpsrvthreads[th].buffer = malloc (buffer_size * sizeof (char));
 	      udpsrvthreads[th].buffer_len =
 		recvfrom (sd_udp, udpsrvthreads[th].buffer,
 			  sizeof (udpsrvthreads[th].buffer), 0,
-			  &(udpsrvthreads[th].addr),
+			  (struct sockaddr *) &(udpsrvthreads[th].addr),
 			  &(udpsrvthreads[th].addr_len));
-	      log_debug ("Main  : %s\n",	// :%d \"%s\"\n", "",0,
-			 // inet_ntoa (udpsrvthreads[th].addr.sin_addr),
-			 // 0,
-			 // ntohs (udpsrvthreads[th].addr.sin_port),
+	      log_debug ("Main  : %s:%d \"%s\"\n",
+			 inet_ntoa (udpsrvthreads[th].addr.sin_addr),
+			 ntohs (udpsrvthreads[th].addr.sin_port),
 			 udpsrvthreads[th].buffer);
 	      if (pthread_cond_signal (&(udpsrvthreads[th].cond)) == 0)
 		{
@@ -105,7 +102,5 @@ udpsrv ()
 	}
       if (th >= num_threads)
 	log_debug ("All threads busy, trying again.");
-
-      sleep (1);
     }
 }

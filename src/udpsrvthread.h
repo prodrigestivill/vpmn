@@ -35,12 +35,12 @@ struct udpsrvthread_t
   pthread_t thread;
   pthread_cond_t cond;
   pthread_mutex_t cond_mutex;
-  char *buffer;
+  char buffer[65535 * sizeof (char)];
   int buffer_len;
   struct sockaddr_in addr;
   socklen_t addr_len;
 };
 
 void udpsrvthread (struct udpsrvthread_t *me);
-
+int udpsrvthread_create (struct udpsrvthread_t *new);
 #endif /* _UDPSRVTHREAD_H */

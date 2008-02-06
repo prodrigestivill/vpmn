@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#include <pthread.h>
+#include <string.h>
 #include "udpsrvsession.h"
 #include "debug.h"
 
@@ -32,25 +34,28 @@ struct udpsrvsession_l
 };
 
 int udpsrvsessions_len = 0;
-udpsrvsession_l *udpsrvsessions;
+struct udpsrvsession_l *udpsrvsessions;
+pthread_mutex_t udpsrvsessions_mutex;
 
-udpsrvsession_t
-udpsrvsession_search (struct *sockaddr_in addr, socklen_t * addr_len)
+struct udpsrvsession_t *
+udpsrvsession_search (char *s_addr, int s_port)
 {
-  udpsrvsession_l *cursession = udpsrvsessions;
-  while (cursession->next != NULL)
+  struct udpsrvsession_l *cursession = udpsrvsessions;
+  while (cursession != NULL)
     {
-      if (cursession->current != NULL && cursession->current->addr == addr)
+      if ((cursession->current != NULL)
+	  && (cursession->current->s_port == s_port)
+	  && (strcmp (s_addr, cursession->current->s_addr) == 0))
 	{
 	  return cursession->current;
 	}
-    cursession = cursession->next}
-  if (i >= udpsrvsession_len)
-    udpsrvsession_create (&addr, &addr_len);
+      cursession = cursession->next;
+    }
+  udpsrvsession_create (s_addr, s_port);
 }
 
-udpsrvsession_t
-udpsrvsession_create (struct *sockaddr_in addr, socklen_t * addr_len)
+struct udpsrvsession_t *
+udpsrvsession_create (char *s_addr, int s_port)
 {
 
 }
@@ -58,10 +63,5 @@ udpsrvsession_create (struct *sockaddr_in addr, socklen_t * addr_len)
 void
 udpsrvsession_clean ()
 {
-  int i;
-  for (i = 0; i < udpsrvsession_len; i++)
-    {
-      // if (timeout <= 0)               //repair time.
 
-    }
 }
