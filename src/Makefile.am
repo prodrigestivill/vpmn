@@ -1,0 +1,29 @@
+## Process this file with automake to produce Makefile.in
+
+## Created by Anjuta
+
+INCLUDES = \
+	-DPACKAGE_LOCALE_DIR=\""$(prefix)/$(DATADIRNAME)/locale"\" \
+	-DPACKAGE_SRC_DIR=\""$(srcdir)"\" \
+	-DPACKAGE_DATA_DIR=\""$(datadir)"\" $(VPMN_CFLAGS)
+
+AM_CFLAGS =\
+	 -Wall\
+	 -g
+
+bin_PROGRAMS = \
+	udpsrv\
+	vpmnd
+
+vpmnd_SOURCES = 
+
+udpsrv_SOURCES = \
+	srvthread.c\
+	srvthread.h \
+	udpsrv.c \
+	debug.c \
+	debug.h
+
+udpsrv_LDFLAGS = \
+	-lpthread
+
