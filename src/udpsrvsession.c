@@ -25,16 +25,26 @@
 #include "udpsrvsession.h"
 #include "debug.h"
 
-int udpsrvsession_len = 0;
-struct udpsrvsession_t udpsrvsessions[];
+struct udpsrvsession_l
+{
+  struct udpsrvsession_t *current;
+  struct udpsrvsession_l *next;
+};
+
+int udpsrvsessions_len = 0;
+udpsrvsession_l *udpsrvsessions;
 
 udpsrvsession_t
 udpsrvsession_search (struct *sockaddr_in addr, socklen_t * addr_len)
 {
-  int i;
-  for (i = 0; i < udpsrvsession_len; i++)
+  udpsrvsession_l *cursession = udpsrvsessions;
+  while (cursession->next != NULL)
     {
-    }
+      if (cursession->current != NULL && cursession->current->addr == addr)
+	{
+	  return cursession->current;
+	}
+    cursession = cursession->next}
   if (i >= udpsrvsession_len)
     udpsrvsession_create (&addr, &addr_len);
 }
@@ -51,6 +61,7 @@ udpsrvsession_clean ()
   int i;
   for (i = 0; i < udpsrvsession_len; i++)
     {
-      if (timeout <= 0)		//repair time.
+      // if (timeout <= 0)               //repair time.
 
-	}
+    }
+}

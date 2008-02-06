@@ -109,9 +109,3 @@ udpsrv ()
       sleep (1);
     }
 }
-
-int
-main ()
-{
-  udpsrv ();
-}

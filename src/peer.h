@@ -25,7 +25,7 @@
 #ifndef _PEER_H
 #define _PEER_H
 
-#include "srvsession.h"
+#include "udpsrvsession.h"
 
 struct peer_t
 {

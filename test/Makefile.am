@@ -12,10 +12,19 @@ AM_CFLAGS =\
 	 -g
 
 bin_PROGRAMS = \
-	vpmnd
+	udpsrvtest
 
-vpmnd_SOURCES = 
+udpsrvtest_SOURCES = \
+	udpsrvtest.c \
+	../src/debug.c \
+	../src/debug.h \
+	../src/peer.h \
+	../src/udpsrv.c \
+	../src/udpsrvsession.c \
+	../src/udpsrvsession.h \
+	../src/udpsrvthread.c \
+	../src/udpsrvthread.h
 
-vpmnd_LDFLAGS = \
+udpsrvtest_LDFLAGS = \
 	-lpthread
 

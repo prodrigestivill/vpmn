@@ -26,6 +26,9 @@
 #define _UDPSRVSESSION_H
 
 #include <pthread.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <resolv.h>
 #include "peer.h"
 
 struct udpsrvsession_t
@@ -40,10 +43,5 @@ struct udpsrvsession_t
 int udpsrvsession_len;
 struct udpsrvsession_t udpsrvsessions[];
 pthread_mutex_t udpsrvsessions_mutex;
-
-srvsession_t udpsrvsession_search (struct *sockaddr_in addr,
-				   socklen_t * addr_len);
-srvsession_t udpsrvsession_create (struct *sockaddr_in addr,
-				   socklen_t * addr_len);
 
 #endif /* _UDPSRVSESSION_H */

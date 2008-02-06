@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 dnl Created by Anjuta application wizard.
 
-AC_INIT(vpmn, 0.1, http://code.google.com/p/vpmn)
+AC_INIT(vpmn, 0.1, http://vpmn.googlecode.com/)
 
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
@@ -31,5 +31,5 @@ AC_SUBST(VPMN_LIBS)
 AC_OUTPUT([
 Makefile
 src/Makefile
-
+test/Makefile
 ])
