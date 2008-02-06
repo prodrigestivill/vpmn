@@ -22,17 +22,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#include <stdlib.h>
 #include "peer.h"
 
 struct peer_t *
 peer_create ()
 {
-  struct peer_t *newpeer = malloc (sizeof (peer_t));
+  struct peer_t *newpeer = malloc (sizeof (struct peer_t));
   newpeer->udpsrvsession = NULL;
+  return newpeer;
 }
 
-int
+void
 peer_destroy (struct peer_t *oldpeer)
 {
-  return free (oldpeer);
+  free (oldpeer);
 }

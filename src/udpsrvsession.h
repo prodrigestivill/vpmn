@@ -38,5 +38,5 @@ struct udpsrvsession_t
 
 struct udpsrvsession_t *udpsrvsession_search (char *s_addr, int s_port);
 struct udpsrvsession_t *udpsrvsession_create (char *s_addr, int s_port);
-
+void udpsrvsession_update_timeout (struct udpsrvsession_t *cursession);
 #endif /* _UDPSRVSESSION_H */

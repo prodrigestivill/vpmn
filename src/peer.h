@@ -30,10 +30,11 @@
 struct peer_t
 {
   struct udpsrvsession_t *udpsrvsession;
-//  struct tcpsrvsession_t *tcpsrvsession;
+//struct tcpsrvsession_t *tcpsrvsession;
   /*networks owned */
 };
 
 struct peer_t *peer_create ();
+void peer_destroy (struct peer_t *oldpeer);
 
 #endif /* _PEER_H */

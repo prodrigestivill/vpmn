@@ -83,8 +83,8 @@ udpsrvsession_clean ()
 }
 
 void
-udpsrvsession_update_timeout (udpsrvsession_t * cursession)
+udpsrvsession_update_timeout (struct udpsrvsession_t *cursession)
 {
   if (cursession != NULL)
-    newsession->timeout = 0;
+    cursession->timeout = 0;
 }
