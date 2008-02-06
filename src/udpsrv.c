@@ -48,11 +48,11 @@ udpsrv ()
   for (th = 0; th < num_threads; th++)
     {
       log_debug ("Creating thread %d...\n", th);
-      if ((rc = udpsrvthread_create(&(udpsrvthreads[th]))))
-		{
+      if ((rc = udpsrvthread_create (&(udpsrvthreads[th]))))
+	{
 	  log_error ("Thread %d creation failed: %d\n", th, rc);
 	  break;
-		}
+	}
     }
   sleep (1);
   log_debug ("Starting...\n");
@@ -77,19 +77,27 @@ udpsrv ()
 	      udpsrvthreads[th].addr_len = sizeof (udpsrvthreads[th].addr);
 	      bzero (&udpsrvthreads[th].addr, udpsrvthreads[th].addr_len);
 	      udpsrvthreads[th].buffer = malloc (buffer_size * sizeof (char));
-	      udpsrvthreads[th].buffer_len = recvfrom (sd_udp, udpsrvthreads[th].buffer, sizeof (udpsrvthreads[th].buffer), 0, &(udpsrvthreads[th].addr), &(udpsrvthreads[th].addr_len));
-	      log_debug ("Main  : %s\n", //:%d \"%s\"\n", "",0,
-//			 inet_ntoa (udpsrvthreads[th].addr.sin_addr), 0,
-//			 ntohs (udpsrvthreads[th].addr.sin_port),
+	      udpsrvthreads[th].buffer_len =
+		recvfrom (sd_udp, udpsrvthreads[th].buffer,
+			  sizeof (udpsrvthreads[th].buffer), 0,
+			  &(udpsrvthreads[th].addr),
+			  &(udpsrvthreads[th].addr_len));
+	      log_debug ("Main  : %s\n",	// :%d \"%s\"\n", "",0,
+			 // inet_ntoa (udpsrvthreads[th].addr.sin_addr),
+			 // 0,
+			 // ntohs (udpsrvthreads[th].addr.sin_port),
 			 udpsrvthreads[th].buffer);
-	      if (pthread_cond_signal (&(udpsrvthreads[th].cond)) == 0){
-pthread_mutex_unlock (&(udpsrvthreads[th].cond_mutex));
-	      break;
-			}else{
-pthread_mutex_unlock (&(udpsrvthreads[th].cond_mutex));
-				log_error("Can't wake up the thread.\n");
-}
-	      
+	      if (pthread_cond_signal (&(udpsrvthreads[th].cond)) == 0)
+		{
+		  pthread_mutex_unlock (&(udpsrvthreads[th].cond_mutex));
+		  break;
+		}
+	      else
+		{
+		  pthread_mutex_unlock (&(udpsrvthreads[th].cond_mutex));
+		  log_error ("Can't wake up the thread.\n");
+		}
+
 	    }
 	  else
 	    log_debug (" busy.\n");
@@ -98,7 +106,7 @@ pthread_mutex_unlock (&(udpsrvthreads[th].cond_mutex));
       if (th >= num_threads)
 	log_debug ("All threads busy, trying again.");
 
-sleep(1);
+      sleep (1);
     }
 }
 

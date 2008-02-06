@@ -36,9 +36,9 @@ udpsrvthread (struct udpsrvthread_t *me)
     {
       log_debug ("Thread waiting...\n");
       pthread_cond_wait (&(me->cond), &(me->cond_mutex));
-      log_debug ("Thread: %s\n", //%s:%d \"%s\"\n", , ,
-	//	 inet_ntoa (me->addr.sin_addr), 0,
-//		 ntohs (me->addr.sin_port),
+      log_debug ("Thread: %s\n",	//%s:%d \"%s\"\n", , ,
+		 //       inet_ntoa (me->addr.sin_addr), 0,
+//               ntohs (me->addr.sin_port),
 		 me->buffer);
       free (me->buffer);
     }
@@ -46,15 +46,18 @@ udpsrvthread (struct udpsrvthread_t *me)
 }
 
 
-int udpsrvthread_create(struct udpsrvthread_t *new)
+int
+udpsrvthread_create (struct udpsrvthread_t *new)
 {
-      if (pthread_mutex_init (&(new->cond_mutex), NULL)!=0){
-	log_error("pthread_mutex_init failed.\n");
-	return -1;
-	}
-      if (pthread_cond_init (&(new->cond), NULL)!=0){
-	log_error("pthread_cond_init failed.\n");
-	return -1;
-	}
-      return pthread_create (&new->thread, NULL, (void *) &udpsrvthread, new);
+  if (pthread_mutex_init (&(new->cond_mutex), NULL) != 0)
+    {
+      log_error ("pthread_mutex_init failed.\n");
+      return -1;
+    }
+  if (pthread_cond_init (&(new->cond), NULL) != 0)
+    {
+      log_error ("pthread_cond_init failed.\n");
+      return -1;
+    }
+  return pthread_create (&new->thread, NULL, (void *) &udpsrvthread, new);
 }

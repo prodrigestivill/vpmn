@@ -28,21 +28,29 @@
 int udpsrvsession_len = 0;
 struct udpsrvsession_t udpsrvsessions[];
 
-udpsrvsession_t udpsrvsession_search(struct *sockaddr_in addr, socklen_t *addr_len){
-	int i;
-	for (i=0; i<udpsrvsession_len;i++){
+udpsrvsession_t
+udpsrvsession_search (struct *sockaddr_in addr, socklen_t * addr_len)
+{
+  int i;
+  for (i = 0; i < udpsrvsession_len; i++)
+    {
+    }
+  if (i >= udpsrvsession_len)
+    udpsrvsession_create (&addr, &addr_len);
+}
+
+udpsrvsession_t
+udpsrvsession_create (struct *sockaddr_in addr, socklen_t * addr_len)
+{
+
+}
+
+void
+udpsrvsession_clean ()
+{
+  int i;
+  for (i = 0; i < udpsrvsession_len; i++)
+    {
+      if (timeout <= 0)		//repair time.
+
 	}
-	if (i>=udpsrvsession_len)
-		udpsrvsession_create(&addr, &addr_len);
-}
-
-udpsrvsession_t udpsrvsession_create(struct *sockaddr_in addr, socklen_t *addr_len){
-
-}
-
-void udpsrvsession_clean(){
-	int i;
-	for (i=0; i<udpsrvsession_len;i++){
-		if (timeout<=0) //repair time.
-			
-}

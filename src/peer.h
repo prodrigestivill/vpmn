@@ -31,7 +31,7 @@ struct peer_t
 {
   struct udpsrvsession_t *udpsrvsession;
 //  struct tcpsrvsession_t *tcpsrvsession;
-  /*networks owned*/
+  /*networks owned */
 };
 
 #endif /* _PEER_H */

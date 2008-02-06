@@ -41,7 +41,9 @@ int udpsrvsession_len;
 struct udpsrvsession_t udpsrvsessions[];
 pthread_mutex_t udpsrvsessions_mutex;
 
-srvsession_t udpsrvsession_search(struct *sockaddr_in addr, socklen_t *addr_len);
-srvsession_t udpsrvsession_create(struct *sockaddr_in addr, socklen_t *addr_len);
+srvsession_t udpsrvsession_search (struct *sockaddr_in addr,
+				   socklen_t * addr_len);
+srvsession_t udpsrvsession_create (struct *sockaddr_in addr,
+				   socklen_t * addr_len);
 
 #endif /* _UDPSRVSESSION_H */
