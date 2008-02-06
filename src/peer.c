@@ -1,7 +1,7 @@
 /***************************************************************************
- *            peer.h
+ *            peer.c
  *
- *  Tue Feb  6 12:03:15 2008
+ *  Tue Feb  7 00:24:22 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -22,18 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _PEER_H
-#define _PEER_H
+#include "peer.h"
 
-#include "udpsrvsession.h"
-
-struct peer_t
+struct peer_t *
+peer_create ()
 {
-  struct udpsrvsession_t *udpsrvsession;
-//  struct tcpsrvsession_t *tcpsrvsession;
-  /*networks owned */
-};
+  struct peer_t *newpeer = malloc (sizeof (peer_t));
+  newpeer->udpsrvsession = NULL;
+}
 
-struct peer_t *peer_create ();
-
-#endif /* _PEER_H */
+int
+peer_destroy (struct peer_t *oldpeer)
+{
+  return free (oldpeer);
+}

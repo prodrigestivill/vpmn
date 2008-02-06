@@ -21,7 +21,8 @@ udpsrvsessiontest_SOURCES = \
 	../src/debug.h \
 	../src/peer.h \
 	../src/udpsrvsession.c \
-	../src/udpsrvsession.h
+	../src/udpsrvsession.h \
+	peer.c
 
 udpsrvtest_SOURCES = \
 	udpsrvtest.c \

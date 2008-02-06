@@ -53,7 +53,7 @@ udpsrvsession_search (char *s_addr, int s_port)
       cursession = cursession->next;
     }
   //Add new session
-  cursession = malloc(sizeof(struct udpsrvsession_t));
+  cursession = malloc (sizeof (struct udpsrvsession_t));
   cursession->current = udpsrvsession_create (s_addr, s_port);
   cursession->next = NULL;
   if (udpsrvsessions_last != NULL)
@@ -67,8 +67,12 @@ udpsrvsession_search (char *s_addr, int s_port)
 struct udpsrvsession_t *
 udpsrvsession_create (char *s_addr, int s_port)
 {
-  struct udpsrvsession_t *newsession = malloc(sizeof(struct udpsrvsession_t));
+  struct udpsrvsession_t *newsession =
+    malloc (sizeof (struct udpsrvsession_t));
   newsession->fd = s_port;
+  newsession->peer = peer_create ();
+  newsession->peer->udpsrvsession = newsession;
+  udpsrvsession_update_timeout (newsession);
   return newsession;
 }
 
@@ -76,4 +80,11 @@ void
 udpsrvsession_clean ()
 {
 
+}
+
+void
+udpsrvsession_update_timeout (udpsrvsession_t * cursession)
+{
+  if (cursession != NULL)
+    newsession->timeout = 0;
 }
