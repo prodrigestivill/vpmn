@@ -34,7 +34,8 @@ struct udpsrvsession_l
 };
 
 int udpsrvsessions_len = 0;
-struct udpsrvsession_l *udpsrvsessions;
+struct udpsrvsession_l *udpsrvsessions = NULL;
+struct udpsrvsession_l *udpsrvsessions_last = NULL;
 pthread_mutex_t udpsrvsessions_mutex;
 
 struct udpsrvsession_t *
@@ -51,13 +52,24 @@ udpsrvsession_search (char *s_addr, int s_port)
 	}
       cursession = cursession->next;
     }
-  udpsrvsession_create (s_addr, s_port);
+  //Add new session
+  cursession = malloc(sizeof(struct udpsrvsession_t));
+  cursession->current = udpsrvsession_create (s_addr, s_port);
+  cursession->next = NULL;
+  if (udpsrvsessions_last != NULL)
+    udpsrvsessions_last->next = cursession;
+  if (udpsrvsessions == NULL)
+    udpsrvsessions = cursession;
+  udpsrvsessions_last = cursession;
+  return cursession->current;
 }
 
 struct udpsrvsession_t *
 udpsrvsession_create (char *s_addr, int s_port)
 {
-
+  struct udpsrvsession_t *newsession = malloc(sizeof(struct udpsrvsession_t));
+  newsession->fd = s_port;
+  return newsession;
 }
 
 void

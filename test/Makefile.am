@@ -12,7 +12,16 @@ AM_CFLAGS =\
 	 -g
 
 bin_PROGRAMS = \
-	udpsrvtest
+	udpsrvtest\
+	udpsrvsessiontest
+
+udpsrvsessiontest_SOURCES = \
+	udpsrvsessiontest.c\
+	../src/debug.c \
+	../src/debug.h \
+	../src/peer.h \
+	../src/udpsrvsession.c \
+	../src/udpsrvsession.h
 
 udpsrvtest_SOURCES = \
 	udpsrvtest.c \
