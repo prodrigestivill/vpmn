@@ -1,29 +1,62 @@
-texjob = Main
+all: pdf
+pdf: cleanpdf epsc
+
+#Default Output PDFs
+paper = paper
+normal = memory
+epsc = epsc_vpmn
+annex = _annex
+
+paper: $(paper).pdf
+
+normal: $(normal).pdf $(normal)$(annex).pdf
+
+epsc: $(epsc).pdf $(epsc)$(annex).pdf
+
+
+#PDF Output files
+$(paper).pdf:
+	pdflatex $(paper).tex
+
+$(normal).pdf:
+	pdflatex $(normal).tex
+
+$(normal)$(annex).pdf:
+	pdflatex $(normal)$(annex).tex
+
+$(epsc).pdf:
+	pdflatex $(epsc).tex
+
+$(epsc)$(annex).pdf:
+	pdflatex $(epsc)$(annex).tex
+
+
+#Clean
+cleanpdf:
+	rm -vf *.pdf
+
+clean:
+	rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.idx *.log *.lot *.lof *.prv *.toc *~
+
+
+#Upload and Subversion Features
+file1 = $(normal).pdf
+file2 = $(normal)$(annex).pdf
+file3 = $(paper).pdf
 uploaduser = prodrigestivill
 projectname = vpmn
 browser = firefox
 
-texfile = $(texjob).tex
-pdffile = $(texjob).pdf
-
-all: cleanpdfs pdf
-
-pdf: $(pdffile)
-
-$(pdffile):
-	pdflatex "$(texfile)"
-
-clean: cleanpdfs
-
-cleanpdfs:
-	rm -vf "$(pdffile)"
-
 cleanupload:
-	$(browser) "http://code.google.com/p/$(projectname)/downloads/delete?filename=$(pdffile)"
+	$(browser) "http://code.google.com/p/$(projectname)/downloads/delete?filename=$(file1)"
+	$(browser) "http://code.google.com/p/$(projectname)/downloads/delete?filename=$(file2)"
+	$(browser) "http://code.google.com/p/$(projectname)/downloads/delete?filename=$(file3)"
 
 upload: cleanupload
 	$(browser) "http://code.google.com/hosting/settings"
-	googlecode_upload.py -s "$(texjob)" -p $(projectname) -l Featured -l Type-Docs -u $(uploaduser) --config-dir=none "$(pdffile)"
+	googlecode_upload.py -s "$(file1)" -p $(projectname) -l Featured -l Type-Docs -u $(uploaduser) --config-dir=none "$(file1)"
+	googlecode_upload.py -s "$(file2)" -p $(projectname) -l Featured -l Type-Docs -u $(uploaduser) --config-dir=none "$(file2)"
+	googlecode_upload.py -s "$(file3)" -p $(projectname) -l Featured -l Type-Docs -u $(uploaduser) --config-dir=none "$(file3)"
 
 ci: commit
 
