@@ -83,8 +83,6 @@
 %%% FancyHeadings and  Calc packages are required
 \RequirePackage{fancyhdr}
 \RequirePackage{calc}
-\RequirePackage[dvips]{graphics}                
-\RequirePackage{epsfig}
 \RequirePackage{graphicx}
 \RequirePackage{tocloft}  %% controls typografic design of the TOC, LOF etc...
 \RequirePackage{pslatex}  %% Arial
@@ -204,7 +202,7 @@
 \newlength{\logoEPSCheight}   %% no tocar. nomes descomentar
 \setlength{\logoEPSCheight}{1.5cm}
 \newsavebox{\logoEPSC}
-\sbox{\logoEPSC}{\includegraphics[angle=0, totalheight=\logoEPSCheight]{./logo_epsc_complert.eps}}
+\sbox{\logoEPSC}{\includegraphics[angle=0, totalheight=\logoEPSCheight]{epsc/logo_epsc_complert.pdf}}
 
 %% PORTADA ENVIRONMENT
 %%%%%%%%%%%%%%%%%%%%%%
