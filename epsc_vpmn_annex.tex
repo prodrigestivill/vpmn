@@ -1,0 +1,87 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%            ANNEX OF VPMN PFC FOR EPSC                %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%    AUTOR: Pau Rodriguez-Estivill                     %%%%%%%%%%%%%
+%%%%%%%%%%    email: prodrigestivill@gmail.com                  %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt,catalan,final]{epsc/epsc_tfc_pfc}
+%% a4paper: mida paper. No tocar
+%% 12pt: mida de la font. No tocar
+
+%%  - OPCIONS A CONFIGURAR:
+%%     - Estat del document: final o draft
+%%       NOTA: Draft no inserta les figures i indica quan el text sobrepassa els marges.
+
+%%  - IDIOMES QUE S'USARAN EN EL DOCUMENT: catalan, spanish, english, french...
+%%    NOTA: per canviar d'idioma al mig del document usar:
+%%          \selectlanguage{nom_idioma}
+\usepackage[catalan,english]{babel}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% PAQUETS LATEX RECOMANABLES A UTILITZAR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% NOTA: es possible que algunes distribuicions Linux o Windows 
+%%%       no portin aquests paquets instal·lats per defecte.
+
+%% El paquet isolatin1 és extramadament útil. 
+%% Permet escriure els accents directament amb l'editor de texte
+%% sense haver de fer coses com per exemple: introducci\'o
+%\usepackage{isolatin1} 
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+
+%% Símbols matemàtics de la American Mathematical Society
+\usepackage{amssymb,amsmath, amsfonts}  
+
+%% El paquet array proporciona eines molt útils a l'hora de fer 
+%% equacions amb matrius
+\usepackage{array}             
+
+%% Permet fer taules fusionant cel·les de files consecutives
+%\usepackage{multirow}          
+
+%% Permet canviar els colors del document
+%\usepackage{color,colortbl}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\pagestyle{empty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% IDIOMA PRINCIPAL DEL DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\selectlanguage{catalan}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%                           APENDIXS                         %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Descomentar una de les dues línies següents, en funció de:
+%%  a) els apendixs s'encuadernaran apart (amb portada) 
+%%  b) els apendixs s'enquadernen amb el mateix projecte (sense portada). 
+%% Recordeu que si tot el document (amb apèndixs) excedeix les 100 pagines 
+%% s'ha d'enquadernar a part
+\appendix\ambportada
+%\appendix\senseportada
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% INCLOURE A PARTIR D'AQUI TOTS ELS CAPÍTOLS DELS APENDIXS   %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\chapter{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
