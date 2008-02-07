@@ -1,0 +1,432 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%              PLANTILLA MEMORIA TFC/PFC DE LA EPSC        %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%    AUTOR: Xavier Prats                               %%%%%%%%%%%%%
+%%%%%%%%%%    email: xavier.prats-menendez@upc.edu              %%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Versió: 1.2   2006/06/14                                               %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,12pt,catalan,final]{epsc_tfc_pfc}
+%% a4paper: mida paper. No tocar
+%% 12pt: mida de la font. No tocar
+
+%%  - OPCIONS A CONFIGURAR:
+%%     - Estat del document: final o draft
+%%       NOTA: Draft no inserta les figures i indica quan el text sobrepassa els marges.
+
+%%  - IDIOMES QUE S'USARAN EN EL DOCUMENT: catalan, spanish, english, french...
+%%    NOTA: per canviar d'idioma al mig del document usar:
+%%          \selectlanguage{nom_idioma}
+\usepackage[catalan,english]{babel}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% PAQUETS LATEX RECOMANABLES A UTILITZAR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% NOTA: es possible que algunes distribuicions Linux o Windows 
+%%%       no portin aquests paquets instal·lats per defecte.
+
+%% El paquet isolatin1 és extramadament útil. 
+%% Permet escriure els accents directament amb l'editor de texte
+%% sense haver de fer coses com per exemple: introducci\'o
+\usepackage{isolatin1}             
+
+%% Símbols matemàtics de la American Mathematical Society
+\usepackage{amssymb,amsmath, amsfonts}  
+
+%% El paquet array proporciona eines molt útils a l'hora de fer 
+%% equacions amb matrius
+\usepackage{array}             
+
+%% Permet fer taules fusionant cel·les de files consecutives
+%\usepackage{multirow}          
+
+%% Permet canviar els colors del document
+%\usepackage{color,colortbl}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\pagestyle{empty}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% IDIOMA PRINCIPAL DEL DOCUMENT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\selectlanguage{catalan}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PORTADA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Portada generada automàticament a partir del fitxer de dades
+\portada
+
+%% RESUM
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTA: la longitud passada com a parametre d'entrada 
+%       s'ha d'ajustar ``a ull'' fins que el requadre del resum ocupi tota la pagina 
+\begin{resum}{10cm}
+Aquest document conté les pautes del format de presentació del treball o projecte de final de carrera. En tot cas, cal tenir en compte el que estableix la ``Normativa del treball de fi de carrera (TFC) i del projecte de fi de carrera (PFC)'' aprovada per la Comissió Permanent de l'EPSC, especialment l'apartat ``Requeriments del treball''.
+\end{resum}
+
+%% OVERVIEW
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTA: la longitud passada com a parametre d'entrada 
+%       s'ha d'ajustar ``a ull'' fins que el requadre del resum ocupi tota la pagina 
+\selectlanguage{english}
+\begin{overview}{11cm}
+This document contains guidelines for writing your TFC/PFC. However, you should also take into consideration the standards established in the document Normativa del treball de fi de carrera (TFC) i del projecte de fi de carrera (PFC), paying special attention to the section Requeriments del treball, as this document has been approved by the EPSC Standing Committee
+\end{overview}
+\selectlanguage{catalan}
+
+%% DEDICATORIA (opcional)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{dedicatoria}
+Escriure aquí opcionalment la dedicatòria.
+\end{dedicatoria}
+
+%% INDEX de continguts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\thispagestyle{empty} 
+\tableofcontents
+\cleardoublepage
+
+%% INDEX de figures (opcional, comentar les 3 linies si no es desitja)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\thispagestyle{empty}
+\listoffigures
+\cleardoublepage
+
+%% INDEX de taules (opcional, comentar les 3 linies si no es desitja)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\thispagestyle{empty}
+\listoftables
+\cleardoublepage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%                    INTRODUCCIÓ                          %%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% NOTA: El text passat com a parametre d'entrada 
+%%       és ''introducció'' amb l'idioma en que es redacti el projecte
+\pagestyle{fancy} 
+
+\begin{intro}{Introducció} 
+L'objectiu d'aquest document és donar unes pautes per a la presentació dels projectes o treballs de fi de carrera fets amb l'entorn \LaTeX. Aquest document és, en si mateix, un exemple de la presentació d'aquest treball en aquest format i pot fer-se servir (es recomana) com a plantilla per editar a sobre la pròpia memòria del TFC/PFC.
+
+Els fitxers \LaTeX \ necessaris han estat escrits per Xavier Prats i Menéndez, professor de la EPSC, per tal d'oferir una alternativa als estudiants a l'hora de redactar les seves memòries de TFC/PFC. Si detecteu qualsevol error o teniu algun suggeriment amb l'ús d'aquesta plantilla i el corresponent fitxer de classe, podeu adreçar-vos a \emph{xavier.prats-menendez@upc.edu} Cal dir, que només s'atendran consultes o problemes sobre els fitxers d'estil i la plantilla proporcionada i en cap cas es donarà suport sobre la utilització i la sintaxi de les comanes \LaTeX. Existeix, tant a Internet com a les biblioteques de la UPC, una gran varietat de bibliografia útil en aquest sentit. 
+
+Al primer capítol es poden trobar totes les instruccions relatives a la forma de presentació, és a dir, el tipus de lletra, el paper, els marges, els encapçalaments, la numeració, i totes aquelles qüestions que afecten el treball o projecte en conjunt.
+
+Al segon capítol es marquen les instruccions que afecten cada part del treball, com poden ser: la portada, el resum, l'índex i el cos del document.
+\end{intro}
+
+\pagestyle{fancy} 
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% INCLOURE A PARTIR D'AQUÍ TOTS ELS CAPÍTOLS DE LA MEMORIA   %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Compaginació}\label{C:compaginacio}
+
+\section{Paper i impressió}
+
+\subsection{Paper}
+
+Cal utilitzar paper mida DIN A4 vertical (210 x 297 mm)  que és l'estàndard més generalitzat.
+
+\subsection{Impressió a dues cares}
+
+La presentació del document ha de ser a dues cares a partir de la Introducció i fins al final del document.
+
+
+\section{Marges}
+
+Pel que fa als marges, no cal fer absolutament res. Aquesta plantilla \LaTeX \ ja ho fa per vosaltres :-)
+
+
+\section{Tipografia}
+
+\subsection{Tipus de lletra}
+
+Pel que fa al tipus de lletra, no cal fer absolutament res. Aquesta plantilla \LaTeX \ ja ho fa per vosaltres :-)
+
+A part dels capítols, només podeu utilitzar tres nivells de profunditat en la divisió per apartats:
+
+\begin{verbatim}
+\chapter{Nom del capítol}
+\section{Nom de l'apartat}
+\subsection{Nom del sub-apartat}
+\subsubsection{Nom del sub-sub-apartat}
+ \end{verbatim}
+
+
+
+\subsection{Interlineat}
+
+Pel que fa al interlineat, ja sigui entre línies o finals de paràgrafs/seccions/capitols, no cal fer absolutament res. Aquesta plantilla \LaTeX \ ja ho fa per vosaltres :-)
+
+
+\section{Numeració dels títols}
+
+Pel que fa a la numeració dels capítols, apartats, subapartats i subsubapartats, no cal fer absolutament res. Aquesta plantilla \LaTeX \ ja ho fa per vosaltres :-)
+
+
+\section{Encapçalaments i números de pàgina}
+
+Pel que fa als encapçalaments i números de pàgina, no cal fer absolutament res. Aquesta plantilla \LaTeX \ ja ho fa per vosaltres :-)
+
+
+\section{Enquadernació}
+
+Cal realitzar l'enquadernació amb espiral negra, i tapes de plàstic transparent. La portada ha de ser de cartolina de color blau (color Pantone 542 o el més similar possible).
+
+
+\chapter{Organització del treball}
+
+\section{Pàgines preliminars}
+
+\subsection{Portada}\label{S:portada}
+
+No cal triar cap altre document per la portada. En funció de com hàgiu configurat el fitxer \texttt{dades.tex} la portada es generarà automàticament. Un altre avantatge d'aquesta plantilla \LaTeX \ :-)
+
+\subsection{Resum}
+
+\subsubsection{Identificador del treball/projecte}
+
+Cal fer la identificació del treball/projecte de la mateixa manera que consta en la portada (apartat \ref{S:portada})
+
+\subsubsection{Resum}
+
+El Resum del treball ha de ser autocontingut i ha de presentar de manera concisa els objectius, la metodologia utilitzada i els resultats obtinguts. No és aconsellable incloure-hi referències numèriques. Tal i com queda recollit a la normativa s'ha de presentar un resum en català/castellà i un altre en anglès. El resum ha de tenir una extensió mínima de 1500 caràcters sense espais i una extensió màxima de 3000.
+
+
+\subsection{Dedicatòria}
+
+En el cas que es vulgui dedicar el treball/projecte a algú, cal afegir-hi la dedicatòria en un full apart, després del resum i abans de l'índex. L'entorn \texttt{dedicatoria} proporcionat amb aquesta plantilla ja formata la dedicatoria adientment. 
+
+
+\subsection{Índex}
+
+Pel que fa a l'índex, no cal fer absolutament res. Aquesta plantilla \LaTeX \ ja el fa tot per vosaltres :-)
+
+D'altra banda pot ser molt recomanable afegir en el full següent un Índex de figures i taules per facilitar-ne la localització. La confecció d'aquest índex també és automàtica i  \LaTeX \ ja ho fa tot per vosaltres :-)
+
+  
+\section{Cos del treball}
+
+\subsection{Introducció}
+
+A la Introducció cal explicar la finalitat del treball i els mètodes utilitzats, així com les principals conclusions a què s'hagi arribat. Es pot considerar una versió ampliada del resum.
+
+També cal explicitar a la introducció la justificació de la divisió del treball en capítols, atès que aquesta no pot ser una divisió qualsevol del treball, sinó que ha de seguir un ordre lògic.
+
+Així mateix, és necessari incloure-hi els termes clau del treball amb la seva definició correcta, i aquelles abreviatures i fórmules bàsiques imprescindibles per a la comprensió del text.
+
+És molt important que la introducció no sigui molt extensa perquè el lector pugui fer-hi una ullada ràpida i entendre'n el contingut o fer-ne memòria en qualsevol moment.
+
+
+\subsection{Confecció dels capítols}
+
+Des del punt de vista de la comprensió i de l'estètica, és aconsellable que els capítols tinguin més o menys la mateixa extensió. Els capítols més llargs es poden dividir en seccions o reduir-los i incloure alguns detalls als apèndixs.
+
+
+\subsection{Fórmules, figures i taules}
+
+\subsubsection{Fórmules}
+
+Pel que fa al format de les formules, no cal fer absolutament res. \LaTeX \ ja ho fa tot per vosaltres :-)  
+
+Simplement el que heu de fer és escriure la fórmula com per exemple:
+
+\begin{equation}\label{E:prova}
+\sum _{i=0}^{N} \sum _{j=0}^{N} \frac{\lambda _{ij}}{\alpha _i \beta_ j} \cdot \cos (2\pi f_i) \sin(2 \pi f_j)
+\end{equation}
+
+i per citar-la és tant fàcil com fer: \ref{E:prova}
+
+\subsubsection{Figures}
+
+Pel que fa al format de les figures, no cal fer absolutament res. \LaTeX \ ja ho fa tot per vosaltres :-) . 
+
+Simplement el que heu de fer és inserir la figura amb el codi següent:
+
+\begin{verbatim}
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{./logo_epsc_complert.eps}
+\caption{Exemple de figura}
+\label{F:prova}
+\end{center}
+\end{figure}
+\end{verbatim}
+
+donant com a resultat la figura \ref{F:prova}.
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{./logo_epsc_complert.eps}
+\caption{Exemple de figura}
+\label{F:prova}
+\end{center}
+\end{figure}
+
+Podem tocar la variable \texttt{width} per ajustar l'amplada de la figura com més ens convingui. Teniu en compte que la variable \texttt{textwidth} guarda el valor de l'amplada del texte dins la pàgina i per tant és una bona referència per delimitar amplades de figura, així doncs, la figura \ref{F:prova} ocupa la meitat de l'amplada del texte en una pàgina. 
+
+\subsubsection{Taules}
+
+Pel que fa a la numeració de les taules, no cal fer gran cosa. \LaTeX \ ja fa gran part de la feina bruta. 
+
+Simplement el que heu de fer és inserir la figura amb el codi següent:
+
+\begin{verbatim}
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|c|l|r|}
+\hline
+{\bf Títol de la Columna 1} & {\bf Títol de la Columna 2} & 
+{\bf Títol de la Columna 3}  \\ \hline \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+\end{tabular}
+\caption{Exemple de taula}
+\label{T:prova}
+\end{center}
+\end{table}
+\end{verbatim}
+
+donant com a resultat la taula \ref{F:prova}.
+
+
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|c|l|r|}
+\hline
+{\bf Títol de la Columna 1} & {\bf Títol de la Columna 2} & {\bf Títol de la Columna 3}  \\ \hline \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+centrada        & a l'esquerra    & a la dreta       \\ \hline
+\end{tabular}
+\caption{Exemple de taula}
+\label{T:prova}
+\end{center}
+\end{table}
+
+L'entorn \texttt{tabular} que ofereix \LaTeX \ és molt complet i permet crear multitud de taules diferents, tot i que és alhora bastant complexe. Cau fora de les intencions del present document descriure la sintaxis i el format d'aquest tipus d'entorn. És molt fàcil trobar informació al respecte amb llibres especialitzats o simplement a Internet. 
+
+
+\subsection{Estudi d'ambientalització}
+
+En general l'estudi d'ambientalització es podrà incloure dins de la introducció o a les conclusions, llevat del cas que les repercussions ambientals del treball tinguin una importància tant rellevant que sigui recomanable dedicar-hi un capítol específic.
+
+
+\subsection{Bibliografia}
+
+Tret que el treball consisteixi en la cerca de bibliografia sobre un tema concret, la bibliografia ha de contenir només la llista d'obres consultades.
+
+A la bibliografia s'han de llistar conjuntament llibres i articles de revistes. Citar una referència bibliogràfica és tant fàcil com fer:
+
+\begin{verbatim}
+\cite{prova1}
+\end{verbatim}
+
+per citar la referència \cite{prova1}.
+
+El format de la bibliografia es genera automàticament. Un altre (gran!) avantatge del \LaTeX \ :-)
+
+
+\section{Apèndixs}
+
+En general, cal posar als apèndixs totes les dades i documents que farien el text feixuc i dificultarien la seva lectura, sense oblidar que les contínues referències als apèndixs poden obligar al lector a interrompre constantment la lectura del treball. És per això, que els apèndixs poden incloure diagrames, dades estadístiques, taules de resultats i desenvolupaments teòrics complementaris.
+
+En el cas que, amb el conjunt d'apèndixs, el treball tingui una extensió superior als 100 fulls (aproximadament 200 pàgines), els apèndixs s'han de enquadernar en un volum separat del cos principal del treball. Aquesta plantilla ja proporciona les eines necessàries per fer la portada necessària en cas d'enquadernar els apèndixs per separat.
+
+
+%%%  BIBLIOGRAFIA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Per la bibliografia hi ha 2 opcions: generarla amb la utilitat BibTeX 
+%%%                                      o fer-la ''a ma''
+%%% NOTA: podeu trobar facilment informació sobre BibTeX a:
+%%%  http://www.ctan.org/tex-archive/biblio/bibtex/contrib/doc/
+
+%%% OPCIO 1: BibTeX -> descomentar les dues línies
+%%% a)  Estil de bibliografia
+%\bibliographystyle{unsrt}  
+%%% b) Indicar els fitxers que contenen la bibliografia
+%\bibliography{fitxer1,fitxer2,...,fitxerN}  
+
+%%% OPCIO 2: bibliografia manual
+%%%
+%%% L'argument d'entrada es el numero de referencies que s'inclouen
+\begin{thebibliography}{2}
+
+%% Llibres:  Autor/s (cognoms i inicials dels noms), títol del llibre (en cursiva), editor, ciutat i any de publicació. Quan es cita el capítol d'un llibre s'ha d'indicar el títol del capítol (entre cometes), el títol del llibre (en cursiva) i els números de pàgines amb la primera i la darrera incloses.
+
+%%  Exemple de capitol en llibre
+\bibitem{prova1} 
+Cognoms-autor, Inicial-nom.
+``Títol del capítol''. {\it Títol del llibre}.
+(Editor. Ciutat. Any publicació): pagina1--paginaN.
+
+%%  Exemple de d'article en revista
+\bibitem{prova2} 
+Cognoms-autor, Inicial-nom.
+``Títol de l'article''. {\it Títol de la revista}.
+{\bf volum}(numero),
+pagina1--paginaN. (Any publicació) 
+
+\end{thebibliography}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%                           APENDIXS                         %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\pagestyle{empty}  % no tocar
+
+%% Descomentar una de les dues línies següents, en funció de:
+%%  a) els apendixs s'encuadernaran apart (amb portada) 
+%%  b) els apendixs s'enquadernen amb el mateix projecte (sense portada). 
+%% Recordeu que si tot el document (amb apèndixs) excedeix les 100 pagines 
+%% s'ha d'enquadernar a part
+\appendix\ambportada
+%\appendix\senseportada
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%% INCLOURE A PARTIR D'AQUI TOTS ELS CAPÍTOLS DELS APENDIXS   %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Exemple de prova d'un apèndix}
+
+Text de prova
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% i  aixo es tot! ;)
+\end{document}
+
+
+
+
+
+

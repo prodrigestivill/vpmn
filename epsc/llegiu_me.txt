@@ -1,0 +1,16 @@
+Maqueta en LATEX per l'edició de la memòria de treballs i projectes fi de carrera de la EPSC
+
+DESCRIPCIÓ DELS FITXERS:
+
+logo_epsc_complert.eps: Logotip de la EPSC
+
+epsc_tfc_pfc.cls: Fitxer d'estil LATEX. No editar!!!
+
+dades.tex: Fitxer amb dades relacionades amb el projecte (títol, autors...). Modificar adientment els continguts de cada variable.
+
+plantilla_tfc.tex: Fitxer principal de la memoria. Conté macros per fer el resum, la dedicatoria, la introducció... És on s'han de posar tots capitols de la memoria i apèndixs. Seguir les indicacions que es donen en forma de comentari dins el fitxer.
+
+NOTA: Els primers quatre fitxers han d'estar en un mateix directori per que el fitxer de classe funcioni correctament. NOTA: són necessaris els seguents paquets pel correcte funcionament del fitxer de classe: ifthen, fancyhdr, calc, graphics, graphicx, epsfig, tocloft, pslatex, helvet
+
+Autor: Xavier Prats i Menéndez
+e-mail: xavier.prats-menendez@upc.edu

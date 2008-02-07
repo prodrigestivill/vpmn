@@ -1,0 +1,90 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%-------------------------------------------------------------------------%%%
+%%%  Fitxer de Capçalera per la plantilla LaTeX de TFC/PFC de la EPSC       %%%
+%%%-------------------------------------------------------------------------%%%
+%%% Author: Xavier Prats i Menéndez                                         %%%
+%%% e-mail: xavier.prats-menendez@upc.edu                                   %%%
+%%%-------------------------------------------------------------------------%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Versió: 1.2   2006/06/14                                                 %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% ATENCIÓ!!!: NOMES en aquest fitxer de dades és obligatori escriure els 
+%%%             accents de la manera següent: \`a, \'e, \`e, \'i, \`o, \'o, \'u
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%  VARIABLES A CONFIGURAR                                                  %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%     - Treball o Projecte de Fi de Carrera?
+%%             TFC = true  PFC = false -> Treball de Fi de Carrera
+%%             TFC = false PFC = true  -> Projecte de Fi de Carrera
+\setboolean{TFC}{false}
+\setboolean{PFC}{true}
+
+%%     - Nombre d'autors del TFC/PFC?
+%%             ONEauthor = true  Nauthors = false -> Un sol autor
+%%             ONEauthor = false  Nauthors = true -> Més d'un autor
+\setboolean{ONEauthor}{false}
+\setboolean{Nauthors}{true}
+
+%%     - El projecte ha estat supervisat per alguna persona externa? 
+%%       (NOMES en cas de les practiques en empresa)
+%%             supervisor = true    -> Hi ha un supervisor
+%%             supervisor = false   -> No hi ha un supervisor
+\setboolean{supervisor}{false}
+%%     - Es vol incloure el logotip de l'empresa?
+%%       (NOMES en cas de les practiques en empresa)
+%%             logo = true    -> Hi ha logo
+%%             logo = false   -> No hi ha logo
+\setboolean{logo}{false}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% DADES DEL DOCUMENT                                                       %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Titol del document en catala/castella
+\newcommand{\titledoc}{Aix\`o \'es el T\'itol del Document}
+
+%% Titol del document en anglès
+\newcommand{\titledocE}{This is the Document's title}
+
+%% Autor/Autors del document
+%% NOTA: cal posar la comana \and entre més d'un autor. 
+%%       Per un sol autor no s'ha de posar
+\newcommand{\authordoc}{Nom del primer autor \and Nom del segon autor \and ... \and Nom de l'ultim autor}
+
+%% Director del TFC/PFC
+\newcommand{\directordoc}{Nom del Director}
+
+%% Supervisor del TFC/PFC 
+%% NOTA:  En el cas de realitzar un TFC/PFC en el marc 
+%%        de practiques en una empresa
+\newcommand{\supervisordoc}{Nom del Supervisor}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% TITULACIÓ                                                               %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% NOTA: Descomentar la línia adient
+
+\newcommand{\titulacio}{Enginyeria T\`ecnica Aeron\`autica, especialitat Aeronavegaci\'o}
+%\newcommand{\titulacio}{Enginyeria T\`ecnica de Telecomunicaci\'o, especialitat Sistemes de Telecomunicaci\'o}
+%\newcommand{\titulacio}{Enginyeria T\`ecnica de Telecomunicaci\'o, especialitat Telem\`atica}
+%\newcommand{\titulacio}{Enginyeria de Telecomunicaci\'o (segon cicle)}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% LOGOTIP DE L'EMPRESA                                                    %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% En el cas que el TFC/PFC s'hagi fet en règim d'intercanvi amb una empresa, 
+%% es pot afegir el seu logotip a la cantonada superior dreta de la portada
+%% Descomentar les línies seguents
+
+% \newlength{\logoHeight}       %% no tocar. nomes descomentar
+% \newsavebox{\logo}            %% no tocar. nomes descomentar
+
+%% configurar ''a ma'' la mida del logo.
+%\setlength{\logoHeight}{2cm}
+
+%% posar el path del fitxer eps del logo
+%\sbox{\logo}{\includegraphics[angle=0, totalheight=\logoHeight]{./logo.eps}}
