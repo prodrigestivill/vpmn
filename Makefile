@@ -1,9 +1,10 @@
-texjob  = Main
+texjob = Main
 uploaduser = prodrigestivill
-texfile = $(texjob).tex
-pdffile = $(texjob).pdf
 projectname = vpmn
 browser = firefox
+
+texfile = $(texjob).tex
+pdffile = $(texjob).pdf
 
 all: cleanpdfs pdf
 
