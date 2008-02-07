@@ -14,7 +14,18 @@ AM_CFLAGS =\
 bin_PROGRAMS = \
 	vpmnd
 
-vpmnd_SOURCES = 
+vpmnd_SOURCES = \
+	debug.c\
+	debug.h \
+	peer.c \
+	peer.h \
+	udpsrv.c \
+	udpsrvsession.c \
+	udpsrvsession.h \
+	udpsrvthread.c \
+	udpsrvthread.h \
+	udpsrvdtls.c \
+	udpsrvdtls.h
 
 vpmnd_LDFLAGS = \
 	-lpthread

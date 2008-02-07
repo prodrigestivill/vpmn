@@ -22,7 +22,9 @@ udpsrvsessiontest_SOURCES = \
 	../src/peer.c \
 	../src/peer.h \
 	../src/udpsrvsession.c \
-	../src/udpsrvsession.h
+	../src/udpsrvsession.h \
+	../src/udpsrvdtls.c \
+	../src/udpsrvdtls.h
 
 udpsrvtest_SOURCES = \
 	udpsrvtest.c \

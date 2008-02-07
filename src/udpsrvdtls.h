@@ -1,9 +1,9 @@
 /***************************************************************************
- *            udpsrvthread.h
+ *            udpsrvdtls.h
  *
- *  Tue Feb  5 11:13:32 2008
- *  Copyright  2008  Pau Rodriguez-Estivill
- *  <prodrigestivill@gmail.com>
+ *  Thu Feb  7 10:33:36 2008
+ *  Copyright  2008  plue
+ *  <plue@<host>>
  ****************************************************************************/
 
 /*
@@ -22,25 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _UDPSRVTHREAD_H
-#define _UDPSRVTHREAD_H
+#ifndef _UDPSRVDTLS_H
+#define _UDPSRVDTLS_H
 
-#include <pthread.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <resolv.h>
 
-struct udpsrvthread_t
-{
-  pthread_t thread;
-  pthread_cond_t cond;
-  pthread_mutex_t cond_mutex;
-  char buffer[65535 * sizeof (char)];
-  int buffer_len;
-  struct sockaddr_in addr;
-  socklen_t addr_len;
-};
-
-void udpsrvthread (struct udpsrvthread_t *me);
-int udpsrvthread_create (struct udpsrvthread_t *new);
-#endif /* _UDPSRVTHREAD_H */
+#endif /* _UDPSRVDTLS_H */
