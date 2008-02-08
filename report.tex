@@ -1,0 +1,118 @@
+\documentclass[12pt,twoside,a4paper]{report/tesis}
+
+\usepackage{a4}
+\usepackage{latexsym}
+\usepackage[catalan,spanish,english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage{makeidx}
+\usepackage{amsmath}
+\usepackage{graphicx}
+
+\selectlanguage{catalan}
+\setlength{\headheight}{15pt}
+
+\include{report/config}
+
+\newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
+\makeindex
+
+\begin{document}
+
+\vspace{2cm}
+
+\begin{center}
+\thispagestyle{empty}
+
+
+
+\
+
+\
+
+\
+
+\
+
+%\hspace{-5cm} % para dvi
+%\hspace{-3cm} % para ps
+
+\
+
+
+{\Large {\sc \universitat}}\\
+\vspace{3mm}
+{\normalsize {\escola}} \\
+\
+
+\
+
+
+{\Large {\sc \titledockind}}\\
+
+
+\
+
+\
+
+
+{\Large {\bf \titledoc}}\\ 
+%\vspace{2mm}
+%{\Large {\bf \titledocCA}} \\
+\vspace{1mm}
+{\Large {\bf }}
+
+\
+
+\
+
+\
+
+\end{center}
+
+\begin{flushright}
+{\normalsize Autor: \bf \authordoc\hspace{1cm}}\\
+\vspace{1mm}
+{\normalsize {Director: \bf \directordoc}}\\
+\vspace{1mm}
+{\normalsize {\escola}}\\
+\vspace{1mm}
+{\normalsize {\titulacio}}\\
+\vspace{1cm}
+{\normalsize {\today}}\\
+\end{flushright}
+
+\break
+\clearemptydoublepage 
+
+\pagenumbering{roman}
+\tableofcontents \clearemptydoublepage
+\listoffigures   \clearemptydoublepage 
+\listoftables    \clearemptydoublepage 
+
+\pagestyle{fancyplain}
+\fancyhf{}
+
+\fancypagestyle{plain}{ %
+\fancyhf{} % remove everything
+\renewcommand{\headrulewidth}{0pt} % remove lines as well
+\renewcommand{\footrulewidth}{0pt}}
+
+\fancyfoot[LE,RO]{\thepage}
+\fancyhead[RO]{\textit{\nouppercase{\leftmark}}}
+\fancyhead[ER]{\textit{\titledockind}}
+ 
+\fancypagestyle{plain}{ %
+\fancyhf{} % remove everything
+\renewcommand{\headrulewidth}{0pt} % remove lines as well
+\renewcommand{\footrulewidth}{0pt}}
+
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\include{report/chapters}
+
+\clearemptydoublepage
+\clearemptydoublepage
+\end{document}

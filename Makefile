@@ -1,5 +1,5 @@
 all: pdf
-pdf: cleanpdf epsc
+pdf: cleanpdf normal
 
 #Default Output PDFs
 paper = paper
