@@ -3,7 +3,7 @@ pdf: cleanpdf epsc
 
 #Default Output PDFs
 paper = paper
-normal = memory
+normal = report
 epsc = epsc_vpmn
 annex = _annex
 
