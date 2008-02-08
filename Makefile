@@ -15,29 +15,33 @@ epsc: $(epsc).pdf $(epsc)$(annex).pdf
 
 
 #PDF Output files
+pdflatex = pdflatex
 $(paper).pdf:
-	pdflatex $(paper).tex
+	$(pdflatex) $(paper).tex
 
 $(normal).pdf:
-	pdflatex $(normal).tex
+	$(pdflatex) $(normal).tex
 
 $(normal)$(annex).pdf:
-	pdflatex $(normal)$(annex).tex
+	$(pdflatex) $(normal)$(annex).tex
 
 $(epsc).pdf:
-	pdflatex $(epsc).tex
+	$(pdflatex) $(epsc).tex
 
 $(epsc)$(annex).pdf:
-	pdflatex $(epsc)$(annex).tex
+	$(pdflatex) $(epsc)$(annex).tex
 
 
 #Clean
+cmdcleanpdf = rm -vf *.pdf
+cmdclean = rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.idx *.log *.lot *.lof *.prv *.toc *~
 cleanpdf:
-	rm -vf *.pdf
+	$(cmdcleanpdf)
 
 clean:
-	rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.idx *.log *.lot *.lof *.prv *.toc *~
-
+	$(cmdclean)
+	cd report; $(cmdclean)
+	cd epsc; $(cmdclean)
 
 #Upload and Subversion Features
 file1 = $(normal).pdf
