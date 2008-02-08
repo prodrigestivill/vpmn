@@ -12,7 +12,7 @@
 \selectlanguage{catalan}
 \setlength{\headheight}{15pt}
 
-\include{report/config}
+\input{report/config}
 
 \newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
 \makeindex
@@ -83,7 +83,14 @@
 \end{flushright}
 
 \break
-\clearemptydoublepage 
+\clearemptydoublepage
+
+
+\chapter*{Introducció}
+
+\thispagestyle{empty}
+\include{report/intro}
+\clearemptydoublepage
 
 \pagenumbering{roman}
 \tableofcontents \clearemptydoublepage
@@ -111,7 +118,7 @@
 \pagenumbering{arabic}
 \setcounter{page}{1}
 
-\include{report/chapters}
+\input{report/chapters}
 
 \clearemptydoublepage
 \clearemptydoublepage

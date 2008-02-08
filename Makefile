@@ -6,31 +6,34 @@ paper = paper
 normal = report
 epsc = epsc_vpmn
 annex = _annex
+withannex = _all
 
 paper: $(paper).pdf
 
 normal: $(normal).pdf $(normal)$(annex).pdf
 
-epsc: $(epsc).pdf $(epsc)$(annex).pdf
+epsc: $(epsc).pdf $(epsc)$(annex).pdf $(epsc)$(withannex).pdf
 
 
 #PDF Output files
 pdflatex = pdflatex
 $(paper).pdf:
-	$(pdflatex) $(paper).tex
+	$(pdflatex) $(paper)
 
 $(normal).pdf:
-	$(pdflatex) $(normal).tex
+	$(pdflatex) $(normal)
 
 $(normal)$(annex).pdf:
-	$(pdflatex) $(normal)$(annex).tex
+	$(pdflatex) $(normal)$(annex)
 
 $(epsc).pdf:
-	$(pdflatex) $(epsc).tex
+	$(pdflatex) $(epsc)
 
 $(epsc)$(annex).pdf:
-	$(pdflatex) $(epsc)$(annex).tex
+	$(pdflatex) $(epsc)$(annex)
 
+$(epsc)$(withannex).pdf:
+	$(pdflatex) $(epsc)$(withannex)
 
 #Clean
 cmdcleanpdf = rm -vf *.pdf

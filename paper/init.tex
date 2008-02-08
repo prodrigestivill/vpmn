@@ -1,0 +1,35 @@
+
+\documentclass[twocolumn]{article} % default is 10 pt
+\usepackage{graphicx} % needed for including graphics e.g. EPS, PS
+
+\long\def\comment#1{}
+
+% uncomment if don't want page numbers
+% \pagestyle{empty}
+
+%set dimensions of columns, gap between columns, and paragraph indent 
+\setlength{\textheight}{8.75in}
+\setlength{\columnsep}{0.375in}
+\setlength{\textwidth}{6.8in}
+\setlength{\topmargin}{0.0625in}
+\setlength{\headheight}{0.0in}
+\setlength{\headsep}{0.0in}
+\setlength{\oddsidemargin}{-.19in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.12in}
+\makeatletter
+\def\@normalsize{\@setsize\normalsize{10pt}\xpt\@xpt
+\abovedisplayskip 10pt plus2pt minus5pt\belowdisplayskip 
+\abovedisplayskip \abovedisplayshortskip \z@ 
+plus3pt\belowdisplayshortskip 6pt plus3pt 
+minus3pt\let\@listi\@listI}
+
+%need an 11 pt font size for subsection and abstract headings 
+\def\subsize{\@setsize\subsize{12pt}\xipt\@xipt}
+%make section titles bold and 12 point, 2 blank lines before, 1 after
+\def\section{\@startsection {section}{1}{\z@}{1.0ex plus
+1ex minus .2ex}{.2ex plus .2ex}{\large\bf}}
+%make subsection titles bold and 11 point, 1 blank line before, 1 after
+\def\subsection{\@startsection 
+   {subsection}{2}{\z@}{.2ex plus 1ex} {.2ex plus .2ex}{\subsize\bf}}
+\makeatother

@@ -1,0 +1,188 @@
+
+\documentclass[twocolumn]{article} % default is 10 pt
+\usepackage{graphicx} % needed for including graphics e.g. EPS, PS
+
+\long\def\comment#1{}
+
+% uncomment if don't want page numbers
+% \pagestyle{empty}
+
+%set dimensions of columns, gap between columns, and paragraph indent 
+\setlength{\textheight}{8.75in}
+\setlength{\columnsep}{0.375in}
+\setlength{\textwidth}{6.8in}
+\setlength{\topmargin}{0.0625in}
+\setlength{\headheight}{0.0in}
+\setlength{\headsep}{0.0in}
+\setlength{\oddsidemargin}{-.19in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.12in}
+\makeatletter
+\def\@normalsize{\@setsize\normalsize{10pt}\xpt\@xpt
+\abovedisplayskip 10pt plus2pt minus5pt\belowdisplayskip 
+\abovedisplayskip \abovedisplayshortskip \z@ 
+plus3pt\belowdisplayshortskip 6pt plus3pt 
+minus3pt\let\@listi\@listI}
+
+%need an 11 pt font size for subsection and abstract headings 
+\def\subsize{\@setsize\subsize{12pt}\xipt\@xipt}
+%make section titles bold and 12 point, 2 blank lines before, 1 after
+\def\section{\@startsection {section}{1}{\z@}{1.0ex plus
+1ex minus .2ex}{.2ex plus .2ex}{\large\bf}}
+%make subsection titles bold and 11 point, 1 blank line before, 1 after
+\def\subsection{\@startsection 
+   {subsection}{2}{\z@}{.2ex plus 1ex} {.2ex plus .2ex}{\subsize\bf}}
+\makeatother
+
+\begin{document}
+
+% don't want date printed
+\date{}
+
+% >>>>>>>>>>>>>>>>>>>>>>>  Put your title here <<<<<<<<<<<<<<<<<<<<<<<<
+% make title bold and 14 pt font (Latex default is non-bold, 16pt) 
+\title{\Large {\bf Replace This Line With Your Title }}
+
+% >>>>>>>>>>>>>>>>>>>>>>> Author's Name, Thanks or Affliation <<<<<<<<
+\author{John H. Smith
+ \thanks{Text in here gets placed in a footnote section.  Typically you
+ thank sponsors here or perhaps add your address e.g. 
+ Drexel University Mechanical Engineering, Robotics 
+ \& Machine Vision Lab, Philadelphia PA USA 19104 
+ Tel/Fax: 215-895-6396/1478 Email: paul@coe.drexel.edu
+ }
+}
+
+\maketitle
+\thispagestyle{empty}
+
+\subsection*{\centering Abstract}
+
+% >>>>>>>>>>>>>>>>>>>>>>>>> Keywords and Abstract <<<<<<<<<<<<<<<<<<<<<
+% Replace with your own keywords and abstract.  Text will be in italics
+{\em Keywords: 
+visual-servoing, tracking, biomimetic, redundancy, degrees-of-freedom
+
+Motion tracking and object recognition often use cameras
+that are mounted in motion platforms like pan-tilt units,
+linear tables and even robots.  Tracking can be
+automated by visually servoing the platform's degrees-of-freedom (DOF)
+thus keeping the camera's point-of-view directed at the target.
+Tracking quick moving targets often demands faster bandwidth platforms.  
+However biology suggests a redundant approach where DOF, like the eye and
+head, cooperate to direct vision systems and overcome joint limits.  This
+paper illustrates the effectiveness of this concept using a 
+robot-mounted camera.
+}
+
+% >>>>>>>>>>>>>>>>>>>>>> START OF YOUR PAPER <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+% Typically paper starts of with an Introduction header.  Replace text in
+% the french braces if you see fit.  I also typically name the label the
+% same as the section
+
+\section{Introduction}
+\label{Introduction}
+
+Visual coverage of large areas often demands mounting cameras on motion
+platforms like booms, gantries, planetary rovers, industrial robots, aircraft 
+and submersibles.  Previous work in visually servoing a 5-DOF hybrid gantry robot 
+demonstrated that a coupled coordination of redundant DOF, called {\it partitioning}, 
+can track faster moving subjects \cite{OhTRA2001}. 
+
+Section~\ref{System Description} describes our tracking interests with a 
+camera-carrying gantry along with brief highlights of previous gain-tuning results.  
+Section~\ref{Cost Function} defines the tracking task and DOF coordination using a 
+cost function to optimally tune gains and develops the necessary controller. 
+
+\section{System Description}
+\label{System Description}
+
+Our particular tracking interests are in visually monitoring tools, workpieces 
+or people moving in a large ($3.6\times6.4\times1.0$ $m^3$) manufacturing workcell,
+Figure~\ref{overView}. We thus built a ceiling-mounted Cartesian gantry and attached a 2-DOF 
+pan-tilt unit (PTU) to its end-effector.  The gantry's large inertias limit camera translational
+velocities but allow the camera to be positioned anywhere in the workcell.  By 
+comparison, the PTU only servos a light-weight camera and thus camera orientations are 
+quick but its joint limits constrain what fields-of-view can be obtained.  The net 
+effect is a hybrid robot characterized by DOF dynamics, kinematics and redundancy.
+The PTU can point the camera at the subject and the gantry can maneuver the camera
+to maintain a desired camera-to-subject depth or achieve line-of-sight if subject
+occlusion occurs.
+
+% >>>>>>>>>>>>>>>>>>>>>>>>>>> Example of including a figure <<<<<<<<<<<<<<<<<<<<<<
+
+Here, 2 copies of the same figure are included and lie side-by-side.  Latex only 
+accepts EPS or PS graphics formats.  The width can be changed from 3 inches
+if you wish.  For caption, change the text between the french braces.
+Lastly, give the figure a label so you can reference it later
+You don't have to worry about where the figure is placed.  Latex does the
+placement for you by considering where in the text the figure is referenced.
+
+\begin{figure*}
+\centerline{
+\mbox{\includegraphics[width=3.00in]{assemblyWorkcellOverview1_0.eps}}
+\mbox{\includegraphics[width=3.00in]{assemblyWorkcellOverview1_0.eps}}
+}
+\caption{Replace text here with your desired caption.}
+\label{overView}
+\end{figure*}
+
+% >>>>>>>>> Add a subsection if you want <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+\subsection{Cost Function}
+\label{Cost Function}
+
+Notice that whatever number the parent section is, the child subsection will be 
+automatically numbered.
+
+% >>>>>>>>>>>>>>>>>>>> Add an equation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+Equation numbers are automatically generated.  Label allows easy 
+referencing throughout the paper
+
+\begin{equation}
+{\bf X}[k+1]=A{\bf X}[k]+B{\bf u}[k]
+\label{stateSpaceForm1}
+\end{equation}
+
+% >>>>>>>>>>>>>>>>>>> Add an unnumbered equation <<<<<<<<<<<<<<<<<<<<<<<<
+
+You can also add an unnumbered equation as follows
+
+$$
+\theta_c[k+1]=\theta_c[k]+Tu_p[k]
+$$
+
+\section{Conclusions and Future Work}
+
+To demonstrate Latex's ability to easily reference sections, equations
+figures and bibliographical references consider the following.  
+Section\ref{Introduction} described the general problems motivating
+the research.
+
+% >>>>>>>>>>>>>>>>>>>>>> Bibliography <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+% A label is give for each bibitem.  Your paper references this label
+
+\begin{thebibliography}{99}
+
+% >>>>>>>>> Book examples <<<<<<<<<
+\bibitem{CarpenterBOOK} Carpenter, R.H.S., {\it Movements of the Eyes},
+ 2nd Edition, Pion Publishing, 1988.
+
+\bibitem{FranklinBOOK} Franklin, G.F., Powel, J.D., Workman, M.L.,
+{\it Digital Control of Dynamic Systems}, Second Edition,
+Addison-Wesley, 1990.
+
+% >>>>>>>>> Conference Proceedings Example <<<<<<<<<
+\bibitem{OhICRA1998} Oh, P.Y., Allen, P.K., ``Design a Partitioned
+ Visual Feedback Controller,'' {\it IEEE Int Conf Robotics
+ \& Automation}, Leuven, Belgium, pp. 1360-1365 5/98
+
+% >>>>>>>>> Journal Example <<<<<<<<<<<<<<<<<<<<<<<<
+\bibitem{OhTRA2001} Oh, P.Y., Allen, P.K., ``Visual Servoing
+ by Partitioning Degrees of Freedom,'' {\it IEEE Trans on 
+ Robotics \& Automation}, V17, N1, pp. 1-17, 2/01
+
+\end{thebibliography}
+\end{document}
+
