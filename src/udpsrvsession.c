@@ -53,7 +53,7 @@ udpsrvsession_search (char *s_addr, int s_port)
       cursession = cursession->next;
     }
   //Add new session
-  cursession = malloc (sizeof (struct udpsrvsession_t));
+  cursession = malloc (sizeof (struct udpsrvsession_l));
   cursession->current = udpsrvsession_create (s_addr, s_port);
   cursession->next = NULL;
   if (udpsrvsessions_last != NULL)

@@ -35,36 +35,28 @@ void
 udpsrvthread (struct udpsrvthread_t *me)
 {
   char *s_addr;
-  int s_port = 0;
+  int s_port;
   struct udpsrvsession_t *udpsession;
   log_debug ("Thread locking...\n");
-  pthread_mutex_lock (&(me->cond_mutex));
+  pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
       log_debug ("Thread waiting...\n");
-      pthread_cond_wait (&(me->cond), &(me->cond_mutex));
-      //s_addr = inet_ntoa (me->addr.sin_addr);
-      //s_port = ntohs (me->addr.sin_port);
-      //udpsession = udpsrvsession_search (s_addr, s_port);
-      log_debug ("Thread: \"%s\"\n", me->buffer);
-      /*log_debug ("Thread: %s:%d \"%s\"\n", inet_ntoa (me->addr.sin_addr),
-         ntohs (me->addr.sin_port), me->buffer); */
+      pthread_cond_wait (&me->cond, &me->cond_mutex);
+      s_addr = inet_ntoa (me->addr.sin_addr);
+      s_port = ntohs (me->addr.sin_port);
+      udpsession = udpsrvsession_search (s_addr, s_port);
+      //DTLS
+      pthread_mutex_unlock (&me->thread_mutex);
     }
-  pthread_mutex_unlock (&(me->cond_mutex));
+  pthread_mutex_unlock (&me->cond_mutex);
 }
 
 int
 udpsrvthread_create (struct udpsrvthread_t *new)
 {
-  if (pthread_mutex_init (&(new->cond_mutex), NULL) != 0)
-    {
-      log_error ("pthread_mutex_init failed.\n");
-      return -1;
-    }
-  if (pthread_cond_init (&(new->cond), NULL) != 0)
-    {
-      log_error ("pthread_cond_init failed.\n");
-      return -1;
-    }
+  pthread_mutex_init (&new->thread_mutex, NULL);
+  pthread_mutex_init (&new->cond_mutex, NULL);
+  pthread_cond_init (&new->cond, NULL);
   return pthread_create (&new->thread, NULL, (void *) &udpsrvthread, new);
 }

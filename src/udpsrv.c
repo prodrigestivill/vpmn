@@ -70,28 +70,25 @@ udpsrv ()
       for (th = 0; th < num_threads; th++)
 	{
 	  log_debug ("Try thread %d...", th);
-	  if (pthread_mutex_trylock (&(udpsrvthreads[th].cond_mutex)) == 0)
+	  if (pthread_mutex_trylock (&udpsrvthreads[th].thread_mutex) == 0)
 	    {
 	      log_debug (" selected.\n");
+	      pthread_mutex_lock (&udpsrvthreads[th].cond_mutex);
 	      udpsrvthreads[th].addr_len = sizeof (udpsrvthreads[th].addr);
 	      bzero (&udpsrvthreads[th].addr, udpsrvthreads[th].addr_len);
 	      udpsrvthreads[th].buffer_len =
 		recvfrom (sd_udp, udpsrvthreads[th].buffer,
 			  sizeof (udpsrvthreads[th].buffer), 0,
-			  (struct sockaddr *) &(udpsrvthreads[th].addr),
-			  &(udpsrvthreads[th].addr_len));
-	      log_debug ("Main  : %s:%d \"%s\"\n",
-			 inet_ntoa (udpsrvthreads[th].addr.sin_addr),
-			 ntohs (udpsrvthreads[th].addr.sin_port),
-			 udpsrvthreads[th].buffer);
-	      if (pthread_cond_signal (&(udpsrvthreads[th].cond)) == 0)
+			  (struct sockaddr *) &udpsrvthreads[th].addr,
+			  &udpsrvthreads[th].addr_len);
+	      if (pthread_cond_signal (&udpsrvthreads[th].cond) == 0)
 		{
-		  pthread_mutex_unlock (&(udpsrvthreads[th].cond_mutex));
+		  pthread_mutex_unlock (&udpsrvthreads[th].cond_mutex);
 		  break;
 		}
 	      else
 		{
-		  pthread_mutex_unlock (&(udpsrvthreads[th].cond_mutex));
+		  pthread_mutex_unlock (&udpsrvthreads[th].cond_mutex);
 		  log_error ("Can't wake up the thread.\n");
 		}
 

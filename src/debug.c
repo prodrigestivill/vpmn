@@ -32,7 +32,8 @@ void
 log_debug (const char *format, void **args)
 {
 #ifdef DEBUG
-  printf (format, args);
+  fprintf (stdout, format, args);
+  fflush(stdout);
 #endif
 }
 
@@ -40,7 +41,8 @@ void
 log_info (const char *format, void **args)
 {
 #ifdef DEBUG
-  printf (format, args);
+  fprintf (stdout, format, args);
+  fflush(stdout);
 #endif
 }
 
@@ -48,6 +50,7 @@ void
 log_error (const char *format, void **args)
 {
 #ifdef DEBUG
-  printf (format, args);
+  fprintf (stderr, format, args);
+  fflush(stderr);
 #endif
 }

@@ -33,6 +33,7 @@
 struct udpsrvthread_t
 {
   pthread_t thread;
+  pthread_mutex_t thread_mutex;
   pthread_cond_t cond;
   pthread_mutex_t cond_mutex;
   char buffer[65535 * sizeof (char)];
