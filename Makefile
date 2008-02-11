@@ -44,6 +44,7 @@ cleanpdf:
 clean:
 	$(cmdclean)
 	cd report; $(cmdclean)
+	cd paper; $(cmdclean)
 	cd epsc; $(cmdclean)
 
 #Upload and Subversion Features
