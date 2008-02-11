@@ -36,31 +36,60 @@ struct udpsrvsession_l
 int udpsrvsessions_len = 0;
 struct udpsrvsession_l *udpsrvsessions = NULL;
 struct udpsrvsession_l *udpsrvsessions_last = NULL;
-pthread_mutex_t udpsrvsessions_mutex;
+pthread_mutex_t udpsrvsessions_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct udpsrvsession_t *
 udpsrvsession_search (char *s_addr, int s_port)
 {
-  struct udpsrvsession_l *cursession = udpsrvsessions;
+  struct udpsrvsession_l *cursession;
+  int local_mutex = 0;
+  if (udpsrvsessions == NULL)
+	{
+      pthread_mutex_lock(&udpsrvsessions_mutex);
+      local_mutex = 1;
+	  if (udpsrvsessions != NULL)
+		{
+		  pthread_mutex_unlock(&udpsrvsessions_mutex);
+		  local_mutex = 0;
+		}
+	}
+  //Search the session.
+  cursession = udpsrvsessions;
   while (cursession != NULL)
     {
       if ((cursession->current != NULL)
-	  && (cursession->current->s_port == s_port)
+	  && (s_port == cursession->current->s_port)
 	  && (strcmp (s_addr, cursession->current->s_addr) == 0))
 	{
 	  return cursession->current;
 	}
+	  if (cursession->next == NULL)
+	    {
+	      pthread_mutex_lock(&udpsrvsessions_mutex);
+	      local_mutex = 1;
+	      if (cursession->next != NULL)
+            {
+              pthread_mutex_unlock(&udpsrvsessions_mutex);
+              local_mutex = 0;
+            }
+	      else
+            break;
+
+	    }		
       cursession = cursession->next;
     }
   //Add new session
+  if (local_mutex == 0)
+    pthread_mutex_lock(&udpsrvsessions_mutex);
   cursession = malloc (sizeof (struct udpsrvsession_l));
   cursession->current = udpsrvsession_create (s_addr, s_port);
   cursession->next = NULL;
-  if (udpsrvsessions_last != NULL)
-    udpsrvsessions_last->next = cursession;
   if (udpsrvsessions == NULL)
     udpsrvsessions = cursession;
+  if (udpsrvsessions_last != NULL)
+    udpsrvsessions_last->next = cursession;
   udpsrvsessions_last = cursession;
+  pthread_mutex_unlock(&udpsrvsessions_mutex);
   return cursession->current;
 }
 
@@ -69,7 +98,9 @@ udpsrvsession_create (char *s_addr, int s_port)
 {
   struct udpsrvsession_t *newsession =
     malloc (sizeof (struct udpsrvsession_t));
-  newsession->fd = s_port;
+  newsession->s_port = s_port;
+  newsession->s_addr = s_addr;
+  newsession->fd = udpsrvsessions_len++;
   newsession->peer = peer_create ();
   newsession->peer->udpsrvsession = newsession;
   udpsrvsession_update_timeout (newsession);

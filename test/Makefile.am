@@ -26,6 +26,9 @@ udpsrvsessiontest_SOURCES = \
 	../src/udpsrvdtls.c \
 	../src/udpsrvdtls.h
 
+udpsrvsessiontest_LDFLAGS = \
+	-lpthread
+
 udpsrvtest_SOURCES = \
 	udpsrvtest.c \
 	../src/debug.c \

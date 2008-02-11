@@ -68,7 +68,8 @@ main ()
       s_addr = inet_ntoa (addr.sin_addr);
       s_port = ntohs (addr.sin_port);
       udpsession = udpsrvsession_search (s_addr, s_port);
-      log_debug ("Main  : %s:%d %d \"%s\"\n", s_addr, s_port, udpsession->fd,
-		 buffer);
+      //log_debug ("Main  : %s:%d %d \"%s\"\n", s_addr, s_port, udpsession->fd,
+      // buffer);
+      log_debug ("Main  : %d \n", udpsession->fd);
     }
 }
