@@ -1,11 +1,3 @@
-/***************************************************************************
- *            udpsrvdtls.c
- *
- *  Thu Feb  7 10:32:56 2008
- *  Copyright  2008  plue
- *  <plue@<host>>
- ****************************************************************************/
-
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +13,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
+ 
+#ifndef _TUNDEVTHREAD_H
+#define _TUNDEVTHREAD_H
 
-void
-udpsrvdtls ()
+#include <pthread.h>
+
+struct tundevthread_t
 {
-//  SSL_load_error_strings ();	/* readable error messages */
-//  SSL_library_init ();			/* initialize library */
-//actions_to_seed_PRNG();
+  pthread_t thread;
+  pthread_mutex_t thread_mutex;
+  pthread_cond_t cond;
+  pthread_mutex_t cond_mutex;
+  char buffer[65535 * sizeof (char)];
+  int buffer_len;
+};
 
-}
+#endif /* _TUNDEVTHREAD_H */
+
+ 

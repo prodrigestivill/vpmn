@@ -35,16 +35,16 @@
 #include "udpsrvthread.h"
 #include "debug.h"
 
-int num_threads = 4;
+int num_udpsrvthreads = 4;
 int port_udp = 1090;
 
 void
 udpsrv ()
 {
   int rc, th;
-  struct udpsrvthread_t udpsrvthreads[num_threads];
+  struct udpsrvthread_t udpsrvthreads[num_udpsrvthreads];
 
-  for (th = 0; th < num_threads; th++)
+  for (th = 0; th < num_udpsrvthreads; th++)
     {
       log_debug ("Creating thread %d...\n", th);
       if ((rc = udpsrvthread_create (&(udpsrvthreads[th]))))
@@ -67,7 +67,7 @@ udpsrv ()
   log_debug ("Listening...\n");
   while (1)
     {
-      for (th = 0; th < num_threads; th++)
+      for (th = 0; th < num_udpsrvthreads; th++)
 	{
 	  log_debug ("Try thread %d...", th);
 	  if (pthread_mutex_trylock (&udpsrvthreads[th].thread_mutex) == 0)
@@ -97,7 +97,7 @@ udpsrv ()
 	    log_debug (" busy.\n");
 
 	}
-      if (th >= num_threads)
+      if (th >= num_udpsrvthreads)
 	log_debug ("All threads busy, trying again.");
     }
 }
