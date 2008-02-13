@@ -21,19 +21,27 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
- 
-#include "tundevthread.h"
-#include <linux/if_tun.h>
-#define DEFAULT_DEVICE 
 
-char *device = "/dev/net/tun";
-int num_tundevthreads = 4;
+#include "debug.h"
+#include "tundevthread.h"
+#include <string.h>
+#include <unistd.h>
+#include <net/if.h>
+#include <linux/if_tun.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#define DEFAULT_DEVICE
+
+char *tundevice = "/dev/net/tun";
+char *tunname = "vpmn0";
+int num_tundevthreads = 10;
+int tunmtu = 1500;
 
 void
 tundev ()
 {
   int rc, th;
-  int device_fd = -1;
+  int sd_tun = -1;
   char *iface;
   char ifrname[IFNAMSIZ];
 
@@ -43,44 +51,70 @@ tundev ()
   for (th = 0; th < num_tundevthreads; th++)
     {
       log_debug ("Creating thread %d...\n", th);
-      if ((rc = udpsrvthread_create (&(tundevthreads[th]))))
+      if ((rc = tundevthread_create (&(tundevthreads[th]))))
 	{
 	  log_error ("Thread %d creation failed: %d\n", th, rc);
 	  break;
 	}
     }
-    
-    /*
-     Begin TUN initzaitzation
-     Copyright (C) 2001-2005 Ivo Timmermans,
-         GPL       2001-2006 Guus Sliepen <guus@tinc-vpn.org>
-    */
-	iface = netname; //Linux
-	//iface = rindex(device, '/') ? rindex(device, '/') + 1 : device;
-	device_fd = open(device, O_RDWR | O_NONBLOCK);
 
-	if(device_fd < 0)
-      {
-	    log_error ("Could not open %s: %s", device, strerror(errno));
-        return;
-      }
+  // Begin TUN initzaitzation
+  //iface = rindex(tundevice, '/') ? rindex(tundevice, '/') + 1 : tundevice;
+  iface = tunname;
+  sd_tun = open (tundevice, O_RDWR);	// | O_NONBLOCK);
 
-	memset(&ifr, 0, sizeof(ifr));
-    ifr.ifr_flags = IFF_TUN;
-    
-	if(iface)
-		strncpy(ifr.ifr_name, iface, IFNAMSIZ);
+  if (sd_tun < 0)
+    {
+      log_error ("Could not open %s.\n", tundevice);
+      return;
+    }
 
-	if(!ioctl(device_fd, TUNSETIFF, &ifr)) {
-		strncpy(ifrname, ifr.ifr_name, IFNAMSIZ);
-		iface = ifrname;
-	} else if(!ioctl(device_fd, (('T' << 8) | 202), &ifr)) {
-		strncpy(ifrname, ifr.ifr_name, IFNAMSIZ);
-		iface = ifrname;
-	} else
-		//overwrite_mac = true;
-		iface = rindex(device, '/') ? rindex(device, '/') + 1 : device;
+  memset (&ifr, 0, sizeof (ifr));
+  ifr.ifr_flags = IFF_TUN;
+
+  if (iface)
+    strncpy (ifr.ifr_name, iface, IFNAMSIZ);
+
+  if (!ioctl (sd_tun, TUNSETIFF, &ifr))
+    {
+      strncpy (ifrname, ifr.ifr_name, IFNAMSIZ);
+      iface = ifrname;
+    }
+  else if (!ioctl (sd_tun, (('T' << 8) | 202), &ifr))
+    {
+      strncpy (ifrname, ifr.ifr_name, IFNAMSIZ);
+      iface = ifrname;
+    }
+  else
+    {
+      //overwrite_mac = true;
+      iface =
+	rindex (tundevice, '/') ? rindex (tundevice, '/') + 1 : tundevice;
+    }
+
+  //End TUN initzaitzation
+  while (1)
+    {
+      for (th = 0; th < num_tundevthreads; th++)
+	{
+	  if (pthread_mutex_trylock (&tundevthreads[th].thread_mutex) == 0)
+	    {
+	      pthread_mutex_lock (&tundevthreads[th].cond_mutex);
+	      tundevthreads[th].buffer_len =
+		read (sd_tun, tundevthreads[th].buffer,
+		      sizeof (tundevthreads[th].buffer));
+	      if (tundevthreads[th].buffer_len > 0)
+		{
+		  pthread_cond_signal (&tundevthreads[th].cond);
+		}
+	      else
+		{
+		  pthread_mutex_unlock (&tundevthreads[th].thread_mutex);
+		  log_error ("Error reading form interface %s\n", iface);
+		}
+	      pthread_mutex_unlock (&tundevthreads[th].cond_mutex);
+	      break;
+	    }
 	}
-
-    //End TUN initzaitzation
+    }
 }

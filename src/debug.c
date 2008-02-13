@@ -33,7 +33,7 @@ log_debug (const char *format, void **args)
 {
 #ifdef DEBUG
   fprintf (stdout, format, args);
-  fflush(stdout);
+  fflush (stdout);
 #endif
 }
 
@@ -42,7 +42,7 @@ log_info (const char *format, void **args)
 {
 #ifdef DEBUG
   fprintf (stdout, format, args);
-  fflush(stdout);
+  fflush (stdout);
 #endif
 }
 
@@ -51,6 +51,6 @@ log_error (const char *format, void **args)
 {
 #ifdef DEBUG
   fprintf (stderr, format, args);
-  fflush(stderr);
+  fflush (stderr);
 #endif
 }

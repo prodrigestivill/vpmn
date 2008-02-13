@@ -44,15 +44,15 @@ udpsrvsession_search (char *s_addr, int s_port)
   struct udpsrvsession_l *cursession;
   int local_mutex = 0;
   if (udpsrvsessions == NULL)
-	{
-      pthread_mutex_lock(&udpsrvsessions_mutex);
+    {
+      pthread_mutex_lock (&udpsrvsessions_mutex);
       local_mutex = 1;
-	  if (udpsrvsessions != NULL)
-		{
-		  pthread_mutex_unlock(&udpsrvsessions_mutex);
-		  local_mutex = 0;
-		}
+      if (udpsrvsessions != NULL)
+	{
+	  pthread_mutex_unlock (&udpsrvsessions_mutex);
+	  local_mutex = 0;
 	}
+    }
   //Search the session.
   cursession = udpsrvsessions;
   while (cursession != NULL)
@@ -63,24 +63,24 @@ udpsrvsession_search (char *s_addr, int s_port)
 	{
 	  return cursession->current;
 	}
-	  if (cursession->next == NULL)
+      if (cursession->next == NULL)
+	{
+	  pthread_mutex_lock (&udpsrvsessions_mutex);
+	  local_mutex = 1;
+	  if (cursession->next != NULL)
 	    {
-	      pthread_mutex_lock(&udpsrvsessions_mutex);
-	      local_mutex = 1;
-	      if (cursession->next != NULL)
-            {
-              pthread_mutex_unlock(&udpsrvsessions_mutex);
-              local_mutex = 0;
-            }
-	      else
-            break;
+	      pthread_mutex_unlock (&udpsrvsessions_mutex);
+	      local_mutex = 0;
+	    }
+	  else
+	    break;
 
-	    }		
+	}
       cursession = cursession->next;
     }
   //Add new session
   if (local_mutex == 0)
-    pthread_mutex_lock(&udpsrvsessions_mutex);
+    pthread_mutex_lock (&udpsrvsessions_mutex);
   cursession = malloc (sizeof (struct udpsrvsession_l));
   cursession->current = udpsrvsession_create (s_addr, s_port);
   cursession->next = NULL;
@@ -89,7 +89,7 @@ udpsrvsession_search (char *s_addr, int s_port)
   if (udpsrvsessions_last != NULL)
     udpsrvsessions_last->next = cursession;
   udpsrvsessions_last = cursession;
-  pthread_mutex_unlock(&udpsrvsessions_mutex);
+  pthread_mutex_unlock (&udpsrvsessions_mutex);
   return cursession->current;
 }
 

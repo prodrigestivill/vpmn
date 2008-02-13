@@ -13,7 +13,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
- 
+
 #ifndef _TUNDEVTHREAD_H
 #define _TUNDEVTHREAD_H
 
@@ -25,10 +25,10 @@ struct tundevthread_t
   pthread_mutex_t thread_mutex;
   pthread_cond_t cond;
   pthread_mutex_t cond_mutex;
-  char buffer[65535 * sizeof (char)];
+  char buffer[1600 * sizeof (char)];
   int buffer_len;
 };
 
+void tundevthread (struct tundevthread_t *me);
+int tundevthread_create (struct tundevthread_t *new);
 #endif /* _TUNDEVTHREAD_H */
-
- 

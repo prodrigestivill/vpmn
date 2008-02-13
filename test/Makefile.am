@@ -13,7 +13,19 @@ AM_CFLAGS =\
 
 bin_PROGRAMS = \
 	udpsrvtest\
-	udpsrvsessiontest
+	udpsrvsessiontest \
+	tundevtest
+
+tundevtest_SOURCES = \
+	tundevtest.c\
+	../src/tundev.c \
+	../src/tundevthread.c \
+	../src/tundevthread.h \
+	../src/debug.c \
+	../src/debug.h
+
+tundevtest_LDFLAGS = \
+	-lpthread
 
 udpsrvsessiontest_SOURCES = \
 	udpsrvsessiontest.c\

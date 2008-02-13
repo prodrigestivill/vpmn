@@ -21,7 +21,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
- 
+
 #include <pthread.h>
 #include "tundevthread.h"
 #include "debug.h"
@@ -33,9 +33,8 @@ tundevthread (struct tundevthread_t *me)
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
-      log_debug ("Thread waiting...\n");
       pthread_cond_wait (&me->cond, &me->cond_mutex);
-      log_debug ("%s\n", &me->buffer);
+      log_debug ("Recived: %s\n", &me->buffer);
 
       pthread_mutex_unlock (&me->thread_mutex);
     }
