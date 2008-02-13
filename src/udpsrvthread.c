@@ -37,11 +37,9 @@ udpsrvthread (struct udpsrvthread_t *me)
   char *s_addr;
   int s_port;
   struct udpsrvsession_t *udpsession;
-  log_debug ("Thread locking...\n");
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
-      log_debug ("Thread waiting...\n");
       pthread_cond_wait (&me->cond, &me->cond_mutex);
       s_addr = inet_ntoa (me->addr.sin_addr);
       s_port = ntohs (me->addr.sin_port);

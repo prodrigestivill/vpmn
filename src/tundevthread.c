@@ -29,12 +29,11 @@
 void
 tundevthread (struct tundevthread_t *me)
 {
-  log_debug ("Thread locking...\n");
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
       pthread_cond_wait (&me->cond, &me->cond_mutex);
-      log_debug ("Recived: %s\n", &me->buffer);
+      log_debug ("Recived (%d bytes): %s\n", me->buffer_len, me->buffer);
 
       pthread_mutex_unlock (&me->thread_mutex);
     }

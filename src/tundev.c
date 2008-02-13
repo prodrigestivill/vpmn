@@ -30,7 +30,6 @@
 #include <linux/if_tun.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-#define DEFAULT_DEVICE
 
 char *tundevice = "/dev/net/tun";
 char *tunname = "vpmn0";
@@ -50,7 +49,6 @@ tundev ()
 
   for (th = 0; th < num_tundevthreads; th++)
     {
-      log_debug ("Creating thread %d...\n", th);
       if ((rc = tundevthread_create (&(tundevthreads[th]))))
 	{
 	  log_error ("Thread %d creation failed: %d\n", th, rc);

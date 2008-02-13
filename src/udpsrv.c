@@ -41,22 +41,18 @@ int port_udp = 1090;
 void
 udpsrv ()
 {
-  int rc, th;
+  int rc, th, sd_udp;
+  struct sockaddr_in bind_addr;
   struct udpsrvthread_t udpsrvthreads[num_udpsrvthreads];
 
   for (th = 0; th < num_udpsrvthreads; th++)
     {
-      log_debug ("Creating thread %d...\n", th);
       if ((rc = udpsrvthread_create (&(udpsrvthreads[th]))))
 	{
 	  log_error ("Thread %d creation failed: %d\n", th, rc);
 	  break;
 	}
     }
-  sleep (2);
-  log_debug ("Starting...\n");
-  int sd_udp;
-  struct sockaddr_in bind_addr;
   bzero (&bind_addr, sizeof (bind_addr));
   sd_udp = socket (PF_INET, SOCK_DGRAM, 0);
   bind_addr.sin_family = AF_INET;
@@ -64,15 +60,12 @@ udpsrv ()
   bind_addr.sin_port = htons (port_udp);
   if (bind (sd_udp, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
     log_error ("Bind error\n");
-  log_debug ("Listening...\n");
   while (1)
     {
       for (th = 0; th < num_udpsrvthreads; th++)
 	{
-	  log_debug ("Try thread %d...", th);
 	  if (pthread_mutex_trylock (&udpsrvthreads[th].thread_mutex) == 0)
 	    {
-	      log_debug (" selected.\n");
 	      pthread_mutex_lock (&udpsrvthreads[th].cond_mutex);
 	      udpsrvthreads[th].addr_len = sizeof (udpsrvthreads[th].addr);
 	      bzero (&udpsrvthreads[th].addr, udpsrvthreads[th].addr_len);
@@ -93,11 +86,8 @@ udpsrv ()
 		}
 
 	    }
-	  else
-	    log_debug (" busy.\n");
-
 	}
-      if (th >= num_udpsrvthreads)
-	log_debug ("All threads busy, trying again.");
+      /*if (th >= num_udpsrvthreads)
+         sleep */
     }
 }
