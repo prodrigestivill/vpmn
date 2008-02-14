@@ -22,7 +22,9 @@ tundevtest_SOURCES = \
 	../src/tundevthread.c \
 	../src/tundevthread.h \
 	../src/debug.c \
-	../src/debug.h
+	../src/debug.h \
+	../src/config.h \
+	../src/config.c
 
 tundevtest_LDFLAGS = \
 	-lpthread
@@ -36,7 +38,9 @@ udpsrvsessiontest_SOURCES = \
 	../src/udpsrvsession.c \
 	../src/udpsrvsession.h \
 	../src/udpsrvdtls.c \
-	../src/udpsrvdtls.h
+	../src/udpsrvdtls.h \
+	../config.h \
+	../src/config.c
 
 udpsrvsessiontest_LDFLAGS = \
 	-lpthread
@@ -51,7 +55,9 @@ udpsrvtest_SOURCES = \
 	../src/udpsrvsession.c \
 	../src/udpsrvsession.h \
 	../src/udpsrvthread.c \
-	../src/udpsrvthread.h
+	../src/udpsrvthread.h \
+	../src/config.h \
+	../src/config.c
 
 udpsrvtest_LDFLAGS = \
 	-lpthread

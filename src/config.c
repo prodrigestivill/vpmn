@@ -1,7 +1,7 @@
 /***************************************************************************
- *            udpsrvthread.h
+ *            config.c
  *
- *  Tue Feb  5 11:13:32 2008
+ *  Thu Feb 14 18:40:38 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -22,27 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _UDPSRVTHREAD_H
-#define _UDPSRVTHREAD_H
-
-#include <pthread.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <resolv.h>
 #include "config.h"
 
-struct udpsrvthread_t
-{
-  pthread_t thread;
-  pthread_mutex_t thread_mutex;
-  pthread_cond_t cond;
-  pthread_mutex_t cond_mutex;
-  char buffer[UDPBUFFERSIZE];
-  int buffer_len;
-  struct sockaddr_in addr;
-  socklen_t addr_len;
-};
+//TUNDEV
+char *tunname = "vpmn0";
+int num_tundevthreads = 10;
+int tunmtu = 1500;
 
-void udpsrvthread (struct udpsrvthread_t *me);
-int udpsrvthread_create (struct udpsrvthread_t *new);
-#endif /* _UDPSRVTHREAD_H */
+//UDPSRV
+int num_udpsrvthreads = 4;
+int port_udp = 1090;

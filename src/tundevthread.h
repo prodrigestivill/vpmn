@@ -18,6 +18,7 @@
 #define _TUNDEVTHREAD_H
 
 #include <pthread.h>
+#include "config.h"
 
 struct tundevthread_t
 {
@@ -25,7 +26,7 @@ struct tundevthread_t
   pthread_mutex_t thread_mutex;
   pthread_cond_t cond;
   pthread_mutex_t cond_mutex;
-  char buffer[65535 * sizeof (char)];
+  char buffer[TUNBUFFERSIZE];
   int buffer_len;
 };
 

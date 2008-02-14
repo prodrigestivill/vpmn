@@ -1,7 +1,7 @@
 /***************************************************************************
- *            udpsrvthread.h
+ *            config.h
  *
- *  Tue Feb  5 11:13:32 2008
+ *  Thu Feb 14 18:30:32 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -22,27 +22,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _UDPSRVTHREAD_H
-#define _UDPSRVTHREAD_H
+#ifndef _CONFIG_H
+#define _CONFIG_H
 
-#include <pthread.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <resolv.h>
-#include "config.h"
+#define DEBUG 1
 
-struct udpsrvthread_t
-{
-  pthread_t thread;
-  pthread_mutex_t thread_mutex;
-  pthread_cond_t cond;
-  pthread_mutex_t cond_mutex;
-  char buffer[UDPBUFFERSIZE];
-  int buffer_len;
-  struct sockaddr_in addr;
-  socklen_t addr_len;
-};
+//TUNDEV
+#define TUNDEVICE "/dev/net/tun"
+#define TUNBUFFERSIZE 65535
+char *tunname;
+int num_tundevthreads;
+int tunmtu;
 
-void udpsrvthread (struct udpsrvthread_t *me);
-int udpsrvthread_create (struct udpsrvthread_t *new);
-#endif /* _UDPSRVTHREAD_H */
+//UDPSRV
+#define UDPBUFFERSIZE 65535
+int num_udpsrvthreads;
+int port_udp;
+
+#endif /* _CONFIG_H */

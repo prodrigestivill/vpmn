@@ -31,17 +31,15 @@
 #include <linux/if_tun.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include "config.h"
 
-#define TUNDEVICE "/dev/net/tun"
-char *tunname = "vpmn0";
-int num_tundevthreads = 10;
-int tunmtu = 1500;
-
-int tundev_initdev(char *iface){
+int
+tundev_initdev (char *iface)
+{
   int sd_tun = -1;
-  int iface_len = strlen(iface);
+  int iface_len = strlen (iface);
   struct ifreq ifr;
-  
+
   if ((sd_tun = open (TUNDEVICE, O_RDWR)) < 0)
     {
       log_error ("Could not open %s.\n", TUNDEVICE);
@@ -56,15 +54,15 @@ int tundev_initdev(char *iface){
 
   if (ioctl (sd_tun, TUNSETIFF, &ifr) < 0)
     {
-      free(&ifr);
-      close(sd_tun);
+      free (&ifr);
+      close (sd_tun);
       log_error ("Could not create interface %s.\n", iface);
       return -1;
     }
-  
+
   if (iface_len == 0)
     strncpy (iface, ifr.ifr_name, IFNAMSIZ);
-  
+
   return sd_tun;
 }
 
@@ -84,9 +82,9 @@ tundev ()
 	  break;
 	}
     }
-  
+
   strncpy (ifrname, tunname, IFNAMSIZ);
-  sd_tun = tundev_initdev(ifrname);
+  sd_tun = tundev_initdev (ifrname);
   while (1)
     {
       for (th = 0; th < num_tundevthreads; th++)

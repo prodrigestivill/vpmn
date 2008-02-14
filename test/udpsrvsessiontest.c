@@ -32,9 +32,8 @@
 
 
 #include "../src/debug.h"
+#include "../src/config.h"
 #include "../src/udpsrvsession.h"
-
-int port_udp = 1090;
 
 int
 main ()

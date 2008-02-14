@@ -34,9 +34,7 @@
 
 #include "udpsrvthread.h"
 #include "debug.h"
-
-int num_udpsrvthreads = 4;
-int port_udp = 1090;
+#include "config.h"
 
 void
 udpsrv ()

@@ -28,7 +28,9 @@ vpmnd_SOURCES = \
 	udpsrvdtls.h \
 	tundev.c \
 	tundevthread.c \
-	tundevthread.h
+	tundevthread.h \
+	config.h \
+	config.c
 
 vpmnd_LDFLAGS = \
 	-lpthread
