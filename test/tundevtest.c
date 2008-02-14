@@ -1,4 +1,4 @@
-void tundev ();
+#include "../src/tundev.h"
 
 int
 main ()

@@ -22,8 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#include "debug.h"
-#include "tundevthread.h"
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -32,6 +30,10 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include "config.h"
+#include "debug.h"
+#include "tundevthread.h"
+
+int tundev_fd = -1;
 
 int
 tundev_initdev (char *iface)
@@ -66,11 +68,18 @@ tundev_initdev (char *iface)
   return sd_tun;
 }
 
+int
+tundev_write (const void *buf, int count)
+{
+  if (tundev_fd >= 0)
+    return write (tundev_fd, buf, count);
+  return -1;
+}
+
 void
 tundev ()
 {
   int rc, th;
-  int sd_tun = -1;
   char ifrname[IFNAMSIZ];
   struct tundevthread_t tundevthreads[num_tundevthreads];
 
@@ -84,7 +93,12 @@ tundev ()
     }
 
   strncpy (ifrname, tunname, IFNAMSIZ);
-  sd_tun = tundev_initdev (ifrname);
+  tundev_fd = tundev_initdev (ifrname);
+  if (tundev_fd < 0)
+    {
+      log_error ("Could not create interface %s.\n", iface);
+      return;
+    }
   while (1)
     {
       for (th = 0; th < num_tundevthreads; th++)
@@ -93,7 +107,7 @@ tundev ()
 	    {
 	      pthread_mutex_lock (&tundevthreads[th].cond_mutex);
 	      tundevthreads[th].buffer_len =
-		read (sd_tun, tundevthreads[th].buffer,
+		read (tundev_fd, tundevthreads[th].buffer,
 		      sizeof (tundevthreads[th].buffer));
 	      if (tundevthreads[th].buffer_len > 0)
 		{

@@ -1,7 +1,7 @@
 /***************************************************************************
- *            tundevthread.h
+ *            tundev.h
  *
- *  Tue Feb 12 09:51:18 2008
+ *  Thu Feb 14 20:08:12 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -22,22 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _TUNDEVTHREAD_H
-#define _TUNDEVTHREAD_H
+#ifndef _TUNDEV_H
+#define _TUNDEV_H
 
-#include <pthread.h>
-#include "config.h"
+int tundev_initdev (char *iface);
+int tundev_write (const void *buf, int count);
+void tundev ();
 
-struct tundevthread_t
-{
-  pthread_t thread;
-  pthread_mutex_t thread_mutex;
-  pthread_cond_t cond;
-  pthread_mutex_t cond_mutex;
-  char buffer[TUNBUFFERSIZE];
-  int buffer_len;
-};
-
-void tundevthread (struct tundevthread_t *me);
-int tundevthread_create (struct tundevthread_t *new);
-#endif /* _TUNDEVTHREAD_H */
+#endif /* _TUNDEV_H */

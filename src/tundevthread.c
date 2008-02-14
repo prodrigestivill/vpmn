@@ -2,8 +2,8 @@
  *            tundevthread.c
  *
  *  Tue Feb 12 09:51:17 2008
- *  Copyright  2008  plue
- *  <plue@<host>>
+ *  Copyright  2008  Pau Rodriguez-Estivill
+ *  <prodrigestivill@gmail.com>
  ****************************************************************************/
 
 /*

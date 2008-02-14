@@ -30,7 +30,8 @@ vpmnd_SOURCES = \
 	tundevthread.c \
 	tundevthread.h \
 	config.h \
-	config.c
+	config.c \
+	tundev.h
 
 vpmnd_LDFLAGS = \
 	-lpthread

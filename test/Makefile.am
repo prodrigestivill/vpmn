@@ -24,7 +24,8 @@ tundevtest_SOURCES = \
 	../src/debug.c \
 	../src/debug.h \
 	../src/config.h \
-	../src/config.c
+	../src/config.c \
+	../src/tundev.h
 
 tundevtest_LDFLAGS = \
 	-lpthread
