@@ -25,7 +25,7 @@ struct tundevthread_t
   pthread_mutex_t thread_mutex;
   pthread_cond_t cond;
   pthread_mutex_t cond_mutex;
-  char buffer[1600 * sizeof (char)];
+  char buffer[65535 * sizeof (char)];
   int buffer_len;
 };
 

@@ -25,26 +25,55 @@
 #include "debug.h"
 #include "tundevthread.h"
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <net/if.h>
 #include <linux/if_tun.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 
-char *tundevice = "/dev/net/tun";
+#define TUNDEVICE "/dev/net/tun"
 char *tunname = "vpmn0";
 int num_tundevthreads = 10;
 int tunmtu = 1500;
+
+int tundev_initdev(char *iface){
+  int sd_tun = -1;
+  int iface_len = strlen(iface);
+  struct ifreq ifr;
+  
+  if ((sd_tun = open (TUNDEVICE, O_RDWR)) < 0)
+    {
+      log_error ("Could not open %s.\n", TUNDEVICE);
+      return -1;
+    }
+
+  memset (&ifr, 0, sizeof (ifr));
+  ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
+
+  if (iface_len > 0)
+    strncpy (ifr.ifr_name, iface, IFNAMSIZ);
+
+  if (ioctl (sd_tun, TUNSETIFF, &ifr) < 0)
+    {
+      free(&ifr);
+      close(sd_tun);
+      log_error ("Could not create interface %s.\n", iface);
+      return -1;
+    }
+  
+  if (iface_len == 0)
+    strncpy (iface, ifr.ifr_name, IFNAMSIZ);
+  
+  return sd_tun;
+}
 
 void
 tundev ()
 {
   int rc, th;
   int sd_tun = -1;
-  char *iface;
   char ifrname[IFNAMSIZ];
-
-  struct ifreq ifr;
   struct tundevthread_t tundevthreads[num_tundevthreads];
 
   for (th = 0; th < num_tundevthreads; th++)
@@ -55,42 +84,9 @@ tundev ()
 	  break;
 	}
     }
-
-  // Begin TUN initzaitzation
-  //iface = rindex(tundevice, '/') ? rindex(tundevice, '/') + 1 : tundevice;
-  iface = tunname;
-  sd_tun = open (tundevice, O_RDWR);	// | O_NONBLOCK);
-
-  if (sd_tun < 0)
-    {
-      log_error ("Could not open %s.\n", tundevice);
-      return;
-    }
-
-  memset (&ifr, 0, sizeof (ifr));
-  ifr.ifr_flags = IFF_TUN;
-
-  if (iface)
-    strncpy (ifr.ifr_name, iface, IFNAMSIZ);
-
-  if (!ioctl (sd_tun, TUNSETIFF, &ifr))
-    {
-      strncpy (ifrname, ifr.ifr_name, IFNAMSIZ);
-      iface = ifrname;
-    }
-  else if (!ioctl (sd_tun, (('T' << 8) | 202), &ifr))
-    {
-      strncpy (ifrname, ifr.ifr_name, IFNAMSIZ);
-      iface = ifrname;
-    }
-  else
-    {
-      //overwrite_mac = true;
-      iface =
-	rindex (tundevice, '/') ? rindex (tundevice, '/') + 1 : tundevice;
-    }
-
-  //End TUN initzaitzation
+  
+  strncpy (ifrname, tunname, IFNAMSIZ);
+  sd_tun = tundev_initdev(ifrname);
   while (1)
     {
       for (th = 0; th < num_tundevthreads; th++)
@@ -108,7 +104,7 @@ tundev ()
 	      else
 		{
 		  pthread_mutex_unlock (&tundevthreads[th].thread_mutex);
-		  log_error ("Error reading form interface %s\n", iface);
+		  log_error ("Error reading form interface %s\n", ifrname);
 		}
 	      pthread_mutex_unlock (&tundevthreads[th].cond_mutex);
 	      break;

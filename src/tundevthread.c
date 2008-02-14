@@ -33,8 +33,8 @@ tundevthread (struct tundevthread_t *me)
   while (1)
     {
       pthread_cond_wait (&me->cond, &me->cond_mutex);
-      log_debug ("Recived (%d bytes): %s\n", me->buffer_len, me->buffer);
-
+      //ROUTING
+      //DTLS
       pthread_mutex_unlock (&me->thread_mutex);
     }
   pthread_mutex_unlock (&me->cond_mutex);
