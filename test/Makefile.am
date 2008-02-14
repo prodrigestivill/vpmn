@@ -39,8 +39,8 @@ udpsrvsessiontest_SOURCES = \
 	../src/udpsrvsession.h \
 	../src/udpsrvdtls.c \
 	../src/udpsrvdtls.h \
-	../config.h \
-	../src/config.c
+	../src/config.c \
+	../src/config.h
 
 udpsrvsessiontest_LDFLAGS = \
 	-lpthread

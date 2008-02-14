@@ -38,7 +38,7 @@
 int
 main ()
 {
-  char buffer[65535 * sizeof (char)];
+  char buffer[UDPBUFFERSIZE];
   int buffer_len;
   char *s_addr;
   int s_port;
