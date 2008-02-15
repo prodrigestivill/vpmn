@@ -26,7 +26,19 @@ AC_SUBST(VPMN_CFLAGS)
 AC_SUBST(VPMN_LIBS)
 
 
+dnl Check and set OS
 
+#AC_CANONICAL_HOST
+
+case $host_os in
+  *linux*)
+    AC_DEFINE(HAVE_LINUX, 1, [Linux])
+    [ rm -f src/tundev.c; ln -sf linux/tundev.c src/tundev.c ]
+  ;;
+  *)
+    AC_MSG_ERROR("Unknown operating system.")
+  ;;
+esac
 
 AC_OUTPUT([
 Makefile

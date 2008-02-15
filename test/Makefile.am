@@ -18,14 +18,15 @@ bin_PROGRAMS = \
 
 tundevtest_SOURCES = \
 	tundevtest.c\
-	../src/tundev.c \
 	../src/tundevthread.c \
 	../src/tundevthread.h \
 	../src/debug.c \
 	../src/debug.h \
 	../src/config.h \
 	../src/config.c \
-	../src/tundev.h
+	../src/tundev.h \
+	../src/tundev.c \
+	../src/tunsrv.c 
 
 tundevtest_LDFLAGS = \
 	-lpthread

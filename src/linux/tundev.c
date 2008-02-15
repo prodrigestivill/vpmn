@@ -25,15 +25,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <fcntl.h>
 #include <net/if.h>
 #include <linux/if_tun.h>
-#include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include "config.h"
 #include "debug.h"
-#include "tundevthread.h"
 
 int tundev_fd = -1;
 
@@ -59,7 +58,7 @@ tundev_initdev ()
     }
 
   memset (&ifr, 0, sizeof (ifr));
-  ifr.ifr_flags = IFF_TUN;	// | IFF_NO_PI;
+  ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
   if (iface_len > 0)
     strncpy (ifr.ifr_name, iface, IFNAMSIZ);
 
@@ -126,42 +125,10 @@ tundev_write (const void *buf, int count)
   return -1;
 }
 
-void
-tundev ()
+int
+tundev_read (void *buf, int count)
 {
-  int rc, th;
-  struct tundevthread_t tundevthreads[num_tundevthreads];
-
-  for (th = 0; th < num_tundevthreads; th++)
-    {
-      if ((rc = tundevthread_create (&(tundevthreads[th]))))
-	{
-	  log_error ("Thread %d creation failed: %d\n", th, rc);
-	  break;
-	}
-    }
-  while (1)
-    {
-      for (th = 0; th < num_tundevthreads; th++)
-	{
-	  if (pthread_mutex_trylock (&tundevthreads[th].thread_mutex) == 0)
-	    {
-	      pthread_mutex_lock (&tundevthreads[th].cond_mutex);
-	      tundevthreads[th].buffer_len =
-		read (tundev_fd, tundevthreads[th].buffer,
-		      sizeof (tundevthreads[th].buffer));
-	      if (tundevthreads[th].buffer_len > 0)
-		{
-		  pthread_cond_signal (&tundevthreads[th].cond);
-		}
-	      else
-		{
-		  pthread_mutex_unlock (&tundevthreads[th].thread_mutex);
-		  log_error ("Error reading form interface.\n");
-		}
-	      pthread_mutex_unlock (&tundevthreads[th].cond_mutex);
-	      break;
-	    }
-	}
-    }
+  if (tundev_fd >= 0)
+    return read (tundev_fd, buf, count);
+  return -1;
 }

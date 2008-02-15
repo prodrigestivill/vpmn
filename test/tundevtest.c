@@ -1,4 +1,7 @@
+#include "../src/config.h"
+#include "../src/debug.h"
 #include "../src/tundev.h"
+void tunsrv ();
 
 int
 main ()
@@ -9,6 +12,6 @@ main ()
       log_error ("Could not create the interface.\n");
       return -1;
     }
-  tundev ();
+  tunsrv ();
   return 0;
 }

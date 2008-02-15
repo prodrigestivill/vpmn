@@ -47,7 +47,8 @@ udpsrv_init ()
   bind_addr.sin_family = AF_INET;
   bind_addr.sin_addr.s_addr = htonl (INADDR_ANY);
   bind_addr.sin_port = htons (port_udp);
-  if (bind (udpsrv_fd, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
+  if (bind (udpsrv_fd, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) !=
+      0)
     {
       log_error ("Bind error\n");
       return -1;
@@ -56,10 +57,11 @@ udpsrv_init ()
 }
 
 int
-udpsrv_write (const void *buf, int count)
+udpsrv_sendto (const void *buf, size_t len, const struct sockaddr *to,
+	       socklen_t tolen)
 {
   if (udpsrv_fd >= 0)
-    return write (udpsrv_fd, buf, count);
+    return sendto (udpsrv_fd, buf, len, 0, to, tolen);
   return -1;
 }
 
