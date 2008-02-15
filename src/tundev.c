@@ -38,13 +38,21 @@
 int tundev_fd = -1;
 
 int
-tundev_initdev (char *iface)
+tundev_initdev ()
 {
-  int sd_tun = -1, sd_sock;
-  int iface_len = strlen (iface);
+  int sd_sock, iface_len;
   struct sockaddr_in tunaddr_dst;
   struct ifreq ifr;
-  if ((sd_tun = open (TUNDEVICE, O_RDWR)) < 0)
+  char iface[IFNAMSIZ];
+  strncpy (iface, tunname, IFNAMSIZ);
+  iface_len = strlen (iface);
+
+  if (tundev_fd != -1)
+    {
+      log_error ("Already initalitzed.\n");
+      return -1;
+    }
+  if ((tundev_fd = open (TUNDEVICE, O_RDWR)) < 0)
     {
       log_error ("Could not open %s.\n", TUNDEVICE);
       return -1;
@@ -55,10 +63,9 @@ tundev_initdev (char *iface)
   if (iface_len > 0)
     strncpy (ifr.ifr_name, iface, IFNAMSIZ);
 
-  if (ioctl (sd_tun, TUNSETIFF, &ifr) < 0)
+  if (ioctl (tundev_fd, TUNSETIFF, &ifr) < 0)
     {
-      close (sd_tun);
-      log_error ("Could not create interface %s.\n", iface);
+      close (tundev_fd);
       return -1;
     }
   if (iface_len == 0)
@@ -105,9 +112,10 @@ tundev_initdev (char *iface)
 	{
 	  log_error ("Could not configure flags of the interface.\n", iface);
 	}
+      close (sd_sock);
     }
 
-  return sd_tun;
+  return tundev_fd;
 }
 
 int
@@ -122,7 +130,6 @@ void
 tundev ()
 {
   int rc, th;
-  char ifrname[IFNAMSIZ];
   struct tundevthread_t tundevthreads[num_tundevthreads];
 
   for (th = 0; th < num_tundevthreads; th++)
@@ -133,15 +140,6 @@ tundev ()
 	  break;
 	}
     }
-  log_debug ("Creating interface: %s\n", tunname);
-  strncpy (ifrname, tunname, IFNAMSIZ);
-  tundev_fd = tundev_initdev (ifrname);
-  if (tundev_fd < 0)
-    {
-      log_error ("Could not create interface %s.\n", ifrname);
-      return;
-    }
-  log_debug ("Created interface: %s\n", ifrname);
   while (1)
     {
       for (th = 0; th < num_tundevthreads; th++)
@@ -159,7 +157,7 @@ tundev ()
 	      else
 		{
 		  pthread_mutex_unlock (&tundevthreads[th].thread_mutex);
-		  log_error ("Error reading form interface %s\n", ifrname);
+		  log_error ("Error reading form interface.\n");
 		}
 	      pthread_mutex_unlock (&tundevthreads[th].cond_mutex);
 	      break;

@@ -36,11 +36,37 @@
 #include "debug.h"
 #include "config.h"
 
+int udpsrv_fd = -1;
+
+int
+udpsrv_init ()
+{
+  struct sockaddr_in bind_addr;
+  bzero (&bind_addr, sizeof (bind_addr));
+  udpsrv_fd = socket (PF_INET, SOCK_DGRAM, 0);
+  bind_addr.sin_family = AF_INET;
+  bind_addr.sin_addr.s_addr = htonl (INADDR_ANY);
+  bind_addr.sin_port = htons (port_udp);
+  if (bind (udpsrv_fd, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
+    {
+      log_error ("Bind error\n");
+      return -1;
+    }
+  return 0;
+}
+
+int
+udpsrv_write (const void *buf, int count)
+{
+  if (udpsrv_fd >= 0)
+    return write (udpsrv_fd, buf, count);
+  return -1;
+}
+
 void
 udpsrv ()
 {
-  int rc, th, sd_udp;
-  struct sockaddr_in bind_addr;
+  int rc, th;
   struct udpsrvthread_t udpsrvthreads[num_udpsrvthreads];
 
   for (th = 0; th < num_udpsrvthreads; th++)
@@ -51,13 +77,7 @@ udpsrv ()
 	  break;
 	}
     }
-  bzero (&bind_addr, sizeof (bind_addr));
-  sd_udp = socket (PF_INET, SOCK_DGRAM, 0);
-  bind_addr.sin_family = AF_INET;
-  bind_addr.sin_addr.s_addr = htonl (INADDR_ANY);
-  bind_addr.sin_port = htons (port_udp);
-  if (bind (sd_udp, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
-    log_error ("Bind error\n");
+
   while (1)
     {
       for (th = 0; th < num_udpsrvthreads; th++)
@@ -68,7 +88,7 @@ udpsrv ()
 	      udpsrvthreads[th].addr_len = sizeof (udpsrvthreads[th].addr);
 	      bzero (&udpsrvthreads[th].addr, udpsrvthreads[th].addr_len);
 	      udpsrvthreads[th].buffer_len =
-		recvfrom (sd_udp, udpsrvthreads[th].buffer,
+		recvfrom (udpsrv_fd, udpsrvthreads[th].buffer,
 			  sizeof (udpsrvthreads[th].buffer), 0,
 			  (struct sockaddr *) &udpsrvthreads[th].addr,
 			  &udpsrvthreads[th].addr_len);

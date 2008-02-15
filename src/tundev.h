@@ -25,7 +25,7 @@
 #ifndef _TUNDEV_H
 #define _TUNDEV_H
 
-int tundev_initdev (char *iface);
+int tundev_initdev ();
 int tundev_write (const void *buf, int count);
 void tundev ();
 
