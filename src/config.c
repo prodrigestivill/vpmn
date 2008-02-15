@@ -22,13 +22,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#include "debug.h"
 #include "config.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
-//TUNDEV
-char *tunname = "vpmn0";
-int num_tundevthreads = 10;
-int tunmtu = 1500;
+void
+config_load ()
+{
+  //TUNDEV
+  tunname = "vpmn0";
 
-//UDPSRV
-int num_udpsrvthreads = 4;
-int port_udp = 1090;
+  char *tunaddr_ip_str = "10.0.0.5";
+  char *tunaddr_nm_str = "255.255.255.0";
+  tunaddr_ip.sin_family = AF_INET;
+  tunaddr_nm.sin_family = AF_INET;
+  if (inet_aton (tunaddr_ip_str, &tunaddr_ip.sin_addr) == 0
+      || inet_aton (tunaddr_nm_str, &tunaddr_nm.sin_addr) == 0)
+    log_error ("Loading IP configurations.");
+
+  num_tundevthreads = 10;
+  tundevmtu = 1450;
+
+  //UDPSRV
+  num_udpsrvthreads = 4;
+  port_udp = 1090;
+}

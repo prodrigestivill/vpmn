@@ -24,6 +24,8 @@
 
 #include <pthread.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 #include "udpsrvsession.h"
 #include "debug.h"
 
@@ -39,8 +41,9 @@ struct udpsrvsession_l *udpsrvsessions_last = NULL;
 pthread_mutex_t udpsrvsessions_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct udpsrvsession_t *
-udpsrvsession_search (char *s_addr, int s_port)
+udpsrvsession_search (struct sockaddr_in *source)
 {
+  int sin_size = sizeof (struct sockaddr_in);
   struct udpsrvsession_l *cursession;
   int local_mutex = 0;
   if (udpsrvsessions == NULL)
@@ -53,13 +56,12 @@ udpsrvsession_search (char *s_addr, int s_port)
 	  local_mutex = 0;
 	}
     }
-  //Search the session.
+  //Search the session
   cursession = udpsrvsessions;
   while (cursession != NULL)
     {
       if ((cursession->current != NULL)
-	  && (s_port == cursession->current->s_port)
-	  && (strcmp (s_addr, cursession->current->s_addr) == 0))
+	  && (memcmp (source, cursession->current->addr, sin_size) == 0))
 	{
 	  return cursession->current;
 	}
@@ -74,7 +76,6 @@ udpsrvsession_search (char *s_addr, int s_port)
 	    }
 	  else
 	    break;
-
 	}
       cursession = cursession->next;
     }
@@ -82,7 +83,7 @@ udpsrvsession_search (char *s_addr, int s_port)
   if (local_mutex == 0)
     pthread_mutex_lock (&udpsrvsessions_mutex);
   cursession = malloc (sizeof (struct udpsrvsession_l));
-  cursession->current = udpsrvsession_create (s_addr, s_port);
+  cursession->current = udpsrvsession_create (source);
   cursession->next = NULL;
   if (udpsrvsessions == NULL)
     udpsrvsessions = cursession;
@@ -94,12 +95,11 @@ udpsrvsession_search (char *s_addr, int s_port)
 }
 
 struct udpsrvsession_t *
-udpsrvsession_create (char *s_addr, int s_port)
+udpsrvsession_create (struct sockaddr_in *source)
 {
   struct udpsrvsession_t *newsession =
     malloc (sizeof (struct udpsrvsession_t));
-  newsession->s_port = s_port;
-  newsession->s_addr = s_addr;
+  newsession->addr = source;
   newsession->fd = udpsrvsessions_len++;
   newsession->peer = peer_create ();
   newsession->peer->udpsrvsession = newsession;

@@ -29,6 +29,8 @@
 #include <linux/if_tun.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
 #include "config.h"
 #include "debug.h"
 #include "tundevthread.h"
@@ -38,10 +40,10 @@ int tundev_fd = -1;
 int
 tundev_initdev (char *iface)
 {
-  int sd_tun = -1;
+  int sd_tun = -1, sd_sock;
   int iface_len = strlen (iface);
+  struct sockaddr_in tunaddr_dst;
   struct ifreq ifr;
-
   if ((sd_tun = open (TUNDEVICE, O_RDWR)) < 0)
     {
       log_error ("Could not open %s.\n", TUNDEVICE);
@@ -49,21 +51,61 @@ tundev_initdev (char *iface)
     }
 
   memset (&ifr, 0, sizeof (ifr));
-  ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
-
+  ifr.ifr_flags = IFF_TUN;	// | IFF_NO_PI;
   if (iface_len > 0)
     strncpy (ifr.ifr_name, iface, IFNAMSIZ);
 
   if (ioctl (sd_tun, TUNSETIFF, &ifr) < 0)
     {
-      free (&ifr);
       close (sd_tun);
       log_error ("Could not create interface %s.\n", iface);
       return -1;
     }
-
   if (iface_len == 0)
     strncpy (iface, ifr.ifr_name, IFNAMSIZ);
+
+  if ((sd_sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
+    {
+      log_error ("Cannot open socket and configure the interface %s.\n",
+		 iface);
+    }
+  else
+    {
+      ifr.ifr_flags = 0;
+      ifr.ifr_mtu = tundevmtu;
+      if (ioctl (sd_sock, SIOCSIFMTU, &ifr) < 0)
+	{
+	  log_error ("Could not configure mtu %d in the interface.\n",
+		     ifr.ifr_mtu);
+	}
+      memcpy (&ifr.ifr_addr, &tunaddr_ip, sizeof (struct sockaddr));
+      if (ioctl (sd_sock, SIOCSIFADDR, &ifr) < 0)
+	{
+	  log_error ("Could not configure inet addr %s in the interface.\n",
+		     inet_ntoa (tunaddr_ip.sin_addr));
+	}
+      memcpy (&ifr.ifr_netmask, &tunaddr_nm, sizeof (struct sockaddr));
+      if (ioctl (sd_sock, SIOCSIFNETMASK, &ifr) < 0)
+	{
+	  log_error ("Could not configure netmask %s in the interface.\n",
+		     inet_ntoa (tunaddr_nm.sin_addr));
+	}
+      tunaddr_dst.sin_family = AF_INET;
+      tunaddr_dst.sin_addr.s_addr =
+	tunaddr_ip.sin_addr.s_addr & tunaddr_nm.sin_addr.s_addr;
+      memcpy (&ifr.ifr_dstaddr, &tunaddr_dst, sizeof (struct sockaddr));
+      if (ioctl (sd_sock, SIOCSIFDSTADDR, &ifr) < 0)
+	{
+	  log_error ("Could not configure net addr %s in the interface.\n",
+		     inet_ntoa (tunaddr_dst.sin_addr));
+	}
+      ioctl (sd_sock, SIOCGIFFLAGS, &ifr);
+      ifr.ifr_flags |= IFF_UP;
+      if (ioctl (sd_sock, SIOCSIFFLAGS, &ifr) < 0)
+	{
+	  log_error ("Could not configure flags of the interface.\n", iface);
+	}
+    }
 
   return sd_tun;
 }
@@ -91,14 +133,15 @@ tundev ()
 	  break;
 	}
     }
-
+  log_debug ("Creating interface: %s\n", tunname);
   strncpy (ifrname, tunname, IFNAMSIZ);
   tundev_fd = tundev_initdev (ifrname);
   if (tundev_fd < 0)
     {
-      log_error ("Could not create interface %s.\n", iface);
+      log_error ("Could not create interface %s.\n", ifrname);
       return;
     }
+  log_debug ("Created interface: %s\n", ifrname);
   while (1)
     {
       for (th = 0; th < num_tundevthreads; th++)

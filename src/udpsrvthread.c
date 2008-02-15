@@ -24,6 +24,7 @@
 
 #include <pthread.h>
 #include <stdlib.h>
+#include <strings.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -34,16 +35,15 @@
 void
 udpsrvthread (struct udpsrvthread_t *me)
 {
-  char *s_addr;
-  int s_port;
+  struct sockaddr_in *addr;
   struct udpsrvsession_t *udpsession;
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
       pthread_cond_wait (&me->cond, &me->cond_mutex);
-      s_addr = inet_ntoa (me->addr.sin_addr);
-      s_port = ntohs (me->addr.sin_port);
-      udpsession = udpsrvsession_search (s_addr, s_port);
+      addr = malloc (sizeof (struct sockaddr_in));
+      bcopy (&me->addr, addr, me->addr_len);
+      udpsession = udpsrvsession_search (addr);
       //DTLS
       pthread_mutex_unlock (&me->thread_mutex);
     }

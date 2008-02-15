@@ -25,18 +25,18 @@
 #ifndef _UDPSRVSESSION_H
 #define _UDPSRVSESSION_H
 
+#include <sys/socket.h>
 #include "peer.h"
 
 struct udpsrvsession_t
 {
   int timeout;
   int fd;
-  char *s_addr;
-  int s_port;
+  struct sockaddr_in *addr;
   struct peer_t *peer;
 };
 
-struct udpsrvsession_t *udpsrvsession_search (char *s_addr, int s_port);
-struct udpsrvsession_t *udpsrvsession_create (char *s_addr, int s_port);
+struct udpsrvsession_t *udpsrvsession_search (struct sockaddr_in *source);
+struct udpsrvsession_t *udpsrvsession_create (struct sockaddr_in *source);
 void udpsrvsession_update_timeout (struct udpsrvsession_t *cursession);
 #endif /* _UDPSRVSESSION_H */
