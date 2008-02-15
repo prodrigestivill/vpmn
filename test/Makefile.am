@@ -18,8 +18,6 @@ bin_PROGRAMS = \
 
 tundevtest_SOURCES = \
 	tundevtest.c\
-	../src/tundevthread.c \
-	../src/tundevthread.h \
 	../src/debug.c \
 	../src/debug.h \
 	../src/config.h \
@@ -30,7 +28,9 @@ tundevtest_SOURCES = \
 	../src/router.c \
 	../src/router.h \
 	../src/peer.c \
-	../src/peer.h
+	../src/peer.h \
+	../src/tunsrvthread.c \
+	../src/tunsrvthread.h
 
 tundevtest_LDFLAGS = \
 	-lpthread

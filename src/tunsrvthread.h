@@ -1,5 +1,5 @@
 /***************************************************************************
- *            tundevthread.h
+ *            tunsrvthread.h
  *
  *  Tue Feb 12 09:51:18 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
@@ -28,7 +28,7 @@
 #include <pthread.h>
 #include "config.h"
 
-struct tundevthread_t
+struct tunsrvthread_t
 {
   pthread_t thread;
   pthread_mutex_t thread_mutex;
@@ -38,6 +38,6 @@ struct tundevthread_t
   int buffer_len;
 };
 
-void tundevthread (struct tundevthread_t *me);
-int tundevthread_create (struct tundevthread_t *new);
+void tunsrvthread (struct tunsrvthread_t *me);
+int tunsrvthread_create (struct tunsrvthread_t *new);
 #endif /* _TUNDEVTHREAD_H */

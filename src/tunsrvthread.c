@@ -1,5 +1,5 @@
 /***************************************************************************
- *            tundevthread.c
+ *            tunsrvthread.c
  *
  *  Tue Feb 12 09:51:17 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
@@ -26,12 +26,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "tundevthread.h"
+#include "tunsrvthread.h"
 #include "router.h"
 #include "debug.h"
 
 void
-tundevthread (struct tundevthread_t *me)
+tunsrvthread (struct tunsrvthread_t *me)
 {
   struct in_addr src4, dst4;
   struct peer_t *dstpeer;
@@ -76,10 +76,10 @@ tundevthread (struct tundevthread_t *me)
 }
 
 int
-tundevthread_create (struct tundevthread_t *new)
+tunsrvthread_create (struct tunsrvthread_t *new)
 {
   pthread_mutex_init (&new->thread_mutex, NULL);
   pthread_mutex_init (&new->cond_mutex, NULL);
   pthread_cond_init (&new->cond, NULL);
-  return pthread_create (&new->thread, NULL, (void *) &tundevthread, new);
+  return pthread_create (&new->thread, NULL, (void *) &tunsrvthread, new);
 }

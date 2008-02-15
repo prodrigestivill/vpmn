@@ -26,17 +26,17 @@
 #include "config.h"
 #include "debug.h"
 #include "tundev.h"
-#include "tundevthread.h"
+#include "tunsrvthread.h"
 
 void
 tunsrv ()
 {
   int rc, th;
-  struct tundevthread_t tundevthreads[num_tundevthreads];
+  struct tunsrvthread_t tunsrvthreads[num_tunsrvthreads];
 
-  for (th = 0; th < num_tundevthreads; th++)
+  for (th = 0; th < num_tunsrvthreads; th++)
     {
-      if ((rc = tundevthread_create (&(tundevthreads[th]))))
+      if ((rc = tunsrvthread_create (&(tunsrvthreads[th]))))
 	{
 	  log_error ("Thread %d creation failed: %d\n", th, rc);
 	  break;
@@ -44,24 +44,24 @@ tunsrv ()
     }
   while (1)
     {
-      for (th = 0; th < num_tundevthreads; th++)
+      for (th = 0; th < num_tunsrvthreads; th++)
 	{
-	  if (pthread_mutex_trylock (&tundevthreads[th].thread_mutex) == 0)
+	  if (pthread_mutex_trylock (&tunsrvthreads[th].thread_mutex) == 0)
 	    {
-	      pthread_mutex_lock (&tundevthreads[th].cond_mutex);
-	      tundevthreads[th].buffer_len =
-		tundev_read (tundevthreads[th].buffer,
-			     sizeof (tundevthreads[th].buffer));
-	      if (tundevthreads[th].buffer_len > 0)
+	      pthread_mutex_lock (&tunsrvthreads[th].cond_mutex);
+	      tunsrvthreads[th].buffer_len =
+		tundev_read (tunsrvthreads[th].buffer,
+			     sizeof (tunsrvthreads[th].buffer));
+	      if (tunsrvthreads[th].buffer_len > 0)
 		{
-		  pthread_cond_signal (&tundevthreads[th].cond);
+		  pthread_cond_signal (&tunsrvthreads[th].cond);
 		}
 	      else
 		{
-		  pthread_mutex_unlock (&tundevthreads[th].thread_mutex);
+		  pthread_mutex_unlock (&tunsrvthreads[th].thread_mutex);
 		  log_error ("Error reading form interface.\n");
 		}
-	      pthread_mutex_unlock (&tundevthreads[th].cond_mutex);
+	      pthread_mutex_unlock (&tunsrvthreads[th].cond_mutex);
 	      break;
 	    }
 	}

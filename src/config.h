@@ -39,8 +39,8 @@ void config_load ();
 char *tunname;
 struct sockaddr_in tunaddr_ip;
 struct sockaddr_in tunaddr_nm;
-int num_tundevthreads;
 int tundevmtu;
+int num_tunsrvthreads;
 
 //UDPSRV
 #define UDPBUFFERSIZE 65535

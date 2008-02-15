@@ -42,7 +42,7 @@ config_load ()
       || inet_aton (tunaddr_nm_str, &tunaddr_nm.sin_addr) == 0)
     log_error ("Loading IP configurations.");
 
-  num_tundevthreads = 10;
+  num_tunsrvthreads = 10;
   tundevmtu = 1450;
 
   //UDPSRV
