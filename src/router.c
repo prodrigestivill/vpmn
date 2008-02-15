@@ -1,7 +1,7 @@
 /***************************************************************************
- *            peer.c
+ *            router.c
  *
- *  Tue Feb  7 00:24:22 2008
+ *  Fri Feb 15 20:39:01 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -22,24 +22,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#include <stdlib.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include "config.h"
 #include "peer.h"
 
-struct peer_t *
-peer_searchdst ()
+int
+router_checksrc (struct in_addr *src)
 {
-	
-}
-struct peer_t *
-peer_create ()
-{
-  struct peer_t *newpeer = malloc (sizeof (struct peer_t));
-  newpeer->udpsrvsession = NULL;
-  return newpeer;
+  if (src->s_addr == tunaddr_ip.sin_addr.s_addr)
+    return 0;
+  //TODO: also add shared networks.
 }
 
-void
-peer_destroy (struct peer_t *oldpeer)
+struct peer_t *
+router_searchdst (struct in_addr *dst)
 {
-  free (oldpeer);
+  return peer_create ();
 }

@@ -26,7 +26,11 @@ tundevtest_SOURCES = \
 	../src/config.c \
 	../src/tundev.h \
 	../src/tundev.c \
-	../src/tunsrv.c 
+	../src/tunsrv.c \
+	../src/router.c \
+	../src/router.h \
+	../src/peer.c \
+	../src/peer.h
 
 tundevtest_LDFLAGS = \
 	-lpthread

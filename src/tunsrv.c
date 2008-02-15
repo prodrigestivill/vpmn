@@ -29,7 +29,7 @@
 #include "tundevthread.h"
 
 void
-tundev ()
+tunsrv ()
 {
   int rc, th;
   struct tundevthread_t tundevthreads[num_tundevthreads];

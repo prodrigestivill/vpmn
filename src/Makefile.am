@@ -32,7 +32,9 @@ vpmnd_SOURCES = \
 	config.c \
 	tundev.h \
 	tundev.c \
-	tunsrv.c 
+	tunsrv.c \
+	router.c \
+	router.h
 
 vpmnd_LDFLAGS = \
 	-lpthread
