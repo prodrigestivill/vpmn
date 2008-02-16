@@ -31,13 +31,16 @@
 int
 router_checksrc (struct in_addr *src)
 {
-  if (src->s_addr == tunaddr_ip.sin_addr.s_addr)
+  int n;
+  if (src->s_addr == tunaddr_ip.addr.s_addr)
     return 0;
-  //TODO: also add shared networks.
-}
-
-struct peer_t *
-router_searchdst (struct in_addr *dst)
-{
-  return peer_create ();
+  if (tunaddr_networks == NULL || tunaddr_networks_len < 1)
+    return -1;
+  for (n = 0; n < tunaddr_networks_len; n++)
+    {
+      if ((src->s_addr & tunaddr_networks[n].netmask.s_addr) ==
+	  tunaddr_networks[n].addr.s_addr)
+	return 0;
+    }
+  return -2;
 }

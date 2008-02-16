@@ -26,15 +26,17 @@
 #include "peer.h"
 
 struct peer_t *
-peer_searchdst ()
+peer_searchdst (struct in_addr *dst)
 {
-	
+	return peer_create();
 }
+
 struct peer_t *
 peer_create ()
 {
   struct peer_t *newpeer = malloc (sizeof (struct peer_t));
   newpeer->udpsrvsession = NULL;
+  newpeer->networks = NULL;
   return newpeer;
 }
 

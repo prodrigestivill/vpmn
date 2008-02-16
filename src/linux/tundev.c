@@ -34,17 +34,16 @@
 #include "config.h"
 #include "debug.h"
 
+#define TUNDEVICE "/dev/net/tun"
 int tundev_fd = -1;
 
 int
 tundev_initdev ()
 {
-  int sd_sock, iface_len;
-  struct sockaddr_in tunaddr_dst;
+  int sd_sock = -1, tunname_len = strlen (tunname);
+  struct sockaddr_in *tunaddr;
   struct ifreq ifr;
-  char iface[IFNAMSIZ];
-  strncpy (iface, tunname, IFNAMSIZ);
-  iface_len = strlen (iface);
+
 
   if (tundev_fd != -1)
     {
@@ -59,21 +58,21 @@ tundev_initdev ()
 
   memset (&ifr, 0, sizeof (ifr));
   ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
-  if (iface_len > 0)
-    strncpy (ifr.ifr_name, iface, IFNAMSIZ);
+  if (tunname_len > 0)
+    strncpy (ifr.ifr_name, tunname, IFNAMSIZ);
 
   if (ioctl (tundev_fd, TUNSETIFF, &ifr) < 0)
     {
       close (tundev_fd);
       return -1;
     }
-  if (iface_len == 0)
-    strncpy (iface, ifr.ifr_name, IFNAMSIZ);
+  if (tunname_len == 0)
+    strncpy (tunname, ifr.ifr_name, IFNAMSIZ);
 
   if ((sd_sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
     {
       log_error ("Cannot open socket and configure the interface %s.\n",
-		 iface);
+		 tunname);
     }
   else
     {
@@ -84,32 +83,35 @@ tundev_initdev ()
 	  log_error ("Could not configure mtu %d in the interface.\n",
 		     ifr.ifr_mtu);
 	}
-      memcpy (&ifr.ifr_addr, &tunaddr_ip, sizeof (struct sockaddr));
+      tunaddr = (struct sockaddr_in *) &ifr.ifr_addr;
+      tunaddr->sin_family = AF_INET;
+      tunaddr->sin_addr.s_addr = tunaddr_ip.addr.s_addr;
       if (ioctl (sd_sock, SIOCSIFADDR, &ifr) < 0)
 	{
 	  log_error ("Could not configure inet addr %s in the interface.\n",
-		     inet_ntoa (tunaddr_ip.sin_addr));
+		     inet_ntoa (tunaddr_ip.addr));
 	}
-      memcpy (&ifr.ifr_netmask, &tunaddr_nm, sizeof (struct sockaddr));
+      tunaddr = (struct sockaddr_in *) &ifr.ifr_netmask;
+      tunaddr->sin_family = AF_INET;
+      tunaddr->sin_addr.s_addr = tunaddr_ip.netmask.s_addr;
       if (ioctl (sd_sock, SIOCSIFNETMASK, &ifr) < 0)
 	{
 	  log_error ("Could not configure netmask %s in the interface.\n",
-		     inet_ntoa (tunaddr_nm.sin_addr));
+		     inet_ntoa (tunaddr_ip.netmask));
 	}
-      tunaddr_dst.sin_family = AF_INET;
-      tunaddr_dst.sin_addr.s_addr =
-	tunaddr_ip.sin_addr.s_addr & tunaddr_nm.sin_addr.s_addr;
-      memcpy (&ifr.ifr_dstaddr, &tunaddr_dst, sizeof (struct sockaddr));
+      tunaddr = (struct sockaddr_in *) &ifr.ifr_dstaddr;
+      tunaddr->sin_family = AF_INET;
+      tunaddr->sin_addr.s_addr = tunaddr_ip.addr.s_addr & tunaddr_ip.netmask.s_addr;
       if (ioctl (sd_sock, SIOCSIFDSTADDR, &ifr) < 0)
 	{
 	  log_error ("Could not configure net addr %s in the interface.\n",
-		     inet_ntoa (tunaddr_dst.sin_addr));
+		     inet_ntoa (tunaddr->sin_addr));
 	}
       ioctl (sd_sock, SIOCGIFFLAGS, &ifr);
       ifr.ifr_flags |= IFF_UP;
       if (ioctl (sd_sock, SIOCSIFFLAGS, &ifr) < 0)
 	{
-	  log_error ("Could not configure flags of the interface.\n", iface);
+	  log_error ("Could not configure flags of the interface.\n");
 	}
       close (sd_sock);
     }

@@ -27,6 +27,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "tunsrvthread.h"
+#include "peer.h"
 #include "router.h"
 #include "debug.h"
 
@@ -50,7 +51,7 @@ tunsrvthread (struct tunsrvthread_t *me)
 	    (me->buffer[18] << 16) | (me->buffer[19] << 24);
 	  log_debug ("->%s\n", inet_ntoa (dst4));
 	  if (router_checksrc (&src4) == 0)
-	    dstpeer = router_searchdst (&dst4);
+	    dstpeer = peer_searchdst (&dst4);
 	  else
 	    log_error ("Invalid source.\n");
 	}

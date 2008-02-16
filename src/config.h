@@ -25,8 +25,7 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#include "router.h"
 #include "../config.h"
 
 void config_load ();
@@ -34,11 +33,11 @@ void config_load ();
 #define DEBUG 1
 
 //TUNDEV
-#define TUNDEVICE "/dev/net/tun"
 #define TUNBUFFERSIZE 65535
 char *tunname;
-struct sockaddr_in tunaddr_ip;
-struct sockaddr_in tunaddr_nm;
+struct in_network tunaddr_ip;
+struct in_network *tunaddr_networks;
+int tunaddr_networks_len;
 int tundevmtu;
 int num_tunsrvthreads;
 

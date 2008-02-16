@@ -25,15 +25,19 @@
 #ifndef _PEER_H
 #define _PEER_H
 
+#include <netinet/in.h>
+#include "router.h"
 #include "udpsrvsession.h"
 
 struct peer_t
 {
   struct udpsrvsession_t *udpsrvsession;
 //struct tcpsrvsession_t *tcpsrvsession;
-  /*networks owned */
+  struct in_network *networks;
 };
 
+struct peer_t *peer_searchdst (struct in_addr *dst);
+//struct peer_t *peer_searchdst6 (struct in6_addr *dst);
 struct peer_t *peer_create ();
 void peer_destroy (struct peer_t *oldpeer);
 

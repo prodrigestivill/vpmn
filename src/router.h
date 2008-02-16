@@ -26,11 +26,13 @@
 #define _ROUTER_H
 
 #include <netinet/in.h>
-#include "peer.h"
+
+struct in_network {
+	struct in_addr addr;
+	struct in_addr netmask;
+};
 
 int router_checksrc (struct in_addr *src);
 //int router_checksrc6 (struct in6_addr *src);
-struct peer_t *router_searchdst (struct in_addr *dst);
-//struct peer_t *router_searchdst6 (struct in6_addr *dst);
 
 #endif /* _ROUTER_H */
