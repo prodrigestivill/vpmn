@@ -25,12 +25,17 @@
 #ifndef _CONFIG_H
 #define _CONFIG_H
 
+#include <unistd.h>
 #include "router.h"
 #include "../config.h"
 
 void config_load ();
 
 #define DEBUG 1
+
+uid_t vpmnd_uid;
+gid_t vpmnd_gid;
+int daemonize;
 
 //TUNDEV
 #define TUNBUFFERSIZE 65535

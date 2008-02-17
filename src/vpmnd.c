@@ -15,16 +15,61 @@
  */
 
 #include <pthread.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <signal.h>
 #include "config.h"
 #include "debug.h"
 #include "srv.h"
 #include "tundev.h"
 
+void
+vpmnd_signalhandler (int sig)
+{
+
+  switch (sig)
+    {
+    case SIGHUP:
+      log_info ("Received SIGHUP signal.\n");
+      break;
+    default:
+      log_info ("Unhandled signal %s.\n", sig);
+      break;
+    }
+}
+
 int
-main ()
+vpmnd_start ()
 {
   pthread_t tunsrv_thread, udpsrv_thread;
-  config_load ();
+  pid_t pid, sid;
+
+  signal (SIGHUP, vpmnd_signalhandler);
+  //signal (SIGTERM, vpmnd_signalhandler);
+  //signal (SIGINT, vpmnd_signalhandler);
+  //signal (SIGQUIT, vpmnd_signalhandler);
+
+  if (daemonize)
+    {
+      pid = fork ();
+      if (pid < 0)
+		return 129;
+      /* If we got a good PID, then
+         we can exit the parent process. */
+      if (pid > 0)
+	  	return 0;
+
+      /* Create a new SID for the child process */
+      sid = setsid ();
+      if (sid < 0)
+			return 130;
+
+      /* Close out the standard file descriptors */
+      fclose (stdin);
+      fclose (stdout);
+      fclose (stderr);
+    }
+	
   if (tundev_initdev () < 0)
     {
       log_error ("Could not create the interface.\n");
@@ -35,8 +80,20 @@ main ()
       log_error ("Could not start the udp server.\n");
       return -1;
     }
-  //Change UID
+  if (!((setgid (vpmnd_gid) == 0) && (setuid (vpmnd_uid) == 0)))
+    {
+      log_error ("Could not set UID and/or GID to the servers.\n");
+      return -1;
+    }
   pthread_create (&tunsrv_thread, NULL, (void *) &tunsrv, NULL);
   pthread_create (&udpsrv_thread, NULL, (void *) &udpsrv, NULL);
+  pthread_join (tunsrv_thread, NULL);
   return 0;
+}
+
+int
+main ()
+{
+  config_load ();
+  return vpmnd_start ();
 }

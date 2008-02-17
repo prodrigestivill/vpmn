@@ -32,6 +32,13 @@
 void
 config_load ()
 {
+  vpmnd_uid = 1000;
+  vpmnd_gid = 1000;
+#ifdef DEBUG
+  daemonize = 0;
+#else
+  daemonize = 1;
+#endif	
   //TUNDEV
   tunname = "vpmn0";
 
