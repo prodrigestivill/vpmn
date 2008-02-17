@@ -14,7 +14,21 @@ AM_CFLAGS =\
 bin_PROGRAMS = \
 	udpsrvtest\
 	udpsrvsessiontest \
-	tundevtest
+	tundevtest \
+	routertest
+
+routertest_SOURCES = \
+	../src/config.c\
+	../src/config.h \
+	../src/debug.c \
+	../src/debug.h \
+	../src/peer.c \
+	../src/peer.h \
+	../src/router.c \
+	../src/router.h \
+	routertest.c \
+	../src/udpsrvsession.c \
+	../src/udpsrvsession.h
 
 tundevtest_SOURCES = \
 	tundevtest.c\

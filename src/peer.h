@@ -33,7 +33,6 @@ struct peer_t
 {
   struct udpsrvsession_t *udpsrvsession;
 //struct tcpsrvsession_t *tcpsrvsession;
-  struct in_network *networks;
 };
 
 struct peer_t *peer_create ();

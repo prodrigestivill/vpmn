@@ -43,7 +43,6 @@ pthread_mutex_t udpsrvsessions_mutex = PTHREAD_MUTEX_INITIALIZER;
 struct udpsrvsession_t *
 udpsrvsession_search (struct sockaddr_in *source)
 {
-  int sin_size = sizeof (struct sockaddr_in);
   struct udpsrvsession_l *cursession;
   int local_mutex = 0;
   if (udpsrvsessions == NULL)
@@ -61,7 +60,10 @@ udpsrvsession_search (struct sockaddr_in *source)
   while (cursession != NULL)
     {
       if ((cursession->current != NULL)
-	  && (memcmp (source, cursession->current->addr, sin_size) == 0))
+	  && (source->sin_family == cursession->current->addr->sin_family)
+	  && (source->sin_port == cursession->current->addr->sin_port)
+	  && (source->sin_addr.s_addr ==
+	      cursession->current->addr->sin_addr.s_addr))
 	{
 	  return cursession->current;
 	}

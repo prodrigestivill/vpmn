@@ -63,6 +63,7 @@ router_addroute (struct in_network *network, struct peer_t *peer)
   struct router_table_l *current;
   struct router_table_l *current_last;
   struct router_table_l *newroute;
+  network->addr.s_addr = network->addr.s_addr & network->netmask.s_addr;
   newroute = malloc (sizeof (struct router_table_l));
   newroute->network = network;
   newroute->peer = peer;
@@ -149,7 +150,7 @@ router_flush (struct peer_t *peer)
     }
   pthread_mutex_unlock (&router_expired_table_mutex);
   pthread_mutex_unlock (&router_table_mutex);
-  router_flushexpired (); //CAUTION
+  router_flushexpired ();	//CAUTION
 }
 
 int
