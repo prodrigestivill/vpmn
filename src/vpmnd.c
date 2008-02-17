@@ -1,11 +1,3 @@
-/***************************************************************************
- *            peer.h
- *
- *  Tue Feb  6 12:03:15 2008
- *  Copyright  2008  Pau Rodriguez-Estivill
- *  <prodrigestivill@gmail.com>
- ****************************************************************************/
-
 /*
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,21 +14,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _PEER_H
-#define _PEER_H
+#include <pthread.h>
+#include "config.h"
+#include "debug.h"
+#include "srv.h"
+#include "tundev.h"
 
-#include <netinet/in.h>
-#include "router.h"
-#include "udpsrvsession.h"
-
-struct peer_t
+int
+main ()
 {
-  struct udpsrvsession_t *udpsrvsession;
-//struct tcpsrvsession_t *tcpsrvsession;
-  struct in_network *networks;
-};
-
-struct peer_t *peer_create ();
-void peer_destroy (struct peer_t *oldpeer);
-
-#endif /* _PEER_H */
+  pthread_t tunsrv_thread, udpsrv_thread;
+  config_load ();
+  if (tundev_initdev () < 0)
+    {
+      log_error ("Could not create the interface.\n");
+      return -1;
+    }
+  if (udpsrv_init () < 0)
+    {
+      log_error ("Could not start the udp server.\n");
+      return -1;
+    }
+  //Change UID
+  pthread_create (&tunsrv_thread, NULL, (void *) &tunsrv, NULL);
+  pthread_create (&udpsrv_thread, NULL, (void *) &udpsrv, NULL);
+  return 0;
+}

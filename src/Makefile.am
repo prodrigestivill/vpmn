@@ -34,7 +34,9 @@ vpmnd_SOURCES = \
 	router.c \
 	router.h \
 	tunsrvthread.c \
-	tunsrvthread.h
+	tunsrvthread.h \
+	vpmnd.c \
+	srv.h
 
 vpmnd_LDFLAGS = \
 	-lpthread

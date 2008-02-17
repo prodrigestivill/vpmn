@@ -23,13 +23,8 @@
  */
 
 #include <stdlib.h>
+#include "router.h"
 #include "peer.h"
-
-struct peer_t *
-peer_searchdst (struct in_addr *dst)
-{
-	return peer_create();
-}
 
 struct peer_t *
 peer_create ()
@@ -43,5 +38,6 @@ peer_create ()
 void
 peer_destroy (struct peer_t *oldpeer)
 {
+  router_flush (oldpeer);
   free (oldpeer);
 }

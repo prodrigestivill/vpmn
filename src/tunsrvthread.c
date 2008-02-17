@@ -42,7 +42,7 @@ tunsrvthread (struct tunsrvthread_t *me)
       dstpeer = NULL;
       pthread_cond_wait (&me->cond, &me->cond_mutex);
       //Check for IPv4
-      if (((me->buffer[0] & 240) >> 4) == 4)
+      if ((me->buffer[0] & 0xF0) == 0x40)
 	{
 	  src4.s_addr = (me->buffer[12]) | (me->buffer[13] << 8) |
 	    (me->buffer[14] << 16) | (me->buffer[15] << 24);
@@ -51,12 +51,12 @@ tunsrvthread (struct tunsrvthread_t *me)
 	    (me->buffer[18] << 16) | (me->buffer[19] << 24);
 	  log_debug ("->%s\n", inet_ntoa (dst4));
 	  if (router_checksrc (&src4) == 0)
-	    dstpeer = peer_searchdst (&dst4);
+	    dstpeer = router_searchdst (&dst4);
 	  else
 	    log_error ("Invalid source.\n");
 	}
       //Check for IPv6
-      else if (((me->buffer[0] & 240) >> 4) == 6)
+      else if ((me->buffer[0] & 0xF0) == 0x60)
 	{
 	  log_error ("IPv6 not implemented.\n");
 	  //ROUTING

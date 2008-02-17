@@ -22,11 +22,135 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#include <pthread.h>
+#include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "config.h"
 #include "peer.h"
+
+struct router_table_l
+{
+  struct in_network *network;
+  struct peer_t *peer;
+  struct router_table_l *next;
+};
+
+pthread_mutex_t router_table_mutex = PTHREAD_MUTEX_INITIALIZER;
+struct router_table_l *router_table;
+pthread_mutex_t router_expired_table_mutex = PTHREAD_MUTEX_INITIALIZER;
+struct router_table_l **router_expired_table;
+int router_expired_table_len = 0;
+
+struct peer_t *
+router_searchdst (struct in_addr *dst)
+{
+  struct router_table_l *current = router_table;
+  while (current != NULL)
+    {
+      if ((dst->s_addr & current->network->netmask.s_addr) ==
+	  current->network->addr.s_addr)
+	return current->peer;
+      current = current->next;
+    }
+  return NULL;
+}
+
+void
+router_addroute (struct in_network *network, struct peer_t *peer)
+{
+  struct router_table_l *current;
+  struct router_table_l *current_last;
+  struct router_table_l *newroute;
+  newroute = malloc (sizeof (struct router_table_l));
+  newroute->network = network;
+  newroute->peer = peer;
+  pthread_mutex_lock (&router_table_mutex);
+  if (router_table == NULL)
+    {
+      newroute->next = NULL;
+      router_table = newroute;
+      pthread_mutex_unlock (&router_table_mutex);
+      return;
+    }
+  current_last = NULL;
+  current = router_table;
+  while (current != NULL)
+    {
+      if (current->network->netmask.s_addr < network->netmask.s_addr)
+	break;
+      current_last = current;
+      current = current->next;
+    }
+  newroute->next = current;
+  current_last->next = newroute;
+  pthread_mutex_unlock (&router_table_mutex);
+  return;
+}
+
+void
+router_flushexpired ()
+{
+  int i;
+  if (router_expired_table_len < 1)
+    return;
+  pthread_mutex_lock (&router_expired_table_mutex);
+  for (i = 0; i < router_expired_table_len; i++)
+    {
+      free (router_expired_table[i]);
+    }
+  free (router_expired_table);
+  router_expired_table_len = 0;
+  router_expired_table = NULL;
+  pthread_mutex_unlock (&router_expired_table_mutex);
+}
+
+void
+router_flush (struct peer_t *peer)
+{
+  struct router_table_l *current;
+  struct router_table_l *current_last;
+  if (router_table == NULL)
+    return;
+  pthread_mutex_lock (&router_table_mutex);
+  pthread_mutex_lock (&router_expired_table_mutex);
+  current = router_table;
+  while (current != NULL && current->peer == peer)
+    {
+      router_expired_table_len++;
+      router_expired_table =
+	realloc (router_expired_table,
+		 router_expired_table_len * sizeof (struct router_table_l *));
+      router_expired_table[router_expired_table_len - 1] = current;
+      router_table = current->next;
+      current = router_table;
+    }
+  current = router_table;
+  current_last = NULL;
+  while (current != NULL)
+    {
+      if (current->peer == peer)
+	{
+	  current_last->next = current->next;
+	  router_expired_table_len++;
+	  router_expired_table =
+	    realloc (router_expired_table,
+		     router_expired_table_len *
+		     sizeof (struct router_table_l *));
+	  router_expired_table[router_expired_table_len - 1] = current;
+	  current = current_last->next;
+	}
+      else
+	{
+	  current_last = current;
+	  current = current->next;
+	}
+    }
+  pthread_mutex_unlock (&router_expired_table_mutex);
+  pthread_mutex_unlock (&router_table_mutex);
+  router_flushexpired (); //CAUTION
+}
 
 int
 router_checksrc (struct in_addr *src)

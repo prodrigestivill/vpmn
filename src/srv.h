@@ -1,7 +1,7 @@
 /***************************************************************************
- *            peer.h
+ *            srv.h
  *
- *  Tue Feb  6 12:03:15 2008
+ *  Sun Feb 17 16:29:55 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -21,22 +21,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
+ 
+#ifndef _SRV_H
+#define _SRV_H
 
-#ifndef _PEER_H
-#define _PEER_H
+void tunsrv ();
+void udpsrv ();
+int udpsrv_init ();
 
-#include <netinet/in.h>
-#include "router.h"
-#include "udpsrvsession.h"
+#endif /* _SRV_H */
 
-struct peer_t
-{
-  struct udpsrvsession_t *udpsrvsession;
-//struct tcpsrvsession_t *tcpsrvsession;
-  struct in_network *networks;
-};
-
-struct peer_t *peer_create ();
-void peer_destroy (struct peer_t *oldpeer);
-
-#endif /* _PEER_H */
+ 

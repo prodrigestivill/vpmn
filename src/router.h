@@ -27,12 +27,17 @@
 
 #include <netinet/in.h>
 
-struct in_network {
-	struct in_addr addr;
-	struct in_addr netmask;
+struct in_network
+{
+  struct in_addr addr;
+  struct in_addr netmask;
 };
 
+struct peer_t *router_searchdst (struct in_addr *dst);
+//struct peer_t *router_searchdst6 (struct in6_addr *dst);
 int router_checksrc (struct in_addr *src);
 //int router_checksrc6 (struct in6_addr *src);
+void router_addroute (struct in_network *network, struct peer_t *peer);
+void router_flush (struct peer_t *peer);
 
 #endif /* _ROUTER_H */
