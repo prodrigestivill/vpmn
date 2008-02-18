@@ -26,12 +26,13 @@
 #define _UDPSRVSESSION_H
 
 #include <sys/socket.h>
+#include <openssl/ssl.h>
 #include "peer.h"
 
 struct udpsrvsession_t
 {
   int timeout;
-  int fd;
+  SSL *dtls;
   struct sockaddr_in *addr;
   struct peer_t *peer;
 };

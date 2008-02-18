@@ -39,5 +39,6 @@ vpmnd_SOURCES = \
 	srv.h
 
 vpmnd_LDFLAGS = \
-	-lpthread
+	-lpthread\
+	-lssl
 

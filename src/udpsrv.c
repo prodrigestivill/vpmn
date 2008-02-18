@@ -31,7 +31,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-
+#include "srv.h"
 #include "udpsrvthread.h"
 #include "debug.h"
 #include "config.h"

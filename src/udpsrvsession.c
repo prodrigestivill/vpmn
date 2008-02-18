@@ -102,7 +102,7 @@ udpsrvsession_create (struct sockaddr_in *source)
   struct udpsrvsession_t *newsession =
     malloc (sizeof (struct udpsrvsession_t));
   newsession->addr = source;
-  newsession->fd = udpsrvsessions_len++;
+  //newsession->fd = udpsrvsessions_len++;
   newsession->peer = peer_create ();
   newsession->peer->udpsrvsession = newsession;
   udpsrvsession_update_timeout (newsession);

@@ -26,6 +26,7 @@
 #define _CONFIG_H
 
 #include <unistd.h>
+#include <openssl/x509v3.h>
 #include "router.h"
 #include "../config.h"
 
@@ -50,5 +51,9 @@ int num_tunsrvthreads;
 #define UDPBUFFERSIZE 65535
 int num_udpsrvthreads;
 int port_udp;
+
+//CRYPTO
+X509 *ssl_cert;
+EVP_PKEY *ssl_pkey;
 
 #endif /* _CONFIG_H */

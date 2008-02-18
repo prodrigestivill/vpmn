@@ -22,42 +22,149 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#include <openssl/ssl.h>
+#include <sys/socket.h>
+#include "config.h"
+#include "debug.h"
+#include "udpsrvsession.h"
+#include "srv.h"
+
+BIO *udpsrvdtls_mbio;
+
 void
-udpsrvdtls ()
+udpsrvdtls_init()
 {
 //  SSL_load_error_strings ();  /* readable error messages */
 //  SSL_library_init ();                        /* initialize library */
 //actions_to_seed_PRNG();
-/*mClientCtx = SSL_CTX_new (DTLSv1_client_method ());
-  mServerCtx = SSL_CTX_new (DTLSv1_server_method ());
-  assert (mClientCtx);
-  assert (mServerCtx);
-  SSL *ssl;
-  BIO *wBio;
-  int retry = 0;
-  ssl = mDtlsConnections[*((struct sockaddr_in *) &peer)];
+   udpsrvdtls_mbio = BIO_new (BIO_s_mem()) ;
+}
+
+int
+udpsrvdtls_write (const char *buffer, const int buffer_len,
+                  struct udpsrvsession_t* session)
+{
+  int len;
+  SSL_CTX *clictx;
+  BIO *wbio;
+  SSL *ssl = session->dtls;
+  struct sockaddr_in *peeraddr = session->addr;
 
   if (ssl == NULL)
     {
-      ssl = SSL_new (mClientCtx);
-      assert (ssl);
-
+      clictx = SSL_CTX_new (DTLSv1_client_method ());
+      ssl = SSL_new (clictx);
       SSL_set_connect_state (ssl);
+      
+      if (!ssl_cert || !ssl_pkey)
+         return -2;
+      if (!SSL_use_certificate (ssl, ssl_cert) ||
+          !SSL_use_PrivateKey (ssl, ssl_pkey))
+         return -2;
 
-      wBio = BIO_new_dgram (mFd, BIO_NOCLOSE);
-      assert (wBio);
-
-      BIO_dgram_set_peer (wBio, &peer);
-*/
-      /* the real rbio will be set by _read */
-//    SSL_set_bio (ssl, mDummyBio, wBio);
-
-      /* we should be ready to take this out if the 
-       * connection fails later */
-/*    mDtlsConnections[*((struct sockaddr_in *) &peer)] = ssl;
+      wbio = BIO_new_dgram (udpsrv_fd, BIO_NOCLOSE);
+      BIO_dgram_set_peer (wbio, peeraddr);
+      SSL_set_bio (ssl, udpsrvdtls_mbio, wbio);
+      session->dtls = ssl;
     }
-  expected = sendData->data.size ();
+   len = SSL_write (ssl, buffer, buffer_len);
+   if ( len <= 0 )
+   {
+      int err = SSL_get_error (ssl, len);
+      switch (err)
+      {
+         case SSL_ERROR_NONE:
+            break;
+         case SSL_ERROR_SSL:
+            break;
+         case SSL_ERROR_WANT_READ:
+            //retry = 1 ;
+            break;
+         case SSL_ERROR_WANT_WRITE:         
+            //retry = 1 ;
+            break;
+         case SSL_ERROR_SYSCALL:
+            log_error ("SSL_ERROR_SYSCALL\n");
+            return -3;
+            break;
+         case SSL_ERROR_ZERO_RETURN:
+            CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
+            SSL_free (ssl);
+            break ;
+         case SSL_ERROR_WANT_CONNECT:
+            break;
+         case SSL_ERROR_WANT_ACCEPT:
+            break;
+         default:
+            break;
+      }
+   }
+   return len;
+}
 
-  count = SSL_write (ssl, sendData->data.data (), sendData->data.size ());
-*/
+int
+udpsrvdtls_read (const char *buffer, const int buffer_len,
+                 char *bufferout, struct udpsrvsession_t* session)
+{
+  int len, err;
+  SSL_CTX *srvctx;
+  BIO *wbio, *rbio;
+  SSL *ssl = session->dtls;
+  struct sockaddr_in *peeraddr = session->addr;
+    
+  if (ssl == NULL)
+   {
+      srvctx = SSL_CTX_new (DTLSv1_server_method ());
+      ssl = SSL_new (srvctx);
+      SSL_set_accept_state (ssl);
+
+      if (!ssl_cert || !ssl_pkey)
+         return -2;
+      if( !SSL_use_certificate (ssl, ssl_cert) ||
+          !SSL_use_PrivateKey (ssl, ssl_pkey))
+         return -2;
+       
+      wbio = BIO_new_dgram (udpsrv_fd, BIO_NOCLOSE);
+      BIO_dgram_set_peer (wbio, peeraddr);
+      SSL_set_bio (ssl, NULL, wbio);
+      session->dtls = ssl;
+   }
+   rbio = BIO_new_mem_buf ((void *) buffer, buffer_len);
+   BIO_set_mem_eof_return (rbio, -1 );
+   ssl->rbio = rbio ;
+   len = SSL_read (ssl, bufferout, UDPBUFFERSIZE);
+   err = SSL_get_error (ssl, len);
+   BIO_free (ssl->rbio);
+   ssl->rbio = udpsrvdtls_mbio;
+   if (len <= 0)
+   {
+      switch (err)
+      {
+         case SSL_ERROR_NONE:
+            break;
+         case SSL_ERROR_SSL:
+            break;
+         case SSL_ERROR_WANT_READ:
+            break;
+         case SSL_ERROR_WANT_WRITE:
+            break;
+         case SSL_ERROR_SYSCALL:
+            break;
+            /* connection closed */
+         case SSL_ERROR_ZERO_RETURN:
+            CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
+            SSL_free (ssl);
+            break;
+         case SSL_ERROR_WANT_CONNECT:
+            break;
+         case SSL_ERROR_WANT_ACCEPT:
+            break;
+         default:
+            break;
+      }
+      return -5;
+   }
+   /*if (SSL_in_init(ssl))
+      DtlsReceiveTimeout */
+   return len;    
 }

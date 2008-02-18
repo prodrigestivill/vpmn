@@ -28,6 +28,7 @@
 void tunsrv ();
 void udpsrv ();
 int udpsrv_init ();
+int udpsrv_fd;
 
 #endif /* _SRV_H */
 
