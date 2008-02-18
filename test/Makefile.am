@@ -60,10 +60,12 @@ udpsrvsessiontest_SOURCES = \
 	../src/udpsrvdtls.c \
 	../src/udpsrvdtls.h \
 	../src/config.c \
-	../src/config.h
+	../src/config.h \
+	../src/router.c \
+	../src/router.h
 
 udpsrvsessiontest_LDFLAGS = \
-	-lpthread
+	-lssl
 
 udpsrvtest_SOURCES = \
 	udpsrvtest.c \
@@ -77,7 +79,9 @@ udpsrvtest_SOURCES = \
 	../src/udpsrvthread.c \
 	../src/udpsrvthread.h \
 	../src/config.h \
-	../src/config.c
+	../src/config.c \
+	../src/router.c \
+	../src/router.h
 
 udpsrvtest_LDFLAGS = \
 	-lpthread
