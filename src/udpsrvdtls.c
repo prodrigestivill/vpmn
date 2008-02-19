@@ -116,7 +116,7 @@ udpsrvdtls_write (const char *buffer, const int buffer_len,
       else
 	retry = 0;
     }
-  while (retry > 0 && retry < 5);
+  while (retry > 0 && retry < 5 && session->dtls != NULL);
   if (len <= 0)
     udpsrvdtls_sessionerr (err, session);
   return len;
@@ -162,7 +162,7 @@ udpsrvdtls_read (const char *buffer, const int buffer_len, char *bufferout,
   return len;
 }
 
-int
+void
 udpsrvdtls_sessionerr (const unsigned long err,
 		       struct udpsrvsession_t *session)
 {
@@ -186,7 +186,9 @@ udpsrvdtls_sessionerr (const unsigned long err,
       pthread_mutex_lock (&session->dtls_mutex);
       CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
       SSL_free (session->dtls);
+	  session->dtls=NULL;
       pthread_mutex_unlock (&session->dtls_mutex);
+	  udpsrvsession_destroy (session);
       break;
     case SSL_ERROR_WANT_CONNECT:
       log_error ("SSL_ERROR_WANT_CONNECT\n");

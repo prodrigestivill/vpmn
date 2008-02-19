@@ -110,7 +110,7 @@ udpsrvsession_create (struct sockaddr_in *source)
 }
 
 void
-udpsrvsession_clean ()
+udpsrvsession_destroy (struct udpsrvsession_t *cursession)
 {
 
 }

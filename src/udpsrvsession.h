@@ -42,4 +42,6 @@ struct udpsrvsession_t
 struct udpsrvsession_t *udpsrvsession_search (struct sockaddr_in *source);
 struct udpsrvsession_t *udpsrvsession_create (struct sockaddr_in *source);
 void udpsrvsession_update_timeout (struct udpsrvsession_t *cursession);
+void udpsrvsession_destroy (struct udpsrvsession_t *cursession);
+
 #endif /* _UDPSRVSESSION_H */
