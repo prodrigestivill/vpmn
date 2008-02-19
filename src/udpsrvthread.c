@@ -31,7 +31,7 @@
 #include "udpsrvdtls.h"
 #include "udpsrvsession.h"
 #include "udpsrvthread.h"
-#include "tundev.h"
+#include "protocol.h"
 #include "debug.h"
 
 void
@@ -52,21 +52,7 @@ udpsrvthread (struct udpsrvthread_t *me)
 	udpsrvdtls_read (me->buffer, me->buffer_len, tunbuffer, TUNBUFFERSIZE,
 			 udpsession);
       if (tunbuffer_len > 0)
-	{
-	  //IP packet
-	  if ((tunbuffer[0] & 0xF0) == 0x40 || (tunbuffer[0] & 0xF0) == 0x60)
-	    {
-	      tundev_write (tunbuffer, tunbuffer_len);
-	    }
-	  else			//Internal packets
-	    {
-	      switch (tunbuffer[0])
-		{
-		default:
-		  log_error ("Unknow packet.\n");
-		}
-	    }
-	}
+	protocol_recvpacket (tunbuffer, tunbuffer_len, udpsession->peer);
       pthread_mutex_unlock (&me->thread_mutex);
     }
   pthread_mutex_unlock (&me->cond_mutex);

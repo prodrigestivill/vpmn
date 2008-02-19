@@ -26,54 +26,18 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "udpsrvdtls.h"
 #include "tunsrvthread.h"
-#include "peer.h"
-#include "router.h"
+#include "protocol.h"
 #include "debug.h"
 
 void
 tunsrvthread (struct tunsrvthread_t *me)
 {
-  struct in_addr src4, dst4;
-  struct peer_t *dstpeer;
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
-      dstpeer = NULL;
       pthread_cond_wait (&me->cond, &me->cond_mutex);
-      //Check for IPv4
-      if ((me->buffer[0] & 0xF0) == 0x40)
-	{
-	  src4.s_addr = (me->buffer[12]) | (me->buffer[13] << 8) |
-	    (me->buffer[14] << 16) | (me->buffer[15] << 24);
-	  log_debug ("IPv4: %s", inet_ntoa (src4));
-	  dst4.s_addr = (me->buffer[16]) | (me->buffer[17] << 8) |
-	    (me->buffer[18] << 16) | (me->buffer[19] << 24);
-	  log_debug ("->%s\n", inet_ntoa (dst4));
-	  if (router_checksrc (&src4) == 0)
-	    dstpeer = router_searchdst (&dst4);
-	  else
-	    log_error ("Invalid source.\n");
-	}
-      //Check for IPv6
-      else if ((me->buffer[0] & 0xF0) == 0x60)
-	{
-	  log_error ("IPv6 not implemented.\n");
-	  //ROUTING
-	}
-      else
-	log_error ("Unknow protocol not implemented.\n");
-
-      //DTLS
-      if (dstpeer != NULL)
-	{
-	  if (dstpeer->udpsrvsession != NULL)
-	    udpsrvdtls_write (me->buffer, me->buffer_len,
-			      dstpeer->udpsrvsession);
-	}
-      else
-	log_error ("Packet lost.\n");
+      protocol_sendframe (me->buffer, me->buffer_len);
       pthread_mutex_unlock (&me->thread_mutex);
     }
   pthread_mutex_unlock (&me->cond_mutex);
