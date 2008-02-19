@@ -25,7 +25,7 @@
 #include "debug.h"
 #include "config.h"
 #include "udpsrvdtls.h"
-#include "router.h"
+#include "protocol.h"
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -89,5 +89,5 @@ config_fistpeersinit ()
   inet_aton (peeraddr_str, &peeraddr->sin_addr);
   udpsrv_firstpeers = calloc (1, sizeof (struct udpsrvsession_t *));
   udpsrv_firstpeers[0] = udpsrvsession_search (peeraddr);
-  router_sendtable (udpsrv_firstpeers[0]->peer);
+  protocol_sendroutes (udpsrv_firstpeers[0]->peer);
 }

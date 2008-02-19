@@ -1,7 +1,7 @@
 /***************************************************************************
- *            router.h
+ *            protocol.h
  *
- *  Fri Feb 15 20:39:15 2008
+ *  Tue Feb 19 15:14:07 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -22,22 +22,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _ROUTER_H
-#define _ROUTER_H
+#ifndef _PROTOCOL_H
+#define _PROTOCOL_H
 
-#include <netinet/in.h>
+#include "router.h"
+#define MAX_PROTOCOL_ROUTES 10
 
-struct in_network
+struct protocol_route
 {
-  struct in_addr addr;
-  struct in_addr netmask;
+  char p;
+  struct in_network routes[MAX_PROTOCOL_ROUTES];
 };
 
-struct peer_t *router_searchdst (const struct in_addr *dst);
-//struct peer_t *router_searchdst6 (struct in6_addr *dst);
-int router_checksrc (const struct in_addr *src);
-//int router_checksrc6 (struct in6_addr *src);
-void router_addroute (struct in_network *network, struct peer_t *peer);
-void router_flush (const struct peer_t *peer);
+void protocol_sendroutes (const struct peer_t *peer);
 
-#endif /* _ROUTER_H */
+#endif /* _PROTOCOL_H */

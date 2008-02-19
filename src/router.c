@@ -23,7 +23,6 @@
  */
 
 #include <pthread.h>
-#include <stdlib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -46,7 +45,7 @@ struct router_table_l **router_expired_table;
 int router_expired_table_len = 0;
 
 struct peer_t *
-router_searchdst (struct in_addr *dst)
+router_searchdst (const struct in_addr *dst)
 {
   struct router_table_l *current = router_table;
   while (current != NULL)
@@ -110,7 +109,7 @@ router_flushexpired ()
 }
 
 void
-router_flush (struct peer_t *peer)
+router_flush (const struct peer_t *peer)
 {
   struct router_table_l *current;
   struct router_table_l *current_last;
@@ -156,7 +155,7 @@ router_flush (struct peer_t *peer)
 }
 
 int
-router_checksrc (struct in_addr *src)
+router_checksrc (const struct in_addr *src)
 {
   int n;
   if (src->s_addr == tunaddr_ip.addr.s_addr)
@@ -170,21 +169,4 @@ router_checksrc (struct in_addr *src)
 	return 0;
     }
   return -2;
-}
-
-void
-router_sendtable (struct peer_t *peer)
-{
-  struct
-  {
-    char p;
-    struct in_network routes[tunaddr_networks_len];
-  } table;
-  table.p = '\0';
-  memcpy (&table.routes, &tunaddr_networks,
-	  tunaddr_networks_len * sizeof (struct in_network));
-  if (peer->udpsrvsession != NULL)
-    {
-      udpsrvdtls_write ((char *) &table, sizeof (table), peer->udpsrvsession);
-    }
 }

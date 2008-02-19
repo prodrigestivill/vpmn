@@ -24,7 +24,7 @@
 #include "tundev.h"
 
 void
-vpmnd_signalhandler (int sig)
+vpmnd_signalhandler (const int sig)
 {
 
   switch (sig)

@@ -1,7 +1,7 @@
 /***************************************************************************
- *            router.h
+ *            protocol.c
  *
- *  Fri Feb 15 20:39:15 2008
+ *  Tue Feb 19 15:13:39 2008
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
@@ -22,22 +22,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#ifndef _ROUTER_H
-#define _ROUTER_H
+#include <stdlib.h>
+#include "config.h"
+#include "protocol.h"
+#include "peer.h"
+#include "router.h"
+#include "udpsrvdtls.h"
 
-#include <netinet/in.h>
-
-struct in_network
+void
+protocol_sendroutes (const struct peer_t *peer)
 {
-  struct in_addr addr;
-  struct in_addr netmask;
-};
-
-struct peer_t *router_searchdst (const struct in_addr *dst);
-//struct peer_t *router_searchdst6 (struct in6_addr *dst);
-int router_checksrc (const struct in_addr *src);
-//int router_checksrc6 (struct in6_addr *src);
-void router_addroute (struct in_network *network, struct peer_t *peer);
-void router_flush (const struct peer_t *peer);
-
-#endif /* _ROUTER_H */
+  int len;
+  struct protocol_route table;
+  table.p = '\0';
+  if (tunaddr_networks_len > MAX_PROTOCOL_ROUTES)
+    len = MAX_PROTOCOL_ROUTES;
+  else
+    len = tunaddr_networks_len;
+  memcpy (&table.routes, &tunaddr_networks, len * sizeof (struct in_network));
+  if (peer->udpsrvsession != NULL)
+    {
+      udpsrvdtls_write ((char *) &table, sizeof (table), peer->udpsrvsession);
+    }
+}

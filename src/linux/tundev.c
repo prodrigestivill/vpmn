@@ -120,7 +120,7 @@ tundev_initdev ()
 }
 
 int
-tundev_write (const void *buf, int count)
+tundev_write (const void *buf, const int count)
 {
   if (tundev_fd >= 0)
     return write (tundev_fd, buf, count);
@@ -128,7 +128,7 @@ tundev_write (const void *buf, int count)
 }
 
 int
-tundev_read (void *buf, int count)
+tundev_read (void *buf, const int count)
 {
   if (tundev_fd >= 0)
     return read (tundev_fd, buf, count);

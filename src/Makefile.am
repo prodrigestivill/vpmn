@@ -36,7 +36,9 @@ vpmnd_SOURCES = \
 	tunsrvthread.c \
 	tunsrvthread.h \
 	vpmnd.c \
-	srv.h
+	srv.h \
+	protocol.c \
+	protocol.h
 
 vpmnd_LDFLAGS = \
 	-lpthread\

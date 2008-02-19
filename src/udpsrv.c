@@ -56,15 +56,6 @@ udpsrv_init ()
   return 0;
 }
 
-int
-udpsrv_sendto (const void *buf, size_t len, const struct sockaddr *to,
-	       socklen_t tolen)
-{
-  if (udpsrv_fd >= 0)
-    return sendto (udpsrv_fd, buf, len, 0, to, tolen);
-  return -1;
-}
-
 void
 udpsrv ()
 {
