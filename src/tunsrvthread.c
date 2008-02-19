@@ -26,6 +26,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "udpsrvdtls.h"
 #include "tunsrvthread.h"
 #include "peer.h"
 #include "router.h"
@@ -67,7 +68,9 @@ tunsrvthread (struct tunsrvthread_t *me)
       //DTLS
       if (dstpeer != NULL)
 	{
-
+	  if (dstpeer->udpsrvsession != NULL)
+	    udpsrvdtls_write (me->buffer, me->buffer_len,
+			      dstpeer->udpsrvsession);
 	}
       else
 	log_error ("Packet lost.\n");

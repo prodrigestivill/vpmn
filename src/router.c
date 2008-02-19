@@ -28,6 +28,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "config.h"
+#include "udpsrvdtls.h"
+#include "udpsrvsession.h"
 #include "peer.h"
 
 struct router_table_l
@@ -168,4 +170,21 @@ router_checksrc (struct in_addr *src)
 	return 0;
     }
   return -2;
+}
+
+void
+router_sendtable (struct peer_t *peer)
+{
+  struct
+  {
+    char p;
+    struct in_network routes[tunaddr_networks_len];
+  } table;
+  table.p = '\0';
+  memcpy (&table.routes, &tunaddr_networks,
+	  tunaddr_networks_len * sizeof (struct in_network));
+  if (peer->udpsrvsession != NULL)
+    {
+      udpsrvdtls_write ((char *) &table, sizeof (table), peer->udpsrvsession);
+    }
 }

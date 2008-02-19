@@ -53,23 +53,23 @@ vpmnd_start ()
     {
       pid = fork ();
       if (pid < 0)
-		return 129;
+	return 129;
       /* If we got a good PID, then
          we can exit the parent process. */
       if (pid > 0)
-	  	return 0;
+	return 0;
 
       /* Create a new SID for the child process */
       sid = setsid ();
       if (sid < 0)
-			return 130;
+	return 130;
 
       /* Close out the standard file descriptors */
       fclose (stdin);
       fclose (stdout);
       fclose (stderr);
     }
-	
+
   if (tundev_initdev () < 0)
     {
       log_error ("Could not create the interface.\n");
@@ -87,6 +87,7 @@ vpmnd_start ()
     }
   pthread_create (&tunsrv_thread, NULL, (void *) &tunsrv, NULL);
   pthread_create (&udpsrv_thread, NULL, (void *) &udpsrv, NULL);
+  config_fistpeersinit ();
   pthread_join (tunsrv_thread, NULL);
   return 0;
 }

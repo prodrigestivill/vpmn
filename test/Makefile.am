@@ -65,6 +65,7 @@ udpsrvsessiontest_SOURCES = \
 	../src/router.h
 
 udpsrvsessiontest_LDFLAGS = \
+	-lpthread            \
 	-lssl
 
 udpsrvtest_SOURCES = \

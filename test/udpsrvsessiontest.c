@@ -34,28 +34,27 @@
 #include "../src/debug.h"
 #include "../src/config.h"
 #include "../src/udpsrvsession.h"
+#include "../src/udpsrvdtls.h"
+#include "../src/srv.h"
 
 int
 main ()
 {
   config_load ();
-  char buffer[UDPBUFFERSIZE];
-  int buffer_len;
-  char *s_addr;
-  int s_port;
+  char buffer[UDPBUFFERSIZE], bufferout[TUNBUFFERSIZE];
+  int buffer_len, bufferout_len;
   struct udpsrvsession_t *udpsession;
   struct sockaddr_in addr;
+  struct sockaddr_in *addr2;
   socklen_t addr_len;
-
   log_debug ("Starting...\n");
-  int sd_udp;
   struct sockaddr_in bind_addr;
   bzero (&bind_addr, sizeof (bind_addr));
-  sd_udp = socket (PF_INET, SOCK_DGRAM, 0);
+  udpsrv_fd = socket (PF_INET, SOCK_DGRAM, 0);
   bind_addr.sin_family = AF_INET;
   bind_addr.sin_addr.s_addr = htonl (INADDR_ANY);
   bind_addr.sin_port = htons (port_udp);
-  if (bind (sd_udp, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
+  if (bind (udpsrv_fd, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
     log_error ("Bind error\n");
   log_debug ("Listening...\n");
   while (1)
@@ -63,13 +62,17 @@ main ()
       addr_len = sizeof (addr);
       bzero (&addr, addr_len);
       buffer_len =
-	recvfrom (sd_udp, buffer, sizeof (buffer), 0,
+	recvfrom (udpsrv_fd, buffer, sizeof (buffer), 0,
 		  (struct sockaddr *) &(addr), &(addr_len));
-      s_addr = inet_ntoa (addr.sin_addr);
-      s_port = ntohs (addr.sin_port);
-      udpsession = udpsrvsession_search (&addr);
-      //log_debug ("Main  : %s:%d %d \"%s\"\n", s_addr, s_port, udpsession->fd,
-      // buffer);
-      log_debug ("Main  : %d \n", udpsession->dtls);
+      addr2 = malloc (sizeof (struct sockaddr_in));
+      bcopy (&addr, addr2, addr_len);
+      udpsession = udpsrvsession_search (addr2);
+      bufferout_len =
+	udpsrvdtls_read (buffer, buffer_len, bufferout, TUNBUFFERSIZE,
+			 udpsession);
+      if (bufferout_len > 0)
+	log_debug ("Decoded: %s \n", bufferout);
+      else
+	log_error ("No decoded data.\n");
     }
 }

@@ -28,13 +28,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "udpsrvdtls.h"
 #include "udpsrvsession.h"
 #include "udpsrvthread.h"
+#include "tundev.h"
 #include "debug.h"
 
 void
 udpsrvthread (struct udpsrvthread_t *me)
 {
+  char tunbuffer[TUNBUFFERSIZE];
+  int tunbuffer_len;
   struct sockaddr_in *addr;
   struct udpsrvsession_t *udpsession;
   pthread_mutex_lock (&me->cond_mutex);
@@ -42,9 +46,27 @@ udpsrvthread (struct udpsrvthread_t *me)
     {
       pthread_cond_wait (&me->cond, &me->cond_mutex);
       addr = malloc (sizeof (struct sockaddr_in));
-      bcopy (&me->addr, addr, me->addr_len);
+      memcpy (addr, &me->addr, me->addr_len);
       udpsession = udpsrvsession_search (addr);
-      //DTLS
+      tunbuffer_len =
+	udpsrvdtls_read (me->buffer, me->buffer_len, tunbuffer, TUNBUFFERSIZE,
+			 udpsession);
+      if (tunbuffer_len > 0)
+	{
+	  //IP packet
+	  if ((tunbuffer[0] & 0xF0) == 0x40 || (tunbuffer[0] & 0xF0) == 0x60)
+	    {
+	      tundev_write (tunbuffer, tunbuffer_len);
+	    }
+	  else			//Internal packets
+	    {
+	      switch (tunbuffer[0])
+		{
+		default:
+		  log_error ("Unknow packet.\n");
+		}
+	    }
+	}
       pthread_mutex_unlock (&me->thread_mutex);
     }
   pthread_mutex_unlock (&me->cond_mutex);

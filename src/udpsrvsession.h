@@ -25,6 +25,7 @@
 #ifndef _UDPSRVSESSION_H
 #define _UDPSRVSESSION_H
 
+#include <pthread.h>
 #include <sys/socket.h>
 #include <openssl/ssl.h>
 #include "peer.h"
@@ -33,6 +34,7 @@ struct udpsrvsession_t
 {
   int timeout;
   SSL *dtls;
+  pthread_mutex_t dtls_mutex;
   struct sockaddr_in *addr;
   struct peer_t *peer;
 };

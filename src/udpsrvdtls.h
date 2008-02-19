@@ -25,9 +25,14 @@
 #ifndef _UDPSRVDTLS_H
 #define _UDPSRVDTLS_H
 
+#include "udpsrvsession.h"
+
 void udpsrvdtls_init ();
+int udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
+			  const char *pkeyfile);
 int udpsrvdtls_read (const char *buffer, const int buffer_len,
-		     char *bufferout, struct udpsrvsession_t *session);
+		     char *bufferout, const int bufferout_len,
+		     struct udpsrvsession_t *session);
 int udpsrvdtls_write (const char *buffer, const int buffer_len,
 		      struct udpsrvsession_t *session);
 

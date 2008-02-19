@@ -22,55 +22,101 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
+#include <pthread.h>
 #include <openssl/ssl.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
 #include <sys/socket.h>
 #include "config.h"
 #include "debug.h"
 #include "udpsrvsession.h"
 #include "srv.h"
 
+SSL_CTX *udpsrvdtls_clictx, *udpsrvdtls_srvctx;
 BIO *udpsrvdtls_mbio;
 
 void
 udpsrvdtls_init ()
 {
-//  SSL_load_error_strings ();  /* readable error messages */
-//  SSL_library_init ();                        /* initialize library */
-//actions_to_seed_PRNG();
+  int verifymode = SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
+#ifdef DEBUG
+  SSL_load_error_strings ();
+  ERR_load_crypto_strings ();
+#endif
+  SSL_library_init ();
+  //actions_to_seed_PRNG();
+  udpsrvdtls_clictx = SSL_CTX_new (DTLSv1_client_method ());
+  if (SSL_CTX_set_cipher_list (udpsrvdtls_clictx, ssl_cipherlist) != 1)
+    log_error ("Error setting cipher list.\n");
+  SSL_CTX_set_verify (udpsrvdtls_clictx, verifymode, NULL);
+  SSL_CTX_set_verify_depth (udpsrvdtls_clictx, ssl_verifydepth);
+  udpsrvdtls_srvctx = SSL_CTX_new (DTLSv1_server_method ());
+  if (SSL_CTX_set_cipher_list (udpsrvdtls_srvctx, ssl_cipherlist) != 1)
+    log_error ("Error setting cipher list.\n");
+  SSL_CTX_set_verify (udpsrvdtls_srvctx, verifymode, NULL);
+  SSL_CTX_set_verify_depth (udpsrvdtls_srvctx, ssl_verifydepth);
   udpsrvdtls_mbio = BIO_new (BIO_s_mem ());
+}
+
+int
+udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
+		      const char *pkeyfile)
+{
+  if (SSL_CTX_use_certificate_file
+      (udpsrvdtls_clictx, certfile, SSL_FILETYPE_PEM) != 1)
+    return -2;
+  if (SSL_CTX_use_PrivateKey_file
+      (udpsrvdtls_clictx, pkeyfile, SSL_FILETYPE_PEM) != 1)
+    return -2;
+  if (SSL_CTX_use_certificate_file
+      (udpsrvdtls_srvctx, certfile, SSL_FILETYPE_PEM) != 1)
+    return -2;
+  if (SSL_CTX_use_PrivateKey_file
+      (udpsrvdtls_srvctx, pkeyfile, SSL_FILETYPE_PEM) != 1)
+    return -2;
+  if (SSL_CTX_load_verify_locations (udpsrvdtls_clictx, cafile, NULL) != 1)
+    return -1;
+  if (SSL_CTX_load_verify_locations (udpsrvdtls_srvctx, cafile, NULL) != 1)
+    return -1;
+  STACK_OF (X509_NAME) * calist = SSL_load_client_CA_file (cafile);
+  if (calist == NULL)
+    return -1;
+  SSL_CTX_set_client_CA_list (udpsrvdtls_srvctx, calist);
+  return 0;
 }
 
 int
 udpsrvdtls_write (const char *buffer, const int buffer_len,
 		  struct udpsrvsession_t *session)
 {
-  int len;
-  SSL_CTX *clictx;
+  int len, retry = 0;
+  unsigned long err;
   BIO *wbio;
-  SSL *ssl = session->dtls;
-  struct sockaddr_in *peeraddr = session->addr;
-
-  if (ssl == NULL)
+  pthread_mutex_lock (&session->dtls_mutex);
+  if (session->dtls == NULL)
     {
-      clictx = SSL_CTX_new (DTLSv1_client_method ());
-      ssl = SSL_new (clictx);
-      SSL_set_connect_state (ssl);
-
-      if (!ssl_cert || !ssl_pkey)
-	return -2;
-      if (!SSL_use_certificate (ssl, ssl_cert) ||
-	  !SSL_use_PrivateKey (ssl, ssl_pkey))
-	return -2;
-
+      session->dtls = SSL_new (udpsrvdtls_clictx);
+      SSL_set_connect_state (session->dtls);
       wbio = BIO_new_dgram (udpsrv_fd, BIO_NOCLOSE);
-      BIO_dgram_set_peer (wbio, peeraddr);
-      SSL_set_bio (ssl, udpsrvdtls_mbio, wbio);
-      session->dtls = ssl;
+      BIO_dgram_set_peer (wbio, session->addr);
+      SSL_set_bio (session->dtls, udpsrvdtls_mbio, wbio);
     }
-  len = SSL_write (ssl, buffer, buffer_len);
+  //Need to lock mutex on write?
+  do
+    {
+      if (retry > 0)
+	pthread_mutex_lock (&session->dtls_mutex);
+      len = SSL_write (session->dtls, buffer, buffer_len);
+      pthread_mutex_unlock (&session->dtls_mutex);
+      err = SSL_get_error (session->dtls, len);
+      if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE)
+	retry++;
+      else
+	retry = 0;
+    }
+  while (retry > 0 && retry < 4);
   if (len <= 0)
     {
-      int err = SSL_get_error (ssl, len);
       switch (err)
 	{
 	case SSL_ERROR_NONE:
@@ -78,18 +124,18 @@ udpsrvdtls_write (const char *buffer, const int buffer_len,
 	case SSL_ERROR_SSL:
 	  break;
 	case SSL_ERROR_WANT_READ:
-	  //retry = 1 ;
 	  break;
 	case SSL_ERROR_WANT_WRITE:
-	  //retry = 1 ;
 	  break;
 	case SSL_ERROR_SYSCALL:
 	  log_error ("SSL_ERROR_SYSCALL\n");
 	  return -3;
 	  break;
 	case SSL_ERROR_ZERO_RETURN:
+	  pthread_mutex_lock (&session->dtls_mutex);
 	  CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
-	  SSL_free (ssl);
+	  SSL_free (session->dtls);
+	  pthread_mutex_unlock (&session->dtls_mutex);
 	  break;
 	case SSL_ERROR_WANT_CONNECT:
 	  break;
@@ -103,39 +149,37 @@ udpsrvdtls_write (const char *buffer, const int buffer_len,
 }
 
 int
-udpsrvdtls_read (const char *buffer, const int buffer_len,
-		 char *bufferout, struct udpsrvsession_t *session)
+udpsrvdtls_read (const char *buffer, const int buffer_len, char *bufferout,
+		 const int bufferout_len, struct udpsrvsession_t *session)
 {
-  int len, err;
-  SSL_CTX *srvctx;
+  int len, retry = 0;
+  unsigned long err;
   BIO *wbio, *rbio;
-  SSL *ssl = session->dtls;
-  struct sockaddr_in *peeraddr = session->addr;
-
-  if (ssl == NULL)
+  pthread_mutex_lock (&session->dtls_mutex);
+  if (session->dtls == NULL)
     {
-      srvctx = SSL_CTX_new (DTLSv1_server_method ());
-      ssl = SSL_new (srvctx);
-      SSL_set_accept_state (ssl);
-
-      if (!ssl_cert || !ssl_pkey)
-	return -2;
-      if (!SSL_use_certificate (ssl, ssl_cert) ||
-	  !SSL_use_PrivateKey (ssl, ssl_pkey))
-	return -2;
-
+      session->dtls = SSL_new (udpsrvdtls_srvctx);
+      SSL_set_accept_state (session->dtls);
       wbio = BIO_new_dgram (udpsrv_fd, BIO_NOCLOSE);
-      BIO_dgram_set_peer (wbio, peeraddr);
-      SSL_set_bio (ssl, NULL, wbio);
-      session->dtls = ssl;
+      BIO_dgram_set_peer (wbio, session->addr);
+      SSL_set_bio (session->dtls, NULL, wbio);
     }
   rbio = BIO_new_mem_buf ((void *) buffer, buffer_len);
   BIO_set_mem_eof_return (rbio, -1);
-  ssl->rbio = rbio;
-  len = SSL_read (ssl, bufferout, UDPBUFFERSIZE);
-  err = SSL_get_error (ssl, len);
-  BIO_free (ssl->rbio);
-  ssl->rbio = udpsrvdtls_mbio;
+  session->dtls->rbio = rbio;
+  do
+    {
+      len = SSL_read (session->dtls, bufferout, bufferout_len);
+      err = SSL_get_error (session->dtls, len);
+      if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE)
+	retry++;
+      else
+	retry = 0;
+    }
+  while (retry > 0 && retry < 4);
+  BIO_free (session->dtls->rbio);
+  session->dtls->rbio = udpsrvdtls_mbio;
+  pthread_mutex_unlock (&session->dtls_mutex);
   if (len <= 0)
     {
       switch (err)
@@ -143,6 +187,8 @@ udpsrvdtls_read (const char *buffer, const int buffer_len,
 	case SSL_ERROR_NONE:
 	  break;
 	case SSL_ERROR_SSL:
+	  log_error ("SSL_ERROR_SSL: %s\n",
+		     ERR_reason_error_string (ERR_get_error ()));
 	  break;
 	case SSL_ERROR_WANT_READ:
 	  break;
@@ -152,19 +198,26 @@ udpsrvdtls_read (const char *buffer, const int buffer_len,
 	  break;
 	  /* connection closed */
 	case SSL_ERROR_ZERO_RETURN:
+	  log_error ("SSL_ERROR_ZERO_RETURN\n");
+	  pthread_mutex_lock (&session->dtls_mutex);
 	  CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
-	  SSL_free (ssl);
+	  SSL_free (session->dtls);
+	  pthread_mutex_unlock (&session->dtls_mutex);
 	  break;
 	case SSL_ERROR_WANT_CONNECT:
+	  log_error ("SSL_ERROR_WANT_CONNECT\n");
 	  break;
 	case SSL_ERROR_WANT_ACCEPT:
+	  log_error ("SSL_ERROR_WANT_ACCEPT\n");
 	  break;
 	default:
+	  log_error ("SSL_ERROR_UNKNOWN\n");
 	  break;
 	}
       return len;
     }
-  /*if (SSL_in_init(ssl))
-     DtlsReceiveTimeout */
+  /*if (SSL_in_init (session->dtls))
+     log_error ("SSL_in_init\n"); */
+  /* Timeout */
   return len;
 }

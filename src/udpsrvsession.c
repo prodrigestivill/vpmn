@@ -35,7 +35,6 @@ struct udpsrvsession_l
   struct udpsrvsession_l *next;
 };
 
-int udpsrvsessions_len = 0;
 struct udpsrvsession_l *udpsrvsessions = NULL;
 struct udpsrvsession_l *udpsrvsessions_last = NULL;
 pthread_mutex_t udpsrvsessions_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -102,9 +101,10 @@ udpsrvsession_create (struct sockaddr_in *source)
   struct udpsrvsession_t *newsession =
     malloc (sizeof (struct udpsrvsession_t));
   newsession->addr = source;
-  //newsession->fd = udpsrvsessions_len++;
   newsession->peer = peer_create ();
   newsession->peer->udpsrvsession = newsession;
+  pthread_mutex_init (&newsession->dtls_mutex, NULL);
+  newsession->dtls = NULL;
   udpsrvsession_update_timeout (newsession);
   return newsession;
 }

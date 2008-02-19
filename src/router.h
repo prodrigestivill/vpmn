@@ -39,5 +39,6 @@ int router_checksrc (struct in_addr *src);
 //int router_checksrc6 (struct in6_addr *src);
 void router_addroute (struct in_network *network, struct peer_t *peer);
 void router_flush (struct peer_t *peer);
+void router_sendtable (struct peer_t *peer);
 
 #endif /* _ROUTER_H */
