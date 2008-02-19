@@ -35,5 +35,7 @@ int udpsrvdtls_read (const char *buffer, const int buffer_len,
 		     struct udpsrvsession_t *session);
 int udpsrvdtls_write (const char *buffer, const int buffer_len,
 		      struct udpsrvsession_t *session);
+int udpsrvdtls_sessionerr (const unsigned long err,
+			   struct udpsrvsession_t *session);
 
 #endif /* _UDPSRVDTLS_H */

@@ -29,6 +29,7 @@
 #include <sys/socket.h>
 #include "config.h"
 #include "debug.h"
+#include "udpsrvdtls.h"
 #include "udpsrvsession.h"
 #include "srv.h"
 
@@ -109,42 +110,15 @@ udpsrvdtls_write (const char *buffer, const int buffer_len,
       len = SSL_write (session->dtls, buffer, buffer_len);
       pthread_mutex_unlock (&session->dtls_mutex);
       err = SSL_get_error (session->dtls, len);
-      if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE)
+      if (len <= 0
+	  && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
 	retry++;
       else
 	retry = 0;
     }
-  while (retry > 0 && retry < 4);
+  while (retry > 0 && retry < 5);
   if (len <= 0)
-    {
-      switch (err)
-	{
-	case SSL_ERROR_NONE:
-	  break;
-	case SSL_ERROR_SSL:
-	  break;
-	case SSL_ERROR_WANT_READ:
-	  break;
-	case SSL_ERROR_WANT_WRITE:
-	  break;
-	case SSL_ERROR_SYSCALL:
-	  log_error ("SSL_ERROR_SYSCALL\n");
-	  return -3;
-	  break;
-	case SSL_ERROR_ZERO_RETURN:
-	  pthread_mutex_lock (&session->dtls_mutex);
-	  CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
-	  SSL_free (session->dtls);
-	  pthread_mutex_unlock (&session->dtls_mutex);
-	  break;
-	case SSL_ERROR_WANT_CONNECT:
-	  break;
-	case SSL_ERROR_WANT_ACCEPT:
-	  break;
-	default:
-	  break;
-	}
-    }
+    udpsrvdtls_sessionerr (err, session);
   return len;
 }
 
@@ -171,53 +145,57 @@ udpsrvdtls_read (const char *buffer, const int buffer_len, char *bufferout,
     {
       len = SSL_read (session->dtls, bufferout, bufferout_len);
       err = SSL_get_error (session->dtls, len);
-      if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE)
+      if (len <= 0
+	  && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
 	retry++;
       else
 	retry = 0;
     }
-  while (retry > 0 && retry < 4);
+  while (retry > 0 && retry < 5);
   BIO_free (session->dtls->rbio);
   session->dtls->rbio = udpsrvdtls_mbio;
   pthread_mutex_unlock (&session->dtls_mutex);
-  if (len <= 0)
-    {
-      switch (err)
-	{
-	case SSL_ERROR_NONE:
-	  break;
-	case SSL_ERROR_SSL:
-	  log_error ("SSL_ERROR_SSL: %s\n",
-		     ERR_reason_error_string (ERR_get_error ()));
-	  break;
-	case SSL_ERROR_WANT_READ:
-	  break;
-	case SSL_ERROR_WANT_WRITE:
-	  break;
-	case SSL_ERROR_SYSCALL:
-	  break;
-	  /* connection closed */
-	case SSL_ERROR_ZERO_RETURN:
-	  log_error ("SSL_ERROR_ZERO_RETURN\n");
-	  pthread_mutex_lock (&session->dtls_mutex);
-	  CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
-	  SSL_free (session->dtls);
-	  pthread_mutex_unlock (&session->dtls_mutex);
-	  break;
-	case SSL_ERROR_WANT_CONNECT:
-	  log_error ("SSL_ERROR_WANT_CONNECT\n");
-	  break;
-	case SSL_ERROR_WANT_ACCEPT:
-	  log_error ("SSL_ERROR_WANT_ACCEPT\n");
-	  break;
-	default:
-	  log_error ("SSL_ERROR_UNKNOWN\n");
-	  break;
-	}
-      return len;
-    }
-  /*if (SSL_in_init (session->dtls))
-     log_error ("SSL_in_init\n"); */
-  /* Timeout */
+  if (len > 0 && retry == 0)
+    udpsrvsession_update_timeout (session);
+  else
+    udpsrvdtls_sessionerr (err, session);
   return len;
+}
+
+int
+udpsrvdtls_sessionerr (const unsigned long err,
+		       struct udpsrvsession_t *session)
+{
+  switch (err)
+    {
+    case SSL_ERROR_NONE:
+      break;
+    case SSL_ERROR_SSL:
+      log_error ("SSL_ERROR_SSL: %s\n",
+		 ERR_reason_error_string (ERR_get_error ()));
+      break;
+    case SSL_ERROR_WANT_READ:
+      break;
+    case SSL_ERROR_WANT_WRITE:
+      break;
+    case SSL_ERROR_SYSCALL:
+      break;
+      /* connection closed */
+    case SSL_ERROR_ZERO_RETURN:
+      log_error ("SSL_ERROR_ZERO_RETURN\n");
+      pthread_mutex_lock (&session->dtls_mutex);
+      CRYPTO_add (&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
+      SSL_free (session->dtls);
+      pthread_mutex_unlock (&session->dtls_mutex);
+      break;
+    case SSL_ERROR_WANT_CONNECT:
+      log_error ("SSL_ERROR_WANT_CONNECT\n");
+      break;
+    case SSL_ERROR_WANT_ACCEPT:
+      log_error ("SSL_ERROR_WANT_ACCEPT\n");
+      break;
+    default:
+      log_error ("SSL_ERROR_UNKNOWN\n");
+      break;
+    }
 }
