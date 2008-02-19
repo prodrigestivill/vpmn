@@ -37,6 +37,6 @@ struct protocol_route
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
 			  struct peer_t *peer);
 void protocol_sendframe (const char *buffer, const int buffer_len);
-void protocol_sendroutes (const struct peer_t *peer);
+void protocol_sendroutes (const struct peer_t *dstpeer);
 
 #endif /* _PROTOCOL_H */

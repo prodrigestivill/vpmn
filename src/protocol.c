@@ -71,23 +71,20 @@ protocol_sendframe (const char *buffer, const int buffer_len)
   else if ((buffer[0] & 0xF0) == 0x60)
     {
       log_error ("IPv6 not implemented.\n");
-      //ROUTING
+      //ROUTING IPv6
     }
   else
     log_error ("Unknow protocol not implemented.\n");
 
   //CRYPTO
-  if (dstpeer != NULL)
-    {
-      if (dstpeer->udpsrvsession != NULL)
-	udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsession);
-    }
+  if (dstpeer != NULL && dstpeer->udpsrvsession != NULL)
+    udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsession);
   else
     log_error ("Packet lost.\n");
 }
 
 void
-protocol_sendroutes (const struct peer_t *peer)
+protocol_sendroutes (const struct peer_t *dstpeer)
 {
   int len;
   struct protocol_route table;
@@ -97,8 +94,7 @@ protocol_sendroutes (const struct peer_t *peer)
   else
     len = tunaddr_networks_len;
   memcpy (&table.routes, &tunaddr_networks, len * sizeof (struct in_network));
-  if (peer->udpsrvsession != NULL)
-    {
-      udpsrvdtls_write ((char *) &table, sizeof (table), peer->udpsrvsession);
-    }
+  if (dstpeer->udpsrvsession != NULL)
+    udpsrvdtls_write ((char *) &table, sizeof (table),
+		      dstpeer->udpsrvsession);
 }
