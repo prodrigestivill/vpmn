@@ -22,21 +22,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor Boston, MA 02110-1301,  USA
  */
 
-#include <sys/socket.h>
-#include <resolv.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <strings.h>
-
+#include <resolv.h>
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-
-#include "srv.h"
-#include "udpsrvthread.h"
+#include "udpsrvdtls.h"
+#include "udpsrvsession.h"
+#include "protocol.h"
 #include "debug.h"
 #include "config.h"
+#include "srv.h"
 
 int udpsrv_fd = -1;
+pthread_cond_t udpsrv_waitcond;
+pthread_mutex_t udpsrv_waitmutex;
+
+struct udpsrv_thread_t
+{
+  pthread_t thread;
+  pthread_mutex_t thread_mutex;
+  pthread_cond_t cond;
+  pthread_mutex_t cond_mutex;
+  char buffer[UDPBUFFERSIZE];
+  int buffer_len;
+  struct sockaddr_in addr;
+  socklen_t addr_len;
+};
 
 int
 udpsrv_init ()
@@ -57,14 +71,54 @@ udpsrv_init ()
 }
 
 void
+udpsrv_thread (struct udpsrv_thread_t *me)
+{
+  char tunbuffer[TUNBUFFERSIZE];
+  int tunbuffer_len;
+  struct sockaddr_in *addr;
+  struct udpsrvsession_t *udpsession;
+  pthread_mutex_lock (&me->cond_mutex);
+  while (1)
+    {
+      pthread_cond_wait (&me->cond, &me->cond_mutex);
+      addr = malloc (sizeof (struct sockaddr_in));
+      memcpy (addr, &me->addr, me->addr_len);
+      udpsession = udpsrvsession_search (addr);
+      tunbuffer_len =
+	udpsrvdtls_read (me->buffer, me->buffer_len, tunbuffer, TUNBUFFERSIZE,
+			 udpsession);
+      if (tunbuffer_len > 0)
+	protocol_recvpacket (tunbuffer, tunbuffer_len, udpsession->peer);
+      pthread_mutex_unlock (&me->thread_mutex);
+      //Notify main loop about finished job
+      pthread_mutex_lock (&udpsrv_waitmutex);
+      pthread_cond_signal (&udpsrv_waitcond);
+      pthread_mutex_unlock (&udpsrv_waitmutex);
+    }
+  pthread_mutex_unlock (&me->cond_mutex);
+}
+
+int
+udpsrv_threadcreate (struct udpsrv_thread_t *new)
+{
+  pthread_mutex_init (&new->thread_mutex, NULL);
+  pthread_mutex_init (&new->cond_mutex, NULL);
+  pthread_cond_init (&new->cond, NULL);
+  return pthread_create (&new->thread, NULL, (void *) &udpsrv_thread, new);
+}
+
+void
 udpsrv ()
 {
   int rc, th;
-  struct udpsrvthread_t udpsrvthreads[num_udpsrvthreads];
+  struct udpsrv_thread_t udpsrvthreads[num_udpsrvthreads];
+
+  pthread_mutex_init (&udpsrv_waitmutex, NULL);
+  pthread_cond_init (&udpsrv_waitcond, NULL);
 
   for (th = 0; th < num_udpsrvthreads; th++)
     {
-      if ((rc = udpsrvthread_create (&(udpsrvthreads[th]))))
+      if ((rc = udpsrv_threadcreate (&(udpsrvthreads[th]))))
 	{
 	  log_error ("Thread %d creation failed: %d\n", th, rc);
 	  break;
@@ -85,20 +139,20 @@ udpsrv ()
 			  sizeof (udpsrvthreads[th].buffer), 0,
 			  (struct sockaddr *) &udpsrvthreads[th].addr,
 			  &udpsrvthreads[th].addr_len);
-	      if (pthread_cond_signal (&udpsrvthreads[th].cond) == 0)
+	      if ((udpsrvthreads[th].buffer_len < 1)
+		  || (pthread_cond_signal (&udpsrvthreads[th].cond) != 0))
 		{
-		  pthread_mutex_unlock (&udpsrvthreads[th].cond_mutex);
-		  break;
+		  pthread_mutex_unlock (&udpsrvthreads[th].thread_mutex);
+		  log_error ("Error reading form socket.\n");
 		}
-	      else
-		{
-		  pthread_mutex_unlock (&udpsrvthreads[th].cond_mutex);
-		  log_error ("Can't wake up the thread.\n");
-		}
-
+	      pthread_mutex_unlock (&udpsrvthreads[th].cond_mutex);
 	    }
 	}
-      /*if (th >= num_udpsrvthreads)
-         sleep */
+      if (th >= num_udpsrvthreads)
+	{
+	  pthread_mutex_lock (&udpsrv_waitmutex);
+	  pthread_cond_wait (&udpsrv_waitcond, &udpsrv_waitmutex);
+	  pthread_mutex_unlock (&udpsrv_waitmutex);
+	}
     }
 }

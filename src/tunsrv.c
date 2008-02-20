@@ -23,20 +23,66 @@
  */
 
 #include <pthread.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include "protocol.h"
+#include "tundev.h"
 #include "config.h"
 #include "debug.h"
-#include "tundev.h"
-#include "tunsrvthread.h"
+
+pthread_cond_t tunsrv_waitcond;
+pthread_mutex_t tunsrv_waitmutex;
+
+struct tunsrv_thread_t
+{
+  pthread_t thread;
+  pthread_mutex_t thread_mutex;
+  pthread_cond_t cond;
+  pthread_mutex_t cond_mutex;
+  char buffer[TUNBUFFERSIZE];
+  int buffer_len;
+};
+
+void
+tunsrv_thread (struct tunsrv_thread_t *me)
+{
+  pthread_mutex_lock (&me->cond_mutex);
+  while (1)
+    {
+      pthread_cond_wait (&me->cond, &me->cond_mutex);
+      protocol_sendframe (me->buffer, me->buffer_len);
+      pthread_mutex_unlock (&me->thread_mutex);
+      //Notify main loop about finished job
+      pthread_mutex_lock (&tunsrv_waitmutex);
+      pthread_cond_signal (&tunsrv_waitcond);
+      pthread_mutex_unlock (&tunsrv_waitmutex);
+    }
+  pthread_mutex_unlock (&me->cond_mutex);
+}
+
+int
+tunsrv_threadcreate (struct tunsrv_thread_t *new)
+{
+  pthread_mutex_init (&new->thread_mutex, NULL);
+  pthread_mutex_init (&new->cond_mutex, NULL);
+  pthread_cond_init (&new->cond, NULL);
+  return pthread_create (&new->thread, NULL, (void *) &tunsrv_thread, new);
+}
 
 void
 tunsrv ()
 {
   int rc, th;
-  struct tunsrvthread_t tunsrvthreads[num_tunsrvthreads];
+  struct tunsrv_thread_t tunsrvthreads[num_tunsrvthreads];
+
+  pthread_mutex_init (&tunsrv_waitmutex, NULL);
+  pthread_cond_init (&tunsrv_waitcond, NULL);
+
 
   for (th = 0; th < num_tunsrvthreads; th++)
     {
-      if ((rc = tunsrvthread_create (&(tunsrvthreads[th]))))
+      if ((rc = tunsrv_threadcreate (&(tunsrvthreads[th]))))
 	{
 	  log_error ("Thread %d creation failed: %d\n", th, rc);
 	  break;
@@ -52,11 +98,8 @@ tunsrv ()
 	      tunsrvthreads[th].buffer_len =
 		tundev_read (tunsrvthreads[th].buffer,
 			     sizeof (tunsrvthreads[th].buffer));
-	      if (tunsrvthreads[th].buffer_len > 0)
-		{
-		  pthread_cond_signal (&tunsrvthreads[th].cond);
-		}
-	      else
+	      if ((tunsrvthreads[th].buffer_len < 1)
+		  || (pthread_cond_signal (&tunsrvthreads[th].cond) != 0))
 		{
 		  pthread_mutex_unlock (&tunsrvthreads[th].thread_mutex);
 		  log_error ("Error reading form interface.\n");
@@ -64,6 +107,12 @@ tunsrv ()
 	      pthread_mutex_unlock (&tunsrvthreads[th].cond_mutex);
 	      break;
 	    }
+	}
+      if (th >= num_tunsrvthreads)
+	{
+	  pthread_mutex_lock (&tunsrv_waitmutex);
+	  pthread_cond_wait (&tunsrv_waitcond, &tunsrv_waitmutex);
+	  pthread_mutex_unlock (&tunsrv_waitmutex);
 	}
     }
 }

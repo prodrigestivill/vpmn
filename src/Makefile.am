@@ -22,8 +22,6 @@ vpmnd_SOURCES = \
 	udpsrv.c \
 	udpsrvsession.c \
 	udpsrvsession.h \
-	udpsrvthread.c \
-	udpsrvthread.h \
 	udpsrvdtls.c \
 	udpsrvdtls.h \
 	config.h \
@@ -33,12 +31,10 @@ vpmnd_SOURCES = \
 	tunsrv.c \
 	router.c \
 	router.h \
-	tunsrvthread.c \
-	tunsrvthread.h \
 	vpmnd.c \
 	srv.h \
 	protocol.c \
-	protocol.h
+	protocol.h 
 
 vpmnd_LDFLAGS = \
 	-lpthread\
