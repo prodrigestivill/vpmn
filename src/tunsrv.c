@@ -98,8 +98,11 @@ tunsrv ()
 	      tunsrvthreads[th].buffer_len =
 		tundev_read (tunsrvthreads[th].buffer,
 			     sizeof (tunsrvthreads[th].buffer));
-	      if ((tunsrvthreads[th].buffer_len < 1)
-		  || (pthread_cond_signal (&tunsrvthreads[th].cond) != 0))
+	      if (tunsrvthreads[th].buffer_len > 0)
+		{
+		  pthread_cond_signal (&tunsrvthreads[th].cond);
+		}
+	      else
 		{
 		  pthread_mutex_unlock (&tunsrvthreads[th].thread_mutex);
 		  log_error ("Error reading form interface.\n");
@@ -108,6 +111,7 @@ tunsrv ()
 	      break;
 	    }
 	}
+      //Wait for free thread
       if (th >= num_tunsrvthreads)
 	{
 	  pthread_mutex_lock (&tunsrv_waitmutex);

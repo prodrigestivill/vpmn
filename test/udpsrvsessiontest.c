@@ -76,3 +76,10 @@ main ()
 	log_error ("No decoded data.\n");
     }
 }
+
+void
+protocol_sendroutes (const struct peer_t *dstpeer)
+{
+  log_debug ("Sending routes... (not implemented)");
+}
+

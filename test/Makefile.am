@@ -42,7 +42,10 @@ tundevtest_SOURCES = \
 	../src/router.c \
 	../src/router.h \
 	../src/peer.c \
-	../src/peer.h 
+	../src/peer.h \
+	../src/srv.h \
+	../src/udpsrvdtls.h \
+	../src/udpsrvsession.h
 
 tundevtest_LDFLAGS = \
 	-lpthread
@@ -78,8 +81,13 @@ udpsrvtest_SOURCES = \
 	../src/config.h \
 	../src/config.c \
 	../src/router.c \
-	../src/router.h
+	../src/router.h \
+	../src/udpsrvdtls.c \
+	../src/udpsrvdtls.h \
+	../src/srv.h \
+	../src/protocol.h
 
 udpsrvtest_LDFLAGS = \
-	-lpthread
+	-lpthread     \
+	-lssl
 

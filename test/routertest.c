@@ -67,3 +67,21 @@ main ()
   log_debug("%s", test);
   log_debug("-> %d\n", ntohs(searchdst(test)->udpsrvsession->addr->sin_port));
 }
+
+void
+protocol_sendroutes (const struct peer_t *dstpeer)
+{
+  log_debug ("Sending routes... (not implemented)");
+}
+
+void
+udpsrvdtls_init ()
+{
+}
+
+int
+udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
+		      const char *pkeyfile)
+{
+  return 0;
+}

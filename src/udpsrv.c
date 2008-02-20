@@ -139,15 +139,20 @@ udpsrv ()
 			  sizeof (udpsrvthreads[th].buffer), 0,
 			  (struct sockaddr *) &udpsrvthreads[th].addr,
 			  &udpsrvthreads[th].addr_len);
-	      if ((udpsrvthreads[th].buffer_len < 1)
-		  || (pthread_cond_signal (&udpsrvthreads[th].cond) != 0))
+	      if (udpsrvthreads[th].buffer_len > 0)
+		{
+		  pthread_cond_signal (&udpsrvthreads[th].cond);
+		}
+	      else
 		{
 		  pthread_mutex_unlock (&udpsrvthreads[th].thread_mutex);
 		  log_error ("Error reading form socket.\n");
 		}
 	      pthread_mutex_unlock (&udpsrvthreads[th].cond_mutex);
+	      break;
 	    }
 	}
+      //Wait for free thread
       if (th >= num_udpsrvthreads)
 	{
 	  pthread_mutex_lock (&udpsrv_waitmutex);

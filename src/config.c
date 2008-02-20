@@ -59,11 +59,11 @@ config_load ()
     tunaddr_networks[0].addr.s_addr & tunaddr_networks[0].netmask.s_addr;
   tunaddr_networks_len = 1;
 
-  num_tunsrvthreads = 10;
-  tundevmtu = 1450;
+  num_tunsrvthreads = 5;
+  tundevmtu = 1500;
 
   //UDPSRV
-  num_udpsrvthreads = 4;
+  num_udpsrvthreads = 5;
   port_udp = 1090;
 
   //DTLS
