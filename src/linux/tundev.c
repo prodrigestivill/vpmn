@@ -77,12 +77,9 @@ tundev_initdev ()
   else
     {
       ifr.ifr_flags = 0;
-      ifr.ifr_mtu = tundevmtu;
-      if (ioctl (sd_sock, SIOCSIFMTU, &ifr) < 0)
-	{
-	  log_error ("Could not configure mtu %d in the interface.\n",
-		     ifr.ifr_mtu);
-	}
+      ifr.ifr_mtu = TUNBUFFERSIZE;
+      ioctl (sd_sock, SIOCSIFMTU, &ifr);
+
       tunaddr = (struct sockaddr_in *) &ifr.ifr_addr;
       tunaddr->sin_family = AF_INET;
       tunaddr->sin_addr.s_addr = tunaddr_ip.addr.s_addr;
@@ -123,7 +120,7 @@ tundev_initdev ()
 int
 tundev_write (const void *buf, const int count)
 {
-  if (tundev_fd >= 0 && count > 0 && count <= tundevmtu)
+  if (tundev_fd >= 0 && count > 0 && count <= TUNBUFFERSIZE)
     return write (tundev_fd, buf, count);
   return -1;
 }
@@ -131,7 +128,7 @@ tundev_write (const void *buf, const int count)
 int
 tundev_read (void *buf, const int count)
 {
-  if (tundev_fd >= 0)
+  if (tundev_fd >= 0 && count > 0 && count <= TUNBUFFERSIZE)
     return read (tundev_fd, buf, count);
   return -1;
 }

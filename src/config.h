@@ -44,7 +44,6 @@ char *tunname;
 struct in_network tunaddr_ip;
 struct in_network *tunaddr_networks;
 int tunaddr_networks_len;
-int tundevmtu;
 int num_tunsrvthreads;
 
 //UDPSRV

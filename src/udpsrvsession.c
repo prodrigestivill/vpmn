@@ -103,8 +103,7 @@ udpsrvsession_create (const struct sockaddr_in *source)
   struct sockaddr_in *addr = malloc (sizeof (struct sockaddr_in));
   memcpy (addr, source, sizeof(const struct sockaddr_in));
   newsession->addr = addr;
-  newsession->peer = peer_create ();
-  newsession->peer->udpsrvsession = newsession;
+  newsession->peer = NULL;
   pthread_mutex_init (&newsession->dtls_mutex, NULL);
   newsession->dtls = NULL;
   udpsrvsession_update_timeout (newsession);

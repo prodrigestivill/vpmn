@@ -60,7 +60,6 @@ config_load ()
   tunaddr_networks_len = 1;
 
   num_tunsrvthreads = 5;
-  tundevmtu = 1500;
 
   //UDPSRV
   num_udpsrvthreads = 5;
