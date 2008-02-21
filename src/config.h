@@ -26,7 +26,7 @@
 #define _CONFIG_H
 
 #include <unistd.h>
-#include "router.h"
+#include "peer.h"
 #include "../config.h"
 
 void config_load ();
@@ -38,13 +38,13 @@ uid_t vpmnd_uid;
 gid_t vpmnd_gid;
 int daemonize;
 
-//TUNDEV
+//TUNSRV
 #define TUNBUFFERSIZE 1500
 char *tunname;
 struct in_network tunaddr_ip;
-struct in_network *tunaddr_networks;
-int tunaddr_networks_len;
 int num_tunsrvthreads;
+struct peer_t tun_selfpeer;
+
 
 //UDPSRV
 #define UDPBUFFERSIZE 65535

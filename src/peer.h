@@ -39,6 +39,8 @@ struct peer_t
 //struct tcpsrvsession_t *tcpsrvsession;
   struct sockaddr_in **addrs;
   int addrs_len;
+  struct in_network *shared_networks;
+  int shared_networks_len;
   int stat;
 };
 

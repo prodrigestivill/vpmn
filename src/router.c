@@ -68,6 +68,8 @@ router_addroute (struct in_network *network, struct peer_t *peer)
   newroute = malloc (sizeof (struct router_table_l));
   newroute->network = network;
   newroute->peer = peer;
+  //peer->shared_networks[peer->shared_networks_len] = network;
+  //peer->shared_networks_len++;
   pthread_mutex_lock (&router_table_mutex);
   if (router_table == NULL)
     {
@@ -155,17 +157,15 @@ router_flush (const struct peer_t *peer)
 }
 
 int
-router_checksrc (const struct in_addr *src)
+router_checksrc (const struct in_addr *src, const struct peer_t *peer)
 {
   int n;
-  if (src->s_addr == tunaddr_ip.addr.s_addr)
-    return 0;
-  if (tunaddr_networks == NULL || tunaddr_networks_len < 1)
+  if (peer->shared_networks == NULL || peer->shared_networks_len < 1)
     return -1;
-  for (n = 0; n < tunaddr_networks_len; n++)
+  for (n = 0; n < peer->shared_networks_len; n++)
     {
-      if ((src->s_addr & tunaddr_networks[n].netmask.s_addr) ==
-	  tunaddr_networks[n].addr.s_addr)
+      if ((src->s_addr & peer->shared_networks[n].netmask.s_addr) ==
+	  peer->shared_networks[n].addr.s_addr)
 	return 0;
     }
   return -2;

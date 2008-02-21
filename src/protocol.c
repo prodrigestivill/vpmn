@@ -49,18 +49,25 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
       //Check if it is an interested packet.
       dst4.s_addr = (buffer[16]) | (buffer[17] << 8) |
 	(buffer[18] << 16) | (buffer[19] << 24);
-      if (router_checksrc (&dst4) != 0)
+      if (router_checksrc (&dst4, &tun_selfpeer) != 0)
 	return;
       //Check permisions
       src4.s_addr = (buffer[12]) | (buffer[13] << 8) |
 	(buffer[14] << 16) | (buffer[15] << 24);
-      //-TODO
+      if (router_checksrc (&src4, peer) != 0)
+	return;
       tundev_write (buffer, buffer_len);
     }
   else				//Internal packets
     {
       switch (buffer[0])
 	{
+	case PROTOCOL1_ID:
+
+	  break;
+	case PROTOCOL1_KA:
+
+	  break;
 	default:
 	  log_error ("Unknow packet.\n");
 	}
@@ -81,7 +88,7 @@ protocol_sendframe (const char *buffer, const int buffer_len)
 	(buffer[14] << 16) | (buffer[15] << 24);
       dst4.s_addr = (buffer[16]) | (buffer[17] << 8) |
 	(buffer[18] << 16) | (buffer[19] << 24);
-      if (router_checksrc (&src4) == 0)
+      if (router_checksrc (&src4, &tun_selfpeer) == 0)
 	dstpeer = router_searchdst (&dst4);
       else
 	log_error ("Invalid source.\n");
@@ -105,15 +112,7 @@ protocol_sendframe (const char *buffer, const int buffer_len)
 void
 protocol_sendroutes (const struct peer_t *dstpeer)
 {
-  int len;
-  struct protocol_route table;
-  table.p = '\0';
-  if (tunaddr_networks_len > MAX_PROTOCOL_ROUTES)
-    len = MAX_PROTOCOL_ROUTES;
-  else
-    len = tunaddr_networks_len;
-  memcpy (&table.routes, &tunaddr_networks, len * sizeof (struct in_network));
-  if (dstpeer->udpsrvsession != NULL)
-    udpsrvdtls_write ((char *) &table, sizeof (table),
-		      dstpeer->udpsrvsession);
+  /*if (dstpeer->udpsrvsession != NULL)
+     udpsrvdtls_write ((char *) &table, sizeof (table),
+     dstpeer->udpsrvsession); */
 }

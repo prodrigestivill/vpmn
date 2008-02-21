@@ -35,7 +35,7 @@ struct in_network
 
 struct peer_t *router_searchdst (const struct in_addr *dst);
 //struct peer_t *router_searchdst6 (struct in6_addr *dst);
-int router_checksrc (const struct in_addr *src);
+int router_checksrc (const struct in_addr *src, const struct peer_t *peer);
 //int router_checksrc6 (struct in6_addr *src);
 void router_addroute (struct in_network *network, struct peer_t *peer);
 void router_flush (const struct peer_t *peer);

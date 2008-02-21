@@ -30,6 +30,9 @@
 
 #define UDPSRVSESSION 0
 
+#define PROTOCOL1_ID 0x01
+#define PROTOCOL1_KA 0x02
+
 struct protocol_route
 {
   char p;

@@ -43,23 +43,25 @@ config_load ()
 #endif
   //TUNDEV
   tunname = "vpmn0";
-
+  num_tunsrvthreads = 5;
+	
   char *tunaddr_ip_str = "10.0.0.5";
   char *tunaddr_nm_str = "255.255.255.0";
   if (inet_aton (tunaddr_ip_str, &tunaddr_ip.addr) == 0
       || inet_aton (tunaddr_nm_str, &tunaddr_ip.netmask) == 0)
     log_error ("Unable to load IP configurations.\n");
 
+  tun_selfpeer.shared_networks = calloc (1+1, sizeof (struct in_network));
+  tun_selfpeer.shared_networks[0].addr.s_addr = tunaddr_ip.addr.s_addr;
+  tun_selfpeer.shared_networks[0].netmask.s_addr = 0xffffffff;
+	
   char *tunaddr_net0_ip_str = "10.1.0.5";
   char *tunaddr_net0_nm_str = "255.255.255.0";
-  tunaddr_networks = calloc (1, sizeof (struct in_network));
-  inet_aton (tunaddr_net0_ip_str, &tunaddr_networks[0].addr);
-  inet_aton (tunaddr_net0_nm_str, &tunaddr_networks[0].netmask);
-  tunaddr_networks[0].addr.s_addr =
-    tunaddr_networks[0].addr.s_addr & tunaddr_networks[0].netmask.s_addr;
-  tunaddr_networks_len = 1;
-
-  num_tunsrvthreads = 5;
+  inet_aton (tunaddr_net0_ip_str, &tun_selfpeer.shared_networks[1].addr);
+  inet_aton (tunaddr_net0_nm_str, &tun_selfpeer.shared_networks[1].netmask);
+  tun_selfpeer.shared_networks[1].addr.s_addr = tun_selfpeer.shared_networks[1].addr.s_addr &
+		tun_selfpeer.shared_networks[1].netmask.s_addr;
+  tun_selfpeer.shared_networks_len = 1+1;
 
   //UDPSRV
   num_udpsrvthreads = 5;

@@ -32,6 +32,8 @@ peer_create ()
   struct peer_t *newpeer = malloc (sizeof (struct peer_t));
   newpeer->udpsrvsession = NULL;
   //newpeer->tcpsrvsession = NULL;
+  newpeer->addrs_len = 0;
+  newpeer->shared_networks_len = 0;
   return newpeer;
 }
 
