@@ -39,7 +39,7 @@ gid_t vpmnd_gid;
 int daemonize;
 
 //TUNDEV
-#define TUNBUFFERSIZE 65535
+#define TUNBUFFERSIZE 1500
 char *tunname;
 struct in_network tunaddr_ip;
 struct in_network *tunaddr_networks;
