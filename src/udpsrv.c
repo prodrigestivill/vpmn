@@ -75,15 +75,12 @@ udpsrv_thread (struct udpsrv_thread_t *me)
 {
   char tunbuffer[TUNBUFFERSIZE];
   int tunbuffer_len;
-  struct sockaddr_in *addr;
   struct udpsrvsession_t *udpsession;
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
       pthread_cond_wait (&me->cond, &me->cond_mutex);
-      addr = malloc (sizeof (struct sockaddr_in));
-      memcpy (addr, &me->addr, me->addr_len);
-      udpsession = udpsrvsession_search (addr);
+      udpsession = udpsrvsession_search (&me->addr);
       tunbuffer_len =
 	udpsrvdtls_read (me->buffer, me->buffer_len, tunbuffer, TUNBUFFERSIZE,
 			 udpsession);

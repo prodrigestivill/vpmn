@@ -40,7 +40,7 @@ struct udpsrvsession_l *udpsrvsessions_last = NULL;
 pthread_mutex_t udpsrvsessions_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct udpsrvsession_t *
-udpsrvsession_search (struct sockaddr_in *source)
+udpsrvsession_search (const struct sockaddr_in *source)
 {
   struct udpsrvsession_l *cursession;
   int local_mutex = 0;
@@ -96,11 +96,13 @@ udpsrvsession_search (struct sockaddr_in *source)
 }
 
 struct udpsrvsession_t *
-udpsrvsession_create (struct sockaddr_in *source)
+udpsrvsession_create (const struct sockaddr_in *source)
 {
   struct udpsrvsession_t *newsession =
     malloc (sizeof (struct udpsrvsession_t));
-  newsession->addr = source;
+  struct sockaddr_in *addr = malloc (sizeof (struct sockaddr_in));
+  memcpy (addr, source, sizeof(const struct sockaddr_in));
+  newsession->addr = addr;
   newsession->peer = peer_create ();
   newsession->peer->udpsrvsession = newsession;
   pthread_mutex_init (&newsession->dtls_mutex, NULL);

@@ -36,11 +36,13 @@ struct udpsrvsession_t
   SSL *dtls;
   pthread_mutex_t dtls_mutex;
   struct sockaddr_in *addr;
+  struct sockaddr_in **otheraddrs;
+  int otheraddrs_len;
   struct peer_t *peer;
 };
 
-struct udpsrvsession_t *udpsrvsession_search (struct sockaddr_in *source);
-struct udpsrvsession_t *udpsrvsession_create (struct sockaddr_in *source);
+struct udpsrvsession_t *udpsrvsession_search (const struct sockaddr_in *source);
+struct udpsrvsession_t *udpsrvsession_create (const struct sockaddr_in *source);
 void udpsrvsession_update_timeout (struct udpsrvsession_t *cursession);
 void udpsrvsession_destroy (struct udpsrvsession_t *cursession);
 
