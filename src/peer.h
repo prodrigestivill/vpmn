@@ -30,13 +30,15 @@
 #include "udpsrvsession.h"
 
 #define PEER_STAT_NEW 0
-#define PEER_STAT_ID  1 //IDENTIFIED
-#define PEER_STAT_TO  2 //TIMEOUT
+#define PEER_STAT_ID  1		//IDENTIFIED
+#define PEER_STAT_TO  2		//TIMEOUT
 
 struct peer_t
 {
   struct udpsrvsession_t *udpsrvsession;
 //struct tcpsrvsession_t *tcpsrvsession;
+  struct sockaddr_in **addrs;
+  int addrs_len;
   int stat;
 };
 

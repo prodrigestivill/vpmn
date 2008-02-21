@@ -28,6 +28,8 @@
 #include "router.h"
 #define MAX_PROTOCOL_ROUTES 10
 
+#define UDPSRVSESSION 0
+
 struct protocol_route
 {
   char p;
@@ -35,7 +37,7 @@ struct protocol_route
 };
 
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
-			  struct peer_t *peer);
+			  void *session, const int sessiontype);
 void protocol_sendframe (const char *buffer, const int buffer_len);
 void protocol_sendroutes (const struct peer_t *dstpeer);
 

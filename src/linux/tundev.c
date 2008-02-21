@@ -101,7 +101,8 @@ tundev_initdev ()
 	}
       tunaddr = (struct sockaddr_in *) &ifr.ifr_dstaddr;
       tunaddr->sin_family = AF_INET;
-      tunaddr->sin_addr.s_addr = tunaddr_ip.addr.s_addr & tunaddr_ip.netmask.s_addr;
+      tunaddr->sin_addr.s_addr = tunaddr_ip.addr.s_addr &
+	tunaddr_ip.netmask.s_addr;
       if (ioctl (sd_sock, SIOCSIFDSTADDR, &ifr) < 0)
 	{
 	  log_error ("Could not configure net addr %s in the interface.\n",
@@ -122,7 +123,7 @@ tundev_initdev ()
 int
 tundev_write (const void *buf, const int count)
 {
-  if (tundev_fd >= 0)
+  if (tundev_fd >= 0 && count > 0 && count <= tundevmtu)
     return write (tundev_fd, buf, count);
   return -1;
 }

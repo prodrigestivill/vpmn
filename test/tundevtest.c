@@ -48,7 +48,7 @@ protocol_sendframe (const char *buffer, const int buffer_len)
 
 void
 protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
-		     struct peer_t *peer)
+		     void *session, const int sessiontype)
 {
   log_debug ("Recive packet... (not implemented)");
 }

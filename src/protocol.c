@@ -32,17 +32,34 @@
 #include "tundev.h"
 
 void
-protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
-		     struct peer_t *peer)
+protocol_recvpacket (const char *buffer, const int buffer_len,
+		     void *session, const int sessiontype)
 {
+  struct in_addr src4, dst4;
+  struct peer_t *peer = NULL;
+  if (buffer_len < 2)
+    return;
+  if (sessiontype == UDPSRVSESSION && session != NULL)
+    peer = ((struct udpsrvsession_t *) session)->peer;
   //IP packet
-  if ((tunbuffer[0] & 0xF0) == 0x40 || (tunbuffer[0] & 0xF0) == 0x60)
+  if ((buffer[0] & 0xF0) == 0x40 || (buffer[0] & 0xF0) == 0x60)
     {
-      tundev_write (tunbuffer, tunbuffer_len);
+      if (peer == NULL || buffer_len < 20)
+	return;
+      //Check if it is an interested packet.
+      dst4.s_addr = (buffer[16]) | (buffer[17] << 8) |
+	(buffer[18] << 16) | (buffer[19] << 24);
+      if (router_checksrc (&dst4) != 0)
+	return;
+      //Check permisions
+      src4.s_addr = (buffer[12]) | (buffer[13] << 8) |
+	(buffer[14] << 16) | (buffer[15] << 24);
+      //-TODO
+      tundev_write (buffer, buffer_len);
     }
   else				//Internal packets
     {
-      switch (tunbuffer[0])
+      switch (buffer[0])
 	{
 	default:
 	  log_error ("Unknow packet.\n");
@@ -55,6 +72,8 @@ protocol_sendframe (const char *buffer, const int buffer_len)
 {
   struct in_addr src4, dst4;
   struct peer_t *dstpeer = NULL;
+  if (buffer_len < 20)
+    return;
   //Check for IPv4
   if ((buffer[0] & 0xF0) == 0x40)
     {

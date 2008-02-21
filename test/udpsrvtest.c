@@ -17,19 +17,19 @@ main ()
 
 void
 protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
-		     struct peer_t *peer)
+		     void *session, const int sessiontype)
 {
-  log_debug("Recv: %s", tunbuffer);
+  log_debug ("Recv: %s", tunbuffer);
 }
 
 void
 protocol_sendframe (const char *buffer, const int buffer_len)
 {
-	log_debug("Sending frame... (not implemented)");
+  log_debug ("Sending frame... (not implemented)");
 }
 
 void
 protocol_sendroutes (const struct peer_t *dstpeer)
 {
-  log_debug("Sending routes... (not implemented)");
+  log_debug ("Sending routes... (not implemented)");
 }

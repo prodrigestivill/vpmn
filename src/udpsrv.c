@@ -85,7 +85,7 @@ udpsrv_thread (struct udpsrv_thread_t *me)
 	udpsrvdtls_read (me->buffer, me->buffer_len, tunbuffer, TUNBUFFERSIZE,
 			 udpsession);
       if (tunbuffer_len > 0)
-	protocol_recvpacket (tunbuffer, tunbuffer_len, udpsession->peer);
+	protocol_recvpacket (tunbuffer, tunbuffer_len, udpsession, UDPSRVSESSION);
       pthread_mutex_unlock (&me->thread_mutex);
       //Notify main loop about finished job
       pthread_mutex_lock (&udpsrv_waitmutex);
