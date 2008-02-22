@@ -89,5 +89,5 @@ config_fistpeersinit ()
   inet_aton (peeraddr_str, &peeraddr->sin_addr);
   udpsrv_firstpeers = calloc (1, sizeof (struct udpsrvsession_t *));
   udpsrv_firstpeers[0] = udpsrvsession_search (peeraddr);
-  protocol_sendroutes (udpsrv_firstpeers[0]->peer);
+  protocol_sendpacket (udpsrv_firstpeers[0]->peer, PROTOCOL1_ID);
 }

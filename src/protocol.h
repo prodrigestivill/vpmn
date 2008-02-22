@@ -27,20 +27,16 @@
 #include "router.h"
 #define MAX_PROTOCOL_ROUTES 10
 
+#define NOSESSION -1
 #define UDPSRVSESSION 0
 
 #define PROTOCOL1_ID 0x01
 #define PROTOCOL1_KA 0x02
 
-struct protocol_route
-{
-  char p;
-  struct in_network routes[MAX_PROTOCOL_ROUTES];
-};
-
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
 			  void *session, const int sessiontype);
-void protocol_sendframe (const char *buffer, const int buffer_len);
-void protocol_sendroutes (const struct peer_t *dstpeer);
+int protocol_sendframe (const char *buffer, const int buffer_len);
+int protocol_sendpacket (const struct peer_t *dstpeer, const int type);
+void protocol_maintainerthread ();
 
 #endif /* _PROTOCOL_H */

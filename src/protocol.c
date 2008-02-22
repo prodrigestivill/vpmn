@@ -30,6 +30,12 @@
 #include "udpsrvdtls.h"
 #include "tundev.h"
 
+char *protocol_v1id;
+int protocol_v1id_len;
+char *protocol_v1ka;
+int protocol_v1ka_len;
+int protocol_v1ka_pos;
+
 void
 protocol_recvpacket (const char *buffer, const int buffer_len,
 		     void *session, const int sessiontype)
@@ -73,13 +79,25 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
     }
 }
 
-void
+int
+protocol_sendraw (const char *buffer, const int buffer_len,
+		  const struct peer_t *dstpeer)
+{
+  if (dstpeer->udpsrvsession != NULL)
+    {
+      udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsession);
+      return UDPSRVSESSION;
+    }
+  return NOSESSION;
+}
+
+int
 protocol_sendframe (const char *buffer, const int buffer_len)
 {
   struct in_addr src4, dst4;
   struct peer_t *dstpeer = NULL;
   if (buffer_len < 20)
-    return;
+    return NOSESSION;
   //Check for IPv4
   if ((buffer[0] & 0xF0) == 0x40)
     {
@@ -100,18 +118,61 @@ protocol_sendframe (const char *buffer, const int buffer_len)
     }
   else
     log_error ("Unknow protocol not implemented.\n");
+  if (buffer_len < 1)
+    return NOSESSION;
+  return protocol_sendraw (buffer, buffer_len, dstpeer);
+}
 
-  //CRYPTO
-  if (dstpeer != NULL && dstpeer->udpsrvsession != NULL)
-    udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsession);
-  else
-    log_error ("Packet lost.\n");
+int
+protocol_sendpacket (const struct peer_t *dstpeer, const int type)
+{
+  char *packet;
+  int packet_len = -1;
+  switch (type)
+    {
+    case PROTOCOL1_ID:
+      packet = protocol_v1id;
+      packet_len = protocol_v1id_len;
+      break;
+    case PROTOCOL1_KA:
+      packet = protocol_v1ka;
+      packet_len = protocol_v1ka_len;
+      break;
+    }
+  if (packet_len < 1)
+    return NOSESSION;
+  return protocol_sendraw (packet, packet_len, dstpeer);
 }
 
 void
-protocol_sendroutes (const struct peer_t *dstpeer)
+protocol_slidekeepalive ()
 {
-  /*if (dstpeer->udpsrvsession != NULL)
-     udpsrvdtls_write ((char *) &table, sizeof (table),
-     dstpeer->udpsrvsession); */
+/*protocol_v1ka;
+  protocol_v1ka_len;
+  protocol_v1ka_pos;*/
+}
+
+void
+protocol_init ()
+{
+/*-TODO
+  protocol_v1id;
+  protocol_v1id_len;*/
+  protocol_v1ka_pos = 0;
+  protocol_slidekeepalive ();
+}
+
+void
+protocol_maintainerthread ()
+{
+  struct peer_t *dstpeer;
+  protocol_init ();
+/*-TODO
+  while (1)
+    {
+      protocol_slidekeepalive ();
+
+      protocol_sendpacket (dstpeer, PROTOCOL1_KA);
+	  sleep(PROTOCOL_HOLEPUNCHINGTIME);
+    }*/
 }
