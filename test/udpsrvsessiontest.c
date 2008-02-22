@@ -1,11 +1,13 @@
 /***************************************************************************
  *            udpsrvsessiontest.c
  *
+ *  VPMN  -  Virtual Private Mesh Network
  *  Copyright  2008  Pau Rodriguez-Estivill
  *  <prodrigestivill@gmail.com>
  ****************************************************************************/
 
-/* This program is free software: you can redistribute it and/or modify
+/*
+ * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
@@ -18,7 +20,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include <sys/socket.h>
 #include <resolv.h>
 #include <stdlib.h>
