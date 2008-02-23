@@ -68,7 +68,8 @@ struct protocol_1ka_s
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
 			  struct udpsrvsession_s *session);
 int protocol_sendframe (const char *buffer, const int buffer_len);
-int protocol_sendpacket (const struct peer_s *dstpeer, const int type);
+int protocol_sendpacket (struct udpsrvsession_s *session,
+			 const int type);
 void protocol_maintainerthread ();
 
 #endif /* _PROTOCOL_H */

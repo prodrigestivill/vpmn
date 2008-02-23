@@ -36,14 +36,16 @@ struct peer_s
 {
   struct udpsrvsession_s **udpsrvsessions;
   int udpsrvsessions_len;
-  struct in_addr *addrs;
+  struct sockaddr_in *addrs;
   int addrs_len;
   struct in_network *shared_networks;
   int shared_networks_len;
   int stat;
 };
 
+void peer_add (struct peer_s *peer, struct udpsrvsession_s *session);
 struct peer_s *peer_create ();
 void peer_destroy (struct peer_s *oldpeer);
+int peer_compare (struct peer_s *peer1, struct peer_s *peer2);
 
 #endif /* _PEER_H */

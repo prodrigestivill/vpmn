@@ -40,8 +40,8 @@ struct udpsrvsession_s
 
 struct udpsrvsession_s *udpsrvsession_search (const struct sockaddr_in
 					      *source);
-struct udpsrvsession_s *udpsrvsession_create (const struct sockaddr_in
-					      *source);
+struct udpsrvsession_s *udpsrvsession_searchcreate (const struct sockaddr_in
+						    *source);
 void udpsrvsession_update_timeout (struct udpsrvsession_s *cursession);
 void udpsrvsession_destroy (struct udpsrvsession_s *cursession);
 int udpsrvsession_dumpsocks (void *out, const int outlen, const int start,

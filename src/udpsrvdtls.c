@@ -44,7 +44,7 @@ udpsrvdtls_init ()
   ERR_load_crypto_strings ();
 #endif
   SSL_library_init ();
-  //actions_to_seed_PRNG();
+  //-TODO: sactions_to_seed_PRNG();
   udpsrvdtls_clictx = SSL_CTX_new (DTLSv1_client_method ());
   if (SSL_CTX_set_cipher_list (udpsrvdtls_clictx, ssl_cipherlist) != 1)
     log_error ("Error setting cipher list.\n");
@@ -101,7 +101,7 @@ udpsrvdtls_write (const char *buffer, const int buffer_len,
       BIO_dgram_set_peer (wbio, session->addr);
       SSL_set_bio (session->dtls, udpsrvdtls_mbio, wbio);
     }
-  //Need to lock mutex on write?
+  //-TODO: Need to lock mutex on write?
   do
     {
       if (retry > 0)
@@ -128,6 +128,8 @@ udpsrvdtls_read (const char *buffer, const int buffer_len, char *bufferout,
   int len, retry = 0;
   unsigned long err;
   BIO *wbio, *rbio;
+  if (session == NULL)
+		return -1;
   pthread_mutex_lock (&session->dtls_mutex);
   if (session->dtls == NULL)
     {
@@ -178,7 +180,7 @@ udpsrvdtls_sessionerr (const unsigned long err,
     case SSL_ERROR_WANT_WRITE:
       break;
     case SSL_ERROR_SYSCALL:
-      break;
+      //break;
       /* connection closed */
     case SSL_ERROR_ZERO_RETURN:
       log_error ("SSL_ERROR_ZERO_RETURN\n");

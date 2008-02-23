@@ -39,7 +39,40 @@ struct udpsrvsession_l *udpsrvsessions_last = NULL;
 pthread_mutex_t udpsrvsessions_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 struct udpsrvsession_s *
+udpsrvsession_create (const struct sockaddr_in *source)
+{
+  struct udpsrvsession_s *newsession =
+    malloc (sizeof (struct udpsrvsession_s));
+  struct sockaddr_in *addr = malloc (sizeof (struct sockaddr_in));
+  memcpy (addr, source, sizeof (const struct sockaddr_in));
+  newsession->addr = addr;
+  newsession->peer = NULL;
+  pthread_mutex_init (&newsession->dtls_mutex, NULL);
+  newsession->dtls = NULL;
+  udpsrvsession_update_timeout (newsession);
+  return newsession;
+}
+
+struct udpsrvsession_s *
 udpsrvsession_search (const struct sockaddr_in *source)
+{
+  struct udpsrvsession_l *cursession;
+  cursession = udpsrvsessions;
+  while (cursession != NULL)
+    {
+      if ((cursession->current != NULL)
+	  && (source->sin_family == cursession->current->addr->sin_family)
+	  && (source->sin_port == cursession->current->addr->sin_port)
+	  && (source->sin_addr.s_addr ==
+	      cursession->current->addr->sin_addr.s_addr))
+	return cursession->current;
+      cursession = cursession->next;
+    }
+  return NULL;
+}
+
+struct udpsrvsession_s *
+udpsrvsession_searchcreate (const struct sockaddr_in *source)
 {
   struct udpsrvsession_l *cursession;
   int local_mutex = 0;
@@ -62,9 +95,7 @@ udpsrvsession_search (const struct sockaddr_in *source)
 	  && (source->sin_port == cursession->current->addr->sin_port)
 	  && (source->sin_addr.s_addr ==
 	      cursession->current->addr->sin_addr.s_addr))
-	{
-	  return cursession->current;
-	}
+	return cursession->current;
       if (cursession->next == NULL)
 	{
 	  pthread_mutex_lock (&udpsrvsessions_mutex);
@@ -92,21 +123,6 @@ udpsrvsession_search (const struct sockaddr_in *source)
   udpsrvsessions_last = cursession;
   pthread_mutex_unlock (&udpsrvsessions_mutex);
   return cursession->current;
-}
-
-struct udpsrvsession_s *
-udpsrvsession_create (const struct sockaddr_in *source)
-{
-  struct udpsrvsession_s *newsession =
-    malloc (sizeof (struct udpsrvsession_s));
-  struct sockaddr_in *addr = malloc (sizeof (struct sockaddr_in));
-  memcpy (addr, source, sizeof (const struct sockaddr_in));
-  newsession->addr = addr;
-  newsession->peer = NULL;
-  pthread_mutex_init (&newsession->dtls_mutex, NULL);
-  newsession->dtls = NULL;
-  udpsrvsession_update_timeout (newsession);
-  return newsession;
 }
 
 void

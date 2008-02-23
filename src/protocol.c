@@ -46,6 +46,7 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
   int i, begin = 0;
   struct sockaddr_in saddr;
   struct peer_s *peer = NULL;
+  struct udpsrvsession_s *newsession = NULL;
 
   if (buffer_len < 4)
     return;
@@ -77,46 +78,84 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 	     return; */
 	  if (peer == NULL)
 	    {
-	      //create peer
+	      peer = peer_create ();
+	      peer->addrs_len =
+		((struct protocol_1id_s *) &buffer[begin])->len_addr;
+	      peer->shared_networks_len =
+		((struct protocol_1id_s *) &buffer[begin])->len_net;
+	      peer->addrs =
+		calloc (peer->addrs_len, sizeof (struct sockaddr_in));
+	      peer->shared_networks =
+		calloc (peer->shared_networks_len,
+			sizeof (struct in_network));
+	      for (i = 0; i < peer->addrs_len; i++)
+		{
+		  peer->addrs[i].sin_family = AF_INET;
+		  peer->addrs[i].sin_port =
+		    ((struct protocol_1id_s *) &buffer[begin])->udpport;
+		  memcpy (&peer->addrs[i].sin_addr.s_addr,
+			  buffer + sizeof (struct protocol_1id_s) +
+			  i * sizeof (uint32_t), sizeof (uint32_t));
+
+		}
+	      for (i = 0; i < peer->shared_networks_len; i++)
+		{
+		  memcpy (&peer->shared_networks[i].addr.s_addr,
+			  buffer + sizeof (struct protocol_1id_s) +
+			  peer->addrs_len * sizeof (uint32_t) +
+			  i * sizeof (struct protocol_netpair_s),
+			  sizeof (uint32_t));
+		  memcpy (&peer->shared_networks[i].addr.s_addr,
+			  buffer + sizeof (struct protocol_1id_s) +
+			  peer->addrs_len * sizeof (uint32_t) +
+			  i * sizeof (struct protocol_netpair_s) +
+			  sizeof (uint32_t), sizeof (uint32_t));
+		}
+	      if (peer_compare (&tun_selfpeer, peer))
+		{
+		  peer_destroy (peer);
+		  return;
+		}
+	      peer_add (peer, session);
 	    }
 	  if (buffer[begin] == PROTOCOL1_ID)
-	    protocol_sendpacket (peer, PROTOCOL1_IDKA);
+	    protocol_sendpacket (session, PROTOCOL1_IDKA);
 	  //Packets are combinable ID+KA
-	  i = begin + 2 + sizeof (struct protocol_addrpair_s) +
-	    (buffer[begin + 1] * sizeof (struct protocol_netpair_s));
+	  i = begin + sizeof (struct protocol_1id_s) +
+	    ((struct protocol_1id_s *) &buffer[begin])->len_addr *
+	    sizeof (uint32_t) +
+	    ((struct protocol_1id_s *) &buffer[begin])->len_net *
+	    sizeof (struct protocol_netpair_s);
 	  if (i + 2 < buffer_len)
 	    begin = i;
 	}
       if (buffer[begin] == PROTOCOL1_KA)
 	{
-	  if (buffer[begin + 1] == 0
-	      ||
-	      ((buffer[begin + 1] * sizeof (struct protocol_addrpair_s)) +
-	       begin + 2) > buffer_len)
+	  if (((struct protocol_1ka_s *) &buffer[begin])->len == 0
+	      || (begin + sizeof (struct protocol_1ka_s) +
+		  (((struct protocol_1ka_s *) &buffer[begin])->len *
+		   sizeof (struct protocol_addrpair_s))) > buffer_len)
 	    return;
-	  for (i = begin + 2; i < buffer_len;
+	  saddr.sin_family = AF_INET;
+	  for (i = begin + sizeof (struct protocol_1ka_s); i < buffer_len;
 	       i += sizeof (struct protocol_addrpair_s))
 	    {
 	      saddr.sin_addr.s_addr =
 		((struct protocol_addrpair_s *) &buffer[i])->addr;
 	      saddr.sin_port =
 		((struct protocol_addrpair_s *) &buffer[i])->port;
-	      //peer_add(&addr);
+	      //-TODO: Control more exactly the states
+	      newsession = udpsrvsession_search (&saddr);
+	      if (newsession == NULL)
+		{
+		  newsession = udpsrvsession_searchcreate (&saddr)
+		    protocol_sendpacket (newsession, PROTOCOL1_ID);
+		}
+	      if (newsession->peer != NULL)
+		protocol_sendpacket (newsession, PROTOCOL1_IDKA);
 	    }
 	}
     }
-}
-
-int
-protocol_sendraw (const char *buffer, const int buffer_len,
-		  const struct peer_s *dstpeer)
-{
-  if (dstpeer->udpsrvsessions_len > 0)
-    {
-      udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsessions[0]);
-      return 0;
-    }
-  return -1;
 }
 
 int
@@ -151,15 +190,18 @@ protocol_sendframe (const char *buffer, const int buffer_len)
     }
   else
     log_error ("Unknow protocol not implemented.\n");
-  if (buffer_len < 1)
-    return -1;
-  return protocol_sendraw (buffer, buffer_len, dstpeer);
+  if (buffer_len > 0 && dstpeer->udpsrvsessions_len > 0)
+    {
+      udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsessions[0]);
+      return 0;
+    }
+  return -1;
 }
 
 int
-protocol_sendpacket (const struct peer_s *dstpeer, const int type)
+protocol_sendpacket (struct udpsrvsession_s *session, const int type)
 {
-  char *packet;
+  char *packet = NULL;
   int packet_len = -1;
   switch (type)
     {
@@ -177,9 +219,12 @@ protocol_sendpacket (const struct peer_s *dstpeer, const int type)
       packet_len = protocol_v1id_len + protocol_v1ka_len;
       break;
     }
-  if (packet_len < 1)
-    return -1;
-  return protocol_sendraw (packet, packet_len, dstpeer);
+  if (packet_len < 1 && session != NULL)
+    {
+      udpsrvdtls_write (packet, packet_len, session);
+      return 0;
+    }
+  return -1;
 }
 
 void
@@ -221,7 +266,7 @@ protocol_init ()
   for (i = 0; i < protocol_v1id->len_addr; i++)
     {
       memcpy (protocol_v1id + sizeof (struct protocol_1id_s) +
-	      i * sizeof (uint32_t), &tun_selfpeer.addrs[i].s_addr,
+	      i * sizeof (uint32_t), &tun_selfpeer.addrs[i].sin_addr.s_addr,
 	      sizeof (uint32_t));
     }
   for (i = 0; i < protocol_v1id->len_net; i++)
