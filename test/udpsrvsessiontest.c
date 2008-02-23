@@ -41,7 +41,7 @@ main ()
   config_load ();
   char buffer[UDPBUFFERSIZE], bufferout[TUNBUFFERSIZE];
   int buffer_len, bufferout_len;
-  struct udpsrvsession_t *udpsession;
+  struct udpsrvsession_s *udpsession;
   struct sockaddr_in addr;
   struct sockaddr_in *addr2;
   socklen_t addr_len;
@@ -76,8 +76,7 @@ main ()
 }
 
 void
-protocol_sendroutes (const struct peer_t *dstpeer)
+protocol_sendroutes (const struct peer_s *dstpeer)
 {
   log_debug ("Sending routes... (not implemented)");
 }
-

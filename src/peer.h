@@ -32,18 +32,18 @@
 #define PEER_STAT_ID  1		//IDENTIFIED
 #define PEER_STAT_TO  2		//TIMEOUT
 
-struct peer_t
+struct peer_s
 {
-  struct udpsrvsession_t *udpsrvsession;
-//struct tcpsrvsession_t *tcpsrvsession;
-  struct sockaddr_in **addrs;
+  struct udpsrvsession_s **udpsrvsessions;
+  int udpsrvsessions_len;
+  struct in_addr *addrs;
   int addrs_len;
   struct in_network *shared_networks;
   int shared_networks_len;
   int stat;
 };
 
-struct peer_t *peer_create ();
-void peer_destroy (struct peer_t *oldpeer);
+struct peer_s *peer_create ();
+void peer_destroy (struct peer_s *oldpeer);
 
 #endif /* _PEER_H */

@@ -33,7 +33,7 @@
 struct router_table_l
 {
   struct in_network *network;
-  struct peer_t *peer;
+  struct peer_s *peer;
   struct router_table_l *next;
 };
 
@@ -43,7 +43,7 @@ pthread_mutex_t router_expired_table_mutex = PTHREAD_MUTEX_INITIALIZER;
 struct router_table_l **router_expired_table;
 int router_expired_table_len = 0;
 
-struct peer_t *
+struct peer_s *
 router_searchdst (const struct in_addr *dst)
 {
   struct router_table_l *current = router_table;
@@ -58,7 +58,7 @@ router_searchdst (const struct in_addr *dst)
 }
 
 void
-router_addroute (struct in_network *network, struct peer_t *peer)
+router_addroute (struct in_network *network, struct peer_s *peer)
 {
   struct router_table_l *current;
   struct router_table_l *current_last;
@@ -110,7 +110,7 @@ router_flushexpired ()
 }
 
 void
-router_flush (const struct peer_t *peer)
+router_flush (const struct peer_s *peer)
 {
   struct router_table_l *current;
   struct router_table_l *current_last;
@@ -156,7 +156,7 @@ router_flush (const struct peer_t *peer)
 }
 
 int
-router_checksrc (const struct in_addr *src, const struct peer_t *peer)
+router_checksrc (const struct in_addr *src, const struct peer_s *peer)
 {
   int n;
   if (peer->shared_networks == NULL || peer->shared_networks_len < 1)

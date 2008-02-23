@@ -51,7 +51,7 @@ protocol_sendframe (const char *buffer, const int buffer_len)
 	(buffer[14] << 16) | (buffer[15] << 24);
       dst4.s_addr = (buffer[16]) | (buffer[17] << 8) |
 	(buffer[18] << 16) | (buffer[19] << 24);
-      if (router_checksrc (&src4) == 0)
+      if (router_checksrc (&src4, &tun_selfpeer) == 0)
 	{
 	  log_debug ("%s", inet_ntoa (src4));
 	  log_debug ("->%s\n", inet_ntoa (dst4));
@@ -77,7 +77,7 @@ protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
 }
 
 void
-protocol_sendroutes (const struct peer_t *dstpeer)
+protocol_sendroutes (const struct peer_s *dstpeer)
 {
   log_debug ("Sending routes... (not implemented)");
 }
@@ -94,14 +94,16 @@ udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
   return 0;
 }
 
-struct udpsrvsession_t *
-udpsrvsession_search (struct sockaddr_in *source)
+struct udpsrvsession_s *
+udpsrvsession_search (const struct sockaddr_in *source)
 {
-  struct udpsrvsession_t *newsession =
-    malloc (sizeof (struct udpsrvsession_t));
+  struct udpsrvsession_s *newsession =
+    malloc (sizeof (struct udpsrvsession_s));
   newsession->addr = source;
   newsession->peer = peer_create ();
-  newsession->peer->udpsrvsession = newsession;
+  newsession->peer->udpsrvsessions = calloc (1, sizeof(void *));
+  newsession->peer->udpsrvsessions[0] = newsession;
+  newsession->peer->udpsrvsessions_len = 1;
   pthread_mutex_init (&newsession->dtls_mutex, NULL);
   newsession->dtls = NULL;
   return newsession;

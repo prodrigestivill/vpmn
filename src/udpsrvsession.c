@@ -30,7 +30,7 @@
 
 struct udpsrvsession_l
 {
-  struct udpsrvsession_t *current;
+  struct udpsrvsession_s *current;
   struct udpsrvsession_l *next;
 };
 
@@ -38,7 +38,7 @@ struct udpsrvsession_l *udpsrvsessions = NULL;
 struct udpsrvsession_l *udpsrvsessions_last = NULL;
 pthread_mutex_t udpsrvsessions_mutex = PTHREAD_MUTEX_INITIALIZER;
 
-struct udpsrvsession_t *
+struct udpsrvsession_s *
 udpsrvsession_search (const struct sockaddr_in *source)
 {
   struct udpsrvsession_l *cursession;
@@ -94,13 +94,13 @@ udpsrvsession_search (const struct sockaddr_in *source)
   return cursession->current;
 }
 
-struct udpsrvsession_t *
+struct udpsrvsession_s *
 udpsrvsession_create (const struct sockaddr_in *source)
 {
-  struct udpsrvsession_t *newsession =
-    malloc (sizeof (struct udpsrvsession_t));
+  struct udpsrvsession_s *newsession =
+    malloc (sizeof (struct udpsrvsession_s));
   struct sockaddr_in *addr = malloc (sizeof (struct sockaddr_in));
-  memcpy (addr, source, sizeof(const struct sockaddr_in));
+  memcpy (addr, source, sizeof (const struct sockaddr_in));
   newsession->addr = addr;
   newsession->peer = NULL;
   pthread_mutex_init (&newsession->dtls_mutex, NULL);
@@ -110,14 +110,46 @@ udpsrvsession_create (const struct sockaddr_in *source)
 }
 
 void
-udpsrvsession_destroy (struct udpsrvsession_t *cursession)
+udpsrvsession_destroy (struct udpsrvsession_s *cursession)
 {
 
 }
 
 void
-udpsrvsession_update_timeout (struct udpsrvsession_t *cursession)
+udpsrvsession_update_timeout (struct udpsrvsession_s *cursession)
 {
   if (cursession != NULL)
     cursession->timeout = 0;
+}
+
+int
+udpsrvsession_dumpsocks (void *out, const int outlen, const int start,
+			 const int num)
+{
+  struct udpsrvsession_l *cursession;
+  int numout = 0, i = 0;
+  cursession = udpsrvsessions;
+  while (cursession != NULL)
+    {
+      if (cursession->current != NULL)
+	{
+	  if (i >= start)
+	    {
+	      if ((numout + 1) * (sizeof (uint32_t) + sizeof (uint16_t)) >
+		  outlen)
+		return numout;
+	      memcpy (out + numout * (sizeof (uint32_t) + sizeof (uint16_t)),
+		      &cursession->current->addr->sin_addr.s_addr,
+		      sizeof (uint32_t));
+	      memcpy (out + (numout + 1) * sizeof (uint32_t) +
+		      numout * sizeof (uint16_t),
+		      &cursession->current->addr->sin_port,
+		      sizeof (uint16_t));
+	      numout++;
+	    }
+	  i++;
+	}
+      cursession = cursession->next;
+    }
+  return numout;
 }

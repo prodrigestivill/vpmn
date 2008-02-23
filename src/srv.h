@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #ifndef _SRV_H
 #define _SRV_H
 
@@ -30,5 +30,3 @@ int udpsrv_init ();
 int udpsrv_fd;
 
 #endif /* _SRV_H */
-
- 

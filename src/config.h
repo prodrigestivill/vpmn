@@ -37,19 +37,22 @@ uid_t vpmnd_uid;
 gid_t vpmnd_gid;
 int daemonize;
 
+//PROTOCOL
+#define MAXPEERS 512
+
 //TUNSRV
 #define TUNBUFFERSIZE 1500
 char *tunname;
 struct in_network tunaddr_ip;
 int num_tunsrvthreads;
-struct peer_t tun_selfpeer;
+struct peer_s tun_selfpeer;
 
 
 //UDPSRV
 #define UDPBUFFERSIZE 65535
 int num_udpsrvthreads;
 int port_udp;
-struct udpsrvsession_t **udpsrv_firstpeers;
+struct udpsrvsession_s **udpsrv_firstpeers;
 
 //CRYPTO
 char *ssl_cipherlist;

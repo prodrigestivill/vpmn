@@ -52,7 +52,7 @@ protocol_sendframe (const char *buffer, const int buffer_len)
 }
 
 void
-protocol_sendroutes (const struct peer_t *dstpeer)
+protocol_sendroutes (const struct peer_s *dstpeer)
 {
   log_debug ("Sending routes... (not implemented)");
 }

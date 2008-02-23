@@ -24,6 +24,7 @@
 #ifndef _ROUTER_H
 #define _ROUTER_H
 
+#include "peer.h"
 #include <netinet/in.h>
 
 struct in_network
@@ -32,11 +33,11 @@ struct in_network
   struct in_addr netmask;
 };
 
-struct peer_t *router_searchdst (const struct in_addr *dst);
-//struct peer_t *router_searchdst6 (struct in6_addr *dst);
-int router_checksrc (const struct in_addr *src, const struct peer_t *peer);
+struct peer_s *router_searchdst (const struct in_addr *dst);
+//struct peer_s *router_searchdst6 (struct in6_addr *dst);
+int router_checksrc (const struct in_addr *src, const struct peer_s *peer);
 //int router_checksrc6 (struct in6_addr *src);
-void router_addroute (struct in_network *network, struct peer_t *peer);
-void router_flush (const struct peer_t *peer);
+void router_addroute (struct in_network *network, struct peer_s *peer);
+void router_flush (const struct peer_s *peer);
 
 #endif /* _ROUTER_H */

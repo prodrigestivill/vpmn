@@ -25,18 +25,50 @@
 #define _PROTOCOL_H
 
 #include "router.h"
-#define MAX_PROTOCOL_ROUTES 10
 
-#define NOSESSION -1
-#define UDPSRVSESSION 0
+#define MAXKAPEERS 200
 
-#define PROTOCOL1_ID 0x01
-#define PROTOCOL1_KA 0x02
+#define PROTOCOL1_ID   0x01
+#define PROTOCOL1_KA   0x02
+#define PROTOCOL1_IDKA 0x03
+
+struct protocol_addrpair_s
+{
+  uint32_t addr;
+  uint16_t port;
+};
+
+struct protocol_netpair_s
+{
+  uint32_t addr;
+  uint32_t netmask;
+};
+
+/* Protocol 1 Identifier
+ * Structure implemented */
+struct protocol_1id_s
+{
+  char packetid;
+  char len_addr;
+  char len_net;
+  uint16_t udpport;
+//uint32_t addrs[];
+//struct protocol_netpair_s networks[];
+};
+
+/* Protocol 1 Keep Alive
+ * Structure implemented */
+struct protocol_1ka_s
+{
+  char packetid;
+  char len;
+//struct protocol_addrpair_s addrs[];
+};
 
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
-			  void *session, const int sessiontype);
+			  struct udpsrvsession_s *session);
 int protocol_sendframe (const char *buffer, const int buffer_len);
-int protocol_sendpacket (const struct peer_t *dstpeer, const int type);
+int protocol_sendpacket (const struct peer_s *dstpeer, const int type);
 void protocol_maintainerthread ();
 
 #endif /* _PROTOCOL_H */

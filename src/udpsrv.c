@@ -39,7 +39,7 @@ int udpsrv_fd = -1;
 pthread_cond_t udpsrv_waitcond;
 pthread_mutex_t udpsrv_waitmutex;
 
-struct udpsrv_thread_t
+struct udpsrv_thread_s
 {
   pthread_t thread;
   pthread_mutex_t thread_mutex;
@@ -70,11 +70,11 @@ udpsrv_init ()
 }
 
 void
-udpsrv_thread (struct udpsrv_thread_t *me)
+udpsrv_thread (struct udpsrv_thread_s *me)
 {
   char tunbuffer[TUNBUFFERSIZE];
   int tunbuffer_len;
-  struct udpsrvsession_t *udpsession;
+  struct udpsrvsession_s *udpsession;
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
     {
@@ -84,7 +84,7 @@ udpsrv_thread (struct udpsrv_thread_t *me)
 	udpsrvdtls_read (me->buffer, me->buffer_len, tunbuffer, TUNBUFFERSIZE,
 			 udpsession);
       if (tunbuffer_len > 0)
-	protocol_recvpacket (tunbuffer, tunbuffer_len, udpsession, UDPSRVSESSION);
+	protocol_recvpacket (tunbuffer, tunbuffer_len, udpsession);
       pthread_mutex_unlock (&me->thread_mutex);
       //Notify main loop about finished job
       pthread_mutex_lock (&udpsrv_waitmutex);
@@ -95,7 +95,7 @@ udpsrv_thread (struct udpsrv_thread_t *me)
 }
 
 int
-udpsrv_threadcreate (struct udpsrv_thread_t *new)
+udpsrv_threadcreate (struct udpsrv_thread_s *new)
 {
   pthread_mutex_init (&new->thread_mutex, NULL);
   pthread_mutex_init (&new->cond_mutex, NULL);
@@ -107,7 +107,7 @@ void
 udpsrv ()
 {
   int rc, th;
-  struct udpsrv_thread_t udpsrvthreads[num_udpsrvthreads];
+  struct udpsrv_thread_s udpsrvthreads[num_udpsrvthreads];
 
   pthread_mutex_init (&udpsrv_waitmutex, NULL);
   pthread_cond_init (&udpsrv_waitcond, NULL);

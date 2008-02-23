@@ -33,7 +33,7 @@
 pthread_cond_t tunsrv_waitcond;
 pthread_mutex_t tunsrv_waitmutex;
 
-struct tunsrv_thread_t
+struct tunsrv_thread_s
 {
   pthread_t thread;
   pthread_mutex_t thread_mutex;
@@ -44,7 +44,7 @@ struct tunsrv_thread_t
 };
 
 void
-tunsrv_thread (struct tunsrv_thread_t *me)
+tunsrv_thread (struct tunsrv_thread_s *me)
 {
   pthread_mutex_lock (&me->cond_mutex);
   while (1)
@@ -61,7 +61,7 @@ tunsrv_thread (struct tunsrv_thread_t *me)
 }
 
 int
-tunsrv_threadcreate (struct tunsrv_thread_t *new)
+tunsrv_threadcreate (struct tunsrv_thread_s *new)
 {
   pthread_mutex_init (&new->thread_mutex, NULL);
   pthread_mutex_init (&new->cond_mutex, NULL);
@@ -73,7 +73,7 @@ void
 tunsrv ()
 {
   int rc, th;
-  struct tunsrv_thread_t tunsrvthreads[num_tunsrvthreads];
+  struct tunsrv_thread_s tunsrvthreads[num_tunsrvthreads];
 
   pthread_mutex_init (&tunsrv_waitmutex, NULL);
   pthread_cond_init (&tunsrv_waitcond, NULL);
