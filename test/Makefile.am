@@ -15,7 +15,23 @@ bin_PROGRAMS = \
 	udpsrvtest\
 	udpsrvsessiontest \
 	tundevtest \
-	routertest
+	routertest \
+	protocoltest
+
+protocoltest_SOURCES = \
+	../src/config.c\
+	../src/config.h\
+	../src/debug.c\
+	../src/debug.h \
+	../src/peer.c \
+	../src/peer.h \
+	../src/protocol.c \
+	../src/protocol.h \
+	../src/router.c \
+	../src/router.h \
+	protocoltest.c \
+	../src/udpsrvsession.c \
+	../src/udpsrvsession.h
 
 routertest_SOURCES = \
 	../src/config.c\

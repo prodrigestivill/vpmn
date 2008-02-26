@@ -67,6 +67,11 @@ config_load ()
   //UDPSRV
   num_udpsrvthreads = 5;
   port_udp = 1090;
+  char *updsrv_ip_str = "192.168.0.2";
+  tun_selfpeer.addrs = calloc (1, sizeof (struct sockaddr_in));
+  inet_aton (updsrv_ip_str, &tun_selfpeer.addrs[0].sin_addr);
+  tun_selfpeer.addrs[0].sin_port = htons (port_udp);
+  tun_selfpeer.addrs_len = 1;
 
   //DTLS
   char *sslcacert_str = "../test/cacert.pem";

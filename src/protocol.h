@@ -29,8 +29,10 @@
 #define MAXKAPEERS 200
 
 #define PROTOCOL1_ID   0x01
-#define PROTOCOL1_KA   0x02
-#define PROTOCOL1_IDKA 0x03
+#define PROTOCOL1_IDA  0x02 //ACK
+#define PROTOCOL1_KA   0x03
+#define PROTOCOL_IPv4  0x40
+#define PROTOCOL_IPv6  0x60
 
 struct protocol_addrpair_s
 {
@@ -44,16 +46,26 @@ struct protocol_netpair_s
   uint32_t netmask;
 };
 
+struct protocol_peer_s
+{
+  char len_net;
+  char len_addr;
+//struct protocol_netpair_s networks[];
+//struct protocol_addrpair_s addrpairs[];
+};
+
+/* Protocol 1 empty */
+struct protocol_1_s
+{
+  char packetid;
+};
+
 /* Protocol 1 Identifier
  * Structure implemented */
 struct protocol_1id_s
 {
   char packetid;
-  char len_addr;
-  char len_net;
-  uint16_t udpport;
-//uint32_t addrs[];
-//struct protocol_netpair_s networks[];
+  struct protocol_peer_s peer;
 };
 
 /* Protocol 1 Keep Alive
@@ -62,7 +74,7 @@ struct protocol_1ka_s
 {
   char packetid;
   char len;
-//struct protocol_addrpair_s addrs[];
+//struct protocol_peer_s peer[];
 };
 
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,

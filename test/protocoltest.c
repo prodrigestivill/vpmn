@@ -1,5 +1,5 @@
 /***************************************************************************
- *            peer.h
+ *            routertest.c
  *
  *  VPMN  -  Virtual Private Mesh Network
  *  Copyright  2008  Pau Rodriguez-Estivill
@@ -21,30 +21,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _PEER_H
-#define _PEER_H
+#include "../src/protocol.h"
 
-#include <netinet/in.h>
-#include "router.h"
-#include "udpsrvsession.h"
+struct protocol_1id_s *protocol_v1id;
+int protocol_v1id_len;
+struct protocol_1_s *protocol_v1ida;
+int protocol_v1ida_len;
+struct protocol_1ka_s *protocol_v1ka;
+int protocol_v1ka_len;
+int protocol_v1ka_pos;
 
-#define PEER_STAT_NEW 0
-#define PEER_STAT_ID  1		//IDENTIFIED
-#define PEER_STAT_TO  2		//TIMEOUT
-
-struct peer_s
+void
+main ()
 {
-  struct udpsrvsession_s *udpsrvsession;
-  struct in_network *shared_networks;
-  int shared_networks_len;
-  struct sockaddr_in *addrs;
-  int addrs_len;
-  int stat;
-};
+  int i;
+  config_load ();
+  protocol_init ();	
+  for (i = 0; i < protocol_v1id_len; i++)
+    log_debug ("%s.1", ((char *) protocol_v1id + i));
+}
 
-void peer_add (struct peer_s *peer, struct udpsrvsession_s *session);
-struct peer_s *peer_create ();
-void peer_destroy (struct peer_s *oldpeer);
-int peer_compare (struct peer_s *peer1, struct peer_s *peer2);
+void
+udpsrvdtls_init ()
+{
+}
 
-#endif /* _PEER_H */
+int
+udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
+		      const char *pkeyfile)
+{
+  return 0;
+}
+
+int
+udpsrvdtls_write (const char *buffer, const int buffer_len,
+		  struct udpsrvsession_s *session)
+{
+  return 0;
+}
+
+int
+tundev_write (const void *buf, const int count)
+{
+  return 0;
+}

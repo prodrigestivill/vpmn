@@ -137,35 +137,3 @@ udpsrvsession_update_timeout (struct udpsrvsession_s *cursession)
   if (cursession != NULL)
     cursession->timeout = 0;
 }
-
-int
-udpsrvsession_dumpsocks (void *out, const int outlen, const int start,
-			 const int num)
-{
-  struct udpsrvsession_l *cursession;
-  int numout = 0, i = 0;
-  cursession = udpsrvsessions;
-  while (cursession != NULL)
-    {
-      if (cursession->current != NULL)
-	{
-	  if (i >= start)
-	    {
-	      if ((numout + 1) * (sizeof (uint32_t) + sizeof (uint16_t)) >
-		  outlen)
-		return numout;
-	      memcpy (out + numout * (sizeof (uint32_t) + sizeof (uint16_t)),
-		      &cursession->current->addr->sin_addr.s_addr,
-		      sizeof (uint32_t));
-	      memcpy (out + (numout + 1) * sizeof (uint32_t) +
-		      numout * sizeof (uint16_t),
-		      &cursession->current->addr->sin_port,
-		      sizeof (uint16_t));
-	      numout++;
-	    }
-	  i++;
-	}
-      cursession = cursession->next;
-    }
-  return numout;
-}

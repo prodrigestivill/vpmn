@@ -35,8 +35,7 @@ struct peer_s *
 peer_create ()
 {
   struct peer_s *newpeer = malloc (sizeof (struct peer_s));
-  newpeer->udpsrvsessions = NULL;
-  newpeer->udpsrvsessions_len = 0;
+  newpeer->udpsrvsession = NULL;
   newpeer->addrs = NULL;
   newpeer->addrs_len = 0;
   newpeer->shared_networks = NULL;
@@ -51,10 +50,7 @@ peer_destroy (struct peer_s *oldpeer)
   if (oldpeer == NULL)
 	  return;
   //router_flush (oldpeer); Only by timeout function.
-  for (i = 0; i < oldpeer->udpsrvsessions_len; i++)
-    udpsrvsession_destroy (oldpeer->udpsrvsessions[i]);
-  if (oldpeer->udpsrvsessions != NULL)
-    free (oldpeer->udpsrvsessions);
+  udpsrvsession_destroy (oldpeer->udpsrvsession);
   if (oldpeer->shared_networks != NULL)
     free (oldpeer->shared_networks);
   if (oldpeer->addrs != NULL)

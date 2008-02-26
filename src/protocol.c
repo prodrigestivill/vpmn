@@ -31,12 +31,13 @@
 #include "tundev.h"
 
 //-TODO MUEXES
-struct protocol_1id_s *protocol_v1idka;
-int protocol_v1idka_maxlen;
 struct protocol_1id_s *protocol_v1id;
 int protocol_v1id_len;
+struct protocol_1_s *protocol_v1ida;
+int protocol_v1ida_len;
 struct protocol_1ka_s *protocol_v1ka;
 int protocol_v1ka_len;
+int protocol_v1ka_maxlen;
 int protocol_v1ka_pos;
 
 void
@@ -71,18 +72,19 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 //else if ((buffer[begin] & 0xF0) == 0x60) //IPv6 Packet
   else				//Internal packets
     {
-      if (buffer[begin] == PROTOCOL1_ID || buffer[begin] == PROTOCOL1_IDKA)
+      if (buffer[begin] == PROTOCOL1_ID)
 	{
 	  /*if (((buffer[begin + 1] * sizeof (struct protocol_addrpair_t)) +
 	     +...) > buffer_len)
 	     return; */
+	  /*
 	  if (peer == NULL)
 	    {
 	      peer = peer_create ();
 	      peer->addrs_len =
-		((struct protocol_1id_s *) &buffer[begin])->len_addr;
+		((struct protocol_1id_s *) &buffer[begin])->peer.len_addr;
 	      peer->shared_networks_len =
-		((struct protocol_1id_s *) &buffer[begin])->len_net;
+		((struct protocol_1id_s *) &buffer[begin])->peer.len_net;
 	      peer->addrs =
 		calloc (peer->addrs_len, sizeof (struct sockaddr_in));
 	      peer->shared_networks =
@@ -129,8 +131,10 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 	  if (i + 2 < buffer_len)
 	    begin = i;
 	}
+	*/
       if (buffer[begin] == PROTOCOL1_KA)
 	{
+	/*
 	  if (((struct protocol_1ka_s *) &buffer[begin])->len == 0
 	      || (begin + sizeof (struct protocol_1ka_s) +
 		  (((struct protocol_1ka_s *) &buffer[begin])->len *
@@ -153,6 +157,7 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 		}
 	      if (newsession->peer != NULL)
 		protocol_sendpacket (newsession, PROTOCOL1_IDKA);
+		*/
 	    }
 	}
     }
@@ -190,9 +195,9 @@ protocol_sendframe (const char *buffer, const int buffer_len)
     }
   else
     log_error ("Unknow protocol not implemented.\n");
-  if (buffer_len > 0 && dstpeer->udpsrvsessions_len > 0)
+  if (buffer_len > 0 && dstpeer->udpsrvsession != NULL)
     {
-      udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsessions[0]);
+      udpsrvdtls_write (buffer, buffer_len, dstpeer->udpsrvsession);
       return 0;
     }
   return -1;
@@ -213,11 +218,6 @@ protocol_sendpacket (struct udpsrvsession_s *session, const int type)
       packet = (char *) protocol_v1ka;
       packet_len = protocol_v1ka_len;
       break;
-    case PROTOCOL1_IDKA:
-      //Both are together
-      packet = (char *) protocol_v1idka;
-      packet_len = protocol_v1id_len + protocol_v1ka_len;
-      break;
     }
   if (packet_len < 1 && session != NULL)
     {
@@ -230,7 +230,8 @@ protocol_sendpacket (struct udpsrvsession_s *session, const int type)
 void
 protocol_slidekeepalive ()
 {
-  int i;
+/*
+	int i;
   if (protocol_v1id_len + protocol_v1ka_len < protocol_v1idka_maxlen)
     protocol_v1ka_pos = 0;
   i = udpsrvsession_dumpsocks (protocol_v1ka + sizeof (struct protocol_1ka_s),
@@ -241,55 +242,62 @@ protocol_slidekeepalive ()
   protocol_v1ka_len =
     sizeof (struct protocol_1ka_s) + i * sizeof (struct protocol_addrpair_s);
   protocol_v1ka_pos += i;
+*/
 }
 
 void
 protocol_init ()
 {
+  struct protocol_addrpair_s *addrpair;
+  struct protocol_netpair_s *netpair;
   int i;
+  protocol_v1ida_len = sizeof (struct protocol_1_s);
+  protocol_v1ida = malloc (protocol_v1ida_len);
+  protocol_v1ida->packetid = PROTOCOL1_IDA;
   protocol_v1id_len = sizeof (struct protocol_1id_s) +
-    tun_selfpeer.addrs_len * sizeof (uint32_t) +
-    tun_selfpeer.shared_networks_len * sizeof (struct protocol_netpair_s);
+    tun_selfpeer.shared_networks_len * sizeof (struct protocol_netpair_s) +
+    tun_selfpeer.addrs_len * sizeof (struct protocol_addrpair_s);
   protocol_v1id = malloc (protocol_v1id_len);
   protocol_v1id->packetid = PROTOCOL1_ID;
   if (tun_selfpeer.shared_networks_len < 0)
     return;
   if (tun_selfpeer.addrs_len < 256)
-    protocol_v1id->len_addr = tun_selfpeer.addrs_len;
+    protocol_v1id->peer.len_addr = tun_selfpeer.addrs_len;
   else
-    protocol_v1id->len_addr = 255;
+    protocol_v1id->peer.len_addr = 255;
   if (tun_selfpeer.shared_networks_len < 256)
-    protocol_v1id->len_net = tun_selfpeer.shared_networks_len;
+    protocol_v1id->peer.len_net = tun_selfpeer.shared_networks_len;
   else
-    protocol_v1id->len_net = 255;
-  protocol_v1id->udpport = htons (port_udp);
-  for (i = 0; i < protocol_v1id->len_addr; i++)
+    protocol_v1id->peer.len_net = 255;
+  for (i = 0; i < protocol_v1id->peer.len_net; i++)
     {
-      memcpy (protocol_v1id + sizeof (struct protocol_1id_s) +
-	      i * sizeof (uint32_t), &tun_selfpeer.addrs[i].sin_addr.s_addr,
+      netpair =
+	(struct protocol_netpair_s *) protocol_v1id +
+	sizeof (struct protocol_1id_s) +
+	i * sizeof (struct protocol_netpair_s);
+      memcpy (&netpair->addr, &tun_selfpeer.shared_networks[i].addr.s_addr,
 	      sizeof (uint32_t));
-    }
-  for (i = 0; i < protocol_v1id->len_net; i++)
-    {
-      memcpy (protocol_v1id + sizeof (struct protocol_1id_s) +
-	      protocol_v1id->len_addr * sizeof (uint32_t) +
-	      i * sizeof (struct protocol_netpair_s),
-	      &tun_selfpeer.shared_networks[i].addr.s_addr,
-	      sizeof (uint32_t));
-      memcpy (protocol_v1id + sizeof (struct protocol_1id_s) +
-	      protocol_v1id->len_addr * sizeof (uint32_t) +
-	      i * sizeof (struct protocol_netpair_s) + sizeof (uint32_t),
+      memcpy (&netpair->netmask,
 	      &tun_selfpeer.shared_networks[i].netmask.s_addr,
 	      sizeof (uint32_t));
     }
-  protocol_v1ka_len = sizeof (struct protocol_1ka_s) +
-    MAXKAPEERS * sizeof (struct protocol_addrpair_s);
-  protocol_v1idka_maxlen = protocol_v1id_len + protocol_v1ka_len;
-  protocol_v1idka = malloc (protocol_v1idka_maxlen);
-  memcpy (protocol_v1idka, protocol_v1id, protocol_v1id_len);
-  protocol_v1idka->packetid = PROTOCOL1_IDKA;
-  protocol_v1ka = (struct protocol_1ka_s *) protocol_v1idka +
-    protocol_v1id_len;
+  for (i = 0; i < protocol_v1id->peer.len_addr; i++)
+    {
+      addrpair =
+	(struct protocol_addrpair_s *) protocol_v1id +
+	sizeof (struct protocol_1id_s) +
+	protocol_v1id->peer.len_net * sizeof (struct protocol_netpair_s) +
+	i * sizeof (struct protocol_addrpair_s);
+      addrpair->port = tun_selfpeer.addrs[i].sin_port;
+      memcpy (&addrpair->addr, &tun_selfpeer.addrs[i].sin_addr.s_addr,
+	      sizeof (uint32_t));
+    }
+  protocol_v1ka_maxlen =
+    sizeof (struct protocol_1ka_s) +
+    MAXKAPEERS * (sizeof (struct protocol_peer_s) +
+		  sizeof (struct protocol_netpair_s) +
+		  sizeof (struct protocol_netpair_s));
+  protocol_v1ka = malloc (protocol_v1ka_maxlen);
   protocol_v1ka_pos = 0;
   protocol_slidekeepalive ();
 }
