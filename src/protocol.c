@@ -34,126 +34,156 @@
 //-TODO MUEXES
 struct protocol_1id_s *protocol_v1id;
 int protocol_v1id_len;
-struct protocol_1_s *protocol_v1ida;
-int protocol_v1ida_len;
+struct protocol_1_s protocol_v1ida;
+#define protocol_v1ida_len sizeof (struct protocol_1_s);
 struct protocol_1ka_s *protocol_v1ka;
 int protocol_v1ka_len;
 int protocol_v1ka_maxlen;
 int protocol_v1ka_pos;
 
+int
+protocol_processpeer (struct peer_s *peer,
+		      struct protocol_peer_s *fragment, int max_size)
+{
+  int i;
+  struct protocol_addrpair_s *addrpair;
+  struct protocol_netpair_s *netpair;
+  if (sizeof (struct protocol_peer_s) +
+      ((struct protocol_peer_s *) fragment)->len_addr *
+      sizeof (struct protocol_netpair_s) +
+      ((struct protocol_peer_s *) fragment)->len_addr *
+      sizeof (struct protocol_addrpair_s) > max_size)
+    return -1;
+  peer->addrs_len = fragment->len_addr;
+  peer->shared_networks_len = fragment->len_net;
+  peer->addrs = realloc (peer->addrs,
+			 peer->addrs_len * sizeof (struct sockaddr_in));
+  peer->shared_networks = realloc (peer->shared_networks,
+				   peer->shared_networks_len *
+				   sizeof (struct in_network));
+  for (i = 0; i < peer->shared_networks_len; i++)
+    {
+      netpair =
+	(struct protocol_netpair_s *) fragment +
+	sizeof (struct protocol_peer_s) +
+	i * sizeof (struct protocol_netpair_s);
+      peer->shared_networks[i].addr.s_addr = netpair->addr;
+      peer->shared_networks[i].addr.s_addr = netpair->netmask;
+    }
+  for (i = 0; i < peer->addrs_len; i++)
+    {
+      addrpair =
+	(struct protocol_addrpair_s *) fragment +
+	sizeof (struct protocol_peer_s) +
+	peer->shared_networks_len *
+	sizeof (struct protocol_netpair_s) +
+	i * sizeof (struct protocol_addrpair_s);
+      peer->addrs[i].sin_family = AF_INET;
+      peer->addrs[i].sin_port = addrpair->port;
+      peer->addrs[i].sin_addr.s_addr = addrpair->addr;
+    }
+  return sizeof (struct protocol_peer_s) +
+    ((struct protocol_peer_s *) fragment)->len_addr *
+    sizeof (struct protocol_netpair_s) +
+    ((struct protocol_peer_s *) fragment)->len_addr *
+    sizeof (struct protocol_addrpair_s);
+}
+
 void
 protocol_recvpacket (const char *buffer, const int buffer_len,
 		     struct udpsrvsession_s *session)
 {
-  int i, begin = 0;
+  int i;
+  void *p;
+  unsigned int begin = 0;
   struct iphdr *ip = NULL;
-  struct peer_s *peer = NULL;
-  struct udpsrvsession_s *newsession = NULL;
+  struct peer_s *peer;
 
   if (buffer_len < 4)
     return;
-  if (session != NULL)
-    peer = session->peer;
   ip = (struct iphdr *) &buffer[begin];
-  if (ip->version == 4)	//IPv4 packet
+  if (ip->version == 4)		//IPv4 packet
     {
-      if (peer == NULL || buffer_len < 20)
+      if (session->peer == NULL || buffer_len < 20)
 	return;
       if (router_checksrc ((struct in_addr *) &ip->daddr, &tun_selfpeer) != 0)
 	return;
-      if (router_checksrc ((struct in_addr *) &ip->saddr, peer) != 0)
+      if (router_checksrc ((struct in_addr *) &ip->saddr, session->peer) != 0)
 	return;
       tundev_write (buffer, buffer_len);
     }
 //else if (ip->version == 6) //IPv6 Packet
-  else if (ip->version == PROTOCOL1_V) //Internal packets v1
+  else if (ip->version == PROTOCOL1_V)	//Internal packets v1
     {
+      if (ip->ihl == PROTOCOL1_IDA && session->peer != NULL)
+	{
+	  peer->recivack = 1;
+	  //Packets are combinable IDACK+ID
+	  begin = begin + sizeof (struct protocol_1_s);
+	  if (begin + 4 > buffer_len)
+	    return;
+	  ip = (struct iphdr *) &buffer[begin];
+	}
+
       if (ip->ihl == PROTOCOL1_ID)
 	{
-	  /*if (((buffer[begin + 1] * sizeof (struct protocol_addrpair_t)) +
-	     +...) > buffer_len)
-	     return; */
-	  /*
-	  if (peer == NULL)
+	  if (session->peer == NULL)
+	    session->peer = peer_create ();
+	  peer = session->peer;
+	  if (peer->stat != PEER_STAT_ID)
+	    {
+	      if (protocol_processpeer (peer,
+					(struct protocol_peer_s *)
+					&((struct protocol_1id_s *)
+					  &buffer[begin])->peer,
+					buffer_len - begin -
+					sizeof (struct protocol_1id_s) +
+					sizeof (struct protocol_peer_s)) < 0)
+		return;
+
+	      peer->stat = PEER_STAT_ID;
+	      /* add local routes to router ¿?
+	         if (peer_compare (&tun_selfpeer, peer))
+	         {
+	         peer_destroy (peer);
+	         return;
+	         }
+	       */
+	      peer_add (peer, session);
+	    }
+	  //-TODO: JOIN packets
+	  protocol_sendpacket (session, PROTOCOL1_IDA);
+	  if (peer->recivack == 0)
+	    protocol_sendpacket (session, PROTOCOL1_ID);
+	  //Packets are combinable ID+KA
+	  begin = begin + sizeof (struct protocol_1id_s) +
+	    ((struct protocol_1id_s *) &buffer[begin])->peer.len_addr *
+	    sizeof (struct protocol_netpair_s) +
+	    ((struct protocol_1id_s *) &buffer[begin])->peer.len_addr *
+	    sizeof (struct protocol_addrpair_s);
+	  if (begin + 4 > buffer_len)
+	    return;
+	  ip = (struct iphdr *) &buffer[begin];
+	}
+      if (ip->ihl == PROTOCOL1_KA)
+	{
+	  p = (void *) &buffer[begin] + sizeof (struct protocol_1ka_s);
+	  while (p <= (void *) &buffer[buffer_len - 1])
 	    {
 	      peer = peer_create ();
-	      peer->addrs_len =
-		((struct protocol_1id_s *) &buffer[begin])->peer.len_addr;
-	      peer->shared_networks_len =
-		((struct protocol_1id_s *) &buffer[begin])->peer.len_net;
-	      peer->addrs =
-		calloc (peer->addrs_len, sizeof (struct sockaddr_in));
-	      peer->shared_networks =
-		calloc (peer->shared_networks_len,
-			sizeof (struct in_network));
-	      for (i = 0; i < peer->addrs_len; i++)
-		{
-		  peer->addrs[i].sin_family = AF_INET;
-		  peer->addrs[i].sin_port =
-		    ((struct protocol_1id_s *) &buffer[begin])->udpport;
-		  memcpy (&peer->addrs[i].sin_addr.s_addr,
-			  buffer + sizeof (struct protocol_1id_s) +
-			  i * sizeof (uint32_t), sizeof (uint32_t));
-
-		}
-	      for (i = 0; i < peer->shared_networks_len; i++)
-		{
-		  memcpy (&peer->shared_networks[i].addr.s_addr,
-			  buffer + sizeof (struct protocol_1id_s) +
-			  peer->addrs_len * sizeof (uint32_t) +
-			  i * sizeof (struct protocol_netpair_s),
-			  sizeof (uint32_t));
-		  memcpy (&peer->shared_networks[i].addr.s_addr,
-			  buffer + sizeof (struct protocol_1id_s) +
-			  peer->addrs_len * sizeof (uint32_t) +
-			  i * sizeof (struct protocol_netpair_s) +
-			  sizeof (uint32_t), sizeof (uint32_t));
-		}
-	      if (peer_compare (&tun_selfpeer, peer))
+	      i = protocol_processpeer (peer, (struct protocol_peer_s *) p,
+					(int) ((void *)
+					       &buffer[buffer_len - 1] - p));
+	      if (i < 0)
 		{
 		  peer_destroy (peer);
 		  return;
 		}
-	      peer_add (peer, session);
-	    }
-	  if (buffer[begin] == PROTOCOL1_ID)
-	    protocol_sendpacket (session, PROTOCOL1_IDKA);
-	  //Packets are combinable ID+KA
-	  i = begin + sizeof (struct protocol_1id_s) +
-	    ((struct protocol_1id_s *) &buffer[begin])->len_addr *
-	    sizeof (uint32_t) +
-	    ((struct protocol_1id_s *) &buffer[begin])->len_net *
-	    sizeof (struct protocol_netpair_s);
-	  if (i + 2 < buffer_len)
-	    begin = i;
-	}
-	*/
-      if (ip->ihl == PROTOCOL1_KA)
-	{
-	/*
-	  if (((struct protocol_1ka_s *) &buffer[begin])->len == 0
-	      || (begin + sizeof (struct protocol_1ka_s) +
-		  (((struct protocol_1ka_s *) &buffer[begin])->len *
-		   sizeof (struct protocol_addrpair_s))) > buffer_len)
-	    return;
-	  saddr.sin_family = AF_INET;
-	  for (i = begin + sizeof (struct protocol_1ka_s); i < buffer_len;
-	       i += sizeof (struct protocol_addrpair_s))
-	    {
-	      saddr.sin_addr.s_addr =
-		((struct protocol_addrpair_s *) &buffer[i])->addr;
-	      saddr.sin_port =
-		((struct protocol_addrpair_s *) &buffer[i])->port;
-	      //-TODO: Control more exactly the states
-	      newsession = udpsrvsession_search (&saddr);
-	      if (newsession == NULL)
-		{
-		  newsession = udpsrvsession_searchcreate (&saddr)
-		    protocol_sendpacket (newsession, PROTOCOL1_ID);
-		}
-	      if (newsession->peer != NULL)
-		protocol_sendpacket (newsession, PROTOCOL1_IDKA);
-		*/
+	      p += i;
+	      //if (router_exist () == 0)
+	      //-TODO Init conn
+	      //else
+	      peer_destroy (peer);
 	    }
 	}
     }
@@ -205,6 +235,10 @@ protocol_sendpacket (struct udpsrvsession_s *session, const int type)
       packet = (char *) protocol_v1id;
       packet_len = protocol_v1id_len;
       break;
+    case PROTOCOL1_IDA:
+      packet = (char *) &protocol_v1ida;
+      packet_len = protocol_v1ida_len;
+      break;
     case PROTOCOL1_KA:
       packet = (char *) protocol_v1ka;
       packet_len = protocol_v1ka_len;
@@ -242,10 +276,8 @@ protocol_init ()
   struct protocol_addrpair_s *addrpair;
   struct protocol_netpair_s *netpair;
   int i;
-  protocol_v1ida_len = sizeof (struct protocol_1_s);
-  protocol_v1ida = malloc (protocol_v1ida_len);
-  protocol_v1ida->version = PROTOCOL1_V;
-  protocol_v1ida->ihl = PROTOCOL1_IDA;
+  protocol_v1ida.version = PROTOCOL1_V;
+  protocol_v1ida.ihl = PROTOCOL1_IDA;
   protocol_v1id_len = sizeof (struct protocol_1id_s) +
     tun_selfpeer.shared_networks_len * sizeof (struct protocol_netpair_s) +
     tun_selfpeer.addrs_len * sizeof (struct protocol_addrpair_s);
@@ -269,7 +301,7 @@ protocol_init ()
 	sizeof (struct protocol_1id_s) +
 	i * sizeof (struct protocol_netpair_s);
       netpair->addr = tun_selfpeer.shared_networks[i].addr.s_addr;
-	  netpair->netmask = tun_selfpeer.shared_networks[i].netmask.s_addr;
+      netpair->netmask = tun_selfpeer.shared_networks[i].netmask.s_addr;
     }
   for (i = 0; i < protocol_v1id->peer.len_addr; i++)
     {

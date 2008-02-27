@@ -40,11 +40,11 @@ struct peer_s
   struct sockaddr_in *addrs;
   int addrs_len;
   int stat;
+  int recivack;
 };
 
 void peer_add (struct peer_s *peer, struct udpsrvsession_s *session);
 struct peer_s *peer_create ();
 void peer_destroy (struct peer_s *oldpeer);
-int peer_compare (struct peer_s *peer1, struct peer_s *peer2);
 
 #endif /* _PEER_H */
