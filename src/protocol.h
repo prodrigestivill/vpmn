@@ -24,6 +24,7 @@
 #ifndef _PROTOCOL_H
 #define _PROTOCOL_H
 
+#include <netinet/ip.h>
 #include "router.h"
 
 #define MAXKAPEERS 200
@@ -34,22 +35,25 @@
 #define PROTOCOL_IPv4  0x40
 #define PROTOCOL_IPv6  0x60
 
+/*-TOCHECK __attribute((packed)) */
+
 struct protocol_addrpair_s
 {
-  uint32_t addr;
-  uint16_t port;
+  u_int32_t addr __attribute((packed));
+  u_int16_t port __attribute((packed));
 };
 
 struct protocol_netpair_s
 {
-  uint32_t addr;
-  uint32_t netmask;
+  u_int32_t addr __attribute((packed));
+  u_int32_t netmask __attribute((packed));
 };
 
+/* Structure implemented */
 struct protocol_peer_s
 {
-  char len_net;
-  char len_addr;
+  u_int8_t len_net;
+  u_int8_t len_addr;
 //struct protocol_netpair_s networks[];
 //struct protocol_addrpair_s addrpairs[];
 };
@@ -57,14 +61,13 @@ struct protocol_peer_s
 /* Protocol 1 empty */
 struct protocol_1_s
 {
-  char packetid;
+  u_int8_t packetid;
 };
 
-/* Protocol 1 Identifier
- * Structure implemented */
+/* Protocol 1 Identifier */
 struct protocol_1id_s
 {
-  char packetid;
+  u_int8_t packetid;
   struct protocol_peer_s peer;
 };
 
@@ -72,8 +75,8 @@ struct protocol_1id_s
  * Structure implemented */
 struct protocol_1ka_s
 {
-  char packetid;
-  char len;
+  u_int8_t packetid;
+  u_int8_t len;
 //struct protocol_peer_s peer[];
 };
 

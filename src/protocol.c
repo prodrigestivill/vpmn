@@ -21,6 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <netinet/ip.h>
 #include <stdlib.h>
 #include "debug.h"
 #include "config.h"
@@ -45,7 +46,7 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 		     struct udpsrvsession_s *session)
 {
   int i, begin = 0;
-  struct sockaddr_in saddr;
+  struct iphdr *ip = NULL;
   struct peer_s *peer = NULL;
   struct udpsrvsession_s *newsession = NULL;
 
@@ -53,23 +54,18 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
     return;
   if (session != NULL)
     peer = session->peer;
-  if ((buffer[begin] & 0xF0) == 0x40)	//IPv4 packet
+  ip = (struct iphdr *) &buffer[begin];
+  if (ip->version == 4)	//IPv4 packet
     {
       if (peer == NULL || buffer_len < 20)
 	return;
-      //DST: Check if it is an interested packet for own host
-      saddr.sin_addr.s_addr = (buffer[16]) | (buffer[17] << 8) |
-	(buffer[18] << 16) | (buffer[19] << 24);
-      if (router_checksrc (&saddr.sin_addr, &tun_selfpeer) != 0)
+      if (router_checksrc ((struct in_addr *) &ip->daddr, &tun_selfpeer) != 0)
 	return;
-      //SRC: Check permisions
-      saddr.sin_addr.s_addr = (buffer[12]) | (buffer[13] << 8) |
-	(buffer[14] << 16) | (buffer[15] << 24);
-      if (router_checksrc (&saddr.sin_addr, peer) != 0)
+      if (router_checksrc ((struct in_addr *) &ip->saddr, peer) != 0)
 	return;
       tundev_write (buffer, buffer_len);
     }
-//else if ((buffer[begin] & 0xF0) == 0x60) //IPv6 Packet
+//else if (ip->version == 6) //IPv6 Packet
   else				//Internal packets
     {
       if (buffer[begin] == PROTOCOL1_ID)
@@ -166,29 +162,24 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 int
 protocol_sendframe (const char *buffer, const int buffer_len)
 {
-  struct in_addr addr;
+  struct iphdr *ip = NULL;
   struct peer_s *dstpeer = NULL;
   if (buffer_len < 20)
     return -1;
+  ip = (struct iphdr *) buffer;
   //Check for IPv4
-  if ((buffer[0] & 0xF0) == 0x40)
+  if (ip->version == 4)
     {
-      //SRC: Valid source?
-      addr.s_addr = (buffer[12]) | (buffer[13] << 8) |
-	(buffer[14] << 16) | (buffer[15] << 24);
-      if (router_checksrc (&addr, &tun_selfpeer) == 0)
+      if (router_checksrc ((struct in_addr *) &ip->saddr, &tun_selfpeer) == 0)
 	{
-	  //DST: Where to send?
-	  addr.s_addr = (buffer[16]) | (buffer[17] << 8) |
-	    (buffer[18] << 16) | (buffer[19] << 24);
 	  //-TODO: CHECK BROADCAST
-	  dstpeer = router_searchdst (&addr);
+	  dstpeer = router_searchdst ((struct in_addr *) &ip->daddr);
 	}
       else
 	log_error ("Invalid source.\n");
     }
   //Check for IPv6
-  else if ((buffer[0] & 0xF0) == 0x60)
+  else if (ip->version == 6)
     {
       log_error ("IPv6 not implemented.\n");
       //ROUTING IPv6
@@ -275,11 +266,8 @@ protocol_init ()
 	(struct protocol_netpair_s *) protocol_v1id +
 	sizeof (struct protocol_1id_s) +
 	i * sizeof (struct protocol_netpair_s);
-      memcpy (&netpair->addr, &tun_selfpeer.shared_networks[i].addr.s_addr,
-	      sizeof (uint32_t));
-      memcpy (&netpair->netmask,
-	      &tun_selfpeer.shared_networks[i].netmask.s_addr,
-	      sizeof (uint32_t));
+      netpair->addr = tun_selfpeer.shared_networks[i].addr.s_addr;
+	  netpair->netmask = tun_selfpeer.shared_networks[i].netmask.s_addr;
     }
   for (i = 0; i < protocol_v1id->peer.len_addr; i++)
     {
@@ -289,8 +277,7 @@ protocol_init ()
 	protocol_v1id->peer.len_net * sizeof (struct protocol_netpair_s) +
 	i * sizeof (struct protocol_addrpair_s);
       addrpair->port = tun_selfpeer.addrs[i].sin_port;
-      memcpy (&addrpair->addr, &tun_selfpeer.addrs[i].sin_addr.s_addr,
-	      sizeof (uint32_t));
+      addrpair->addr = tun_selfpeer.addrs[i].sin_addr.s_addr;
     }
   protocol_v1ka_maxlen =
     sizeof (struct protocol_1ka_s) +
