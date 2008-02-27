@@ -49,7 +49,7 @@ protocol_processpeer (struct peer_s *peer,
   struct protocol_addrpair_s *addrpair;
   struct protocol_netpair_s *netpair;
   if (sizeof (struct protocol_peer_s) +
-      ((struct protocol_peer_s *) fragment)->len_addr *
+      ((struct protocol_peer_s *) fragment)->len_net *
       sizeof (struct protocol_netpair_s) +
       ((struct protocol_peer_s *) fragment)->len_addr *
       sizeof (struct protocol_addrpair_s) > max_size)
@@ -83,7 +83,7 @@ protocol_processpeer (struct peer_s *peer,
       peer->addrs[i].sin_addr.s_addr = addrpair->addr;
     }
   return sizeof (struct protocol_peer_s) +
-    ((struct protocol_peer_s *) fragment)->len_addr *
+    ((struct protocol_peer_s *) fragment)->len_net *
     sizeof (struct protocol_netpair_s) +
     ((struct protocol_peer_s *) fragment)->len_addr *
     sizeof (struct protocol_addrpair_s);
@@ -283,8 +283,6 @@ protocol_init ()
   protocol_v1id = malloc (protocol_v1id_len);
   protocol_v1id->base.ihl = PROTOCOL1_ID;
   protocol_v1id->base.version = PROTOCOL1_V;
-  if (tun_selfpeer.shared_networks_len < 0)
-    return;
   if (tun_selfpeer.addrs_len < 256)
     protocol_v1id->peer.len_addr = tun_selfpeer.addrs_len;
   else
@@ -309,8 +307,8 @@ protocol_init ()
 	sizeof (struct protocol_1id_s) +
 	protocol_v1id->peer.len_net * sizeof (struct protocol_netpair_s) +
 	i * sizeof (struct protocol_addrpair_s);
-      addrpair->port = tun_selfpeer.addrs[i].sin_port;
       addrpair->addr = tun_selfpeer.addrs[i].sin_addr.s_addr;
+	  addrpair->port = tun_selfpeer.addrs[i].sin_port;
     }
   protocol_v1ka_maxlen =
     sizeof (struct protocol_1ka_s) +

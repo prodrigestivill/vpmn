@@ -36,9 +36,9 @@ struct peer_s
 {
   struct udpsrvsession_s *udpsrvsession;
   struct in_network *shared_networks;
-  int shared_networks_len;
+  unsigned int shared_networks_len;
   struct sockaddr_in *addrs;
-  int addrs_len;
+  unsigned int addrs_len;
   int stat;
   int recivack;
 };
