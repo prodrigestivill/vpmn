@@ -66,9 +66,9 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
       tundev_write (buffer, buffer_len);
     }
 //else if (ip->version == 6) //IPv6 Packet
-  else				//Internal packets
+  else if (ip->version == PROTOCOL1_V) //Internal packets v1
     {
-      if (buffer[begin] == PROTOCOL1_ID)
+      if (ip->ihl == PROTOCOL1_ID)
 	{
 	  /*if (((buffer[begin + 1] * sizeof (struct protocol_addrpair_t)) +
 	     +...) > buffer_len)
@@ -128,7 +128,7 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 	    begin = i;
 	}
 	*/
-      if (buffer[begin] == PROTOCOL1_KA)
+      if (ip->ihl == PROTOCOL1_KA)
 	{
 	/*
 	  if (((struct protocol_1ka_s *) &buffer[begin])->len == 0
@@ -244,12 +244,14 @@ protocol_init ()
   int i;
   protocol_v1ida_len = sizeof (struct protocol_1_s);
   protocol_v1ida = malloc (protocol_v1ida_len);
-  protocol_v1ida->packetid = PROTOCOL1_IDA;
+  protocol_v1ida->version = PROTOCOL1_V;
+  protocol_v1ida->ihl = PROTOCOL1_IDA;
   protocol_v1id_len = sizeof (struct protocol_1id_s) +
     tun_selfpeer.shared_networks_len * sizeof (struct protocol_netpair_s) +
     tun_selfpeer.addrs_len * sizeof (struct protocol_addrpair_s);
   protocol_v1id = malloc (protocol_v1id_len);
-  protocol_v1id->packetid = PROTOCOL1_ID;
+  protocol_v1id->base.ihl = PROTOCOL1_ID;
+  protocol_v1id->base.version = PROTOCOL1_V;
   if (tun_selfpeer.shared_networks_len < 0)
     return;
   if (tun_selfpeer.addrs_len < 256)

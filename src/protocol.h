@@ -25,29 +25,29 @@
 #define _PROTOCOL_H
 
 #include <netinet/ip.h>
+#include <bits/endian.h>
 #include "router.h"
 
 #define MAXKAPEERS 200
 
-#define PROTOCOL1_ID   0x01
-#define PROTOCOL1_IDA  0x02 //ACK
-#define PROTOCOL1_KA   0x03
-#define PROTOCOL_IPv4  0x40
-#define PROTOCOL_IPv6  0x60
+#define PROTOCOL1_V    1 //IP version for internal packets
+#define PROTOCOL1_ID   0
+#define PROTOCOL1_IDA  1 //ACK
+#define PROTOCOL1_KA   2
 
 /*-TOCHECK __attribute((packed)) */
 
 struct protocol_addrpair_s
 {
-  u_int32_t addr __attribute((packed));
-  u_int16_t port __attribute((packed));
-};
+  u_int32_t addr;
+  u_int16_t port;
+} __attribute((packed));
 
 struct protocol_netpair_s
 {
-  u_int32_t addr __attribute((packed));
-  u_int32_t netmask __attribute((packed));
-};
+  u_int32_t addr;
+  u_int32_t netmask;
+} __attribute((packed));
 
 /* Structure implemented */
 struct protocol_peer_s
@@ -56,29 +56,37 @@ struct protocol_peer_s
   u_int8_t len_addr;
 //struct protocol_netpair_s networks[];
 //struct protocol_addrpair_s addrpairs[];
-};
+} __attribute((packed));
 
 /* Protocol 1 empty */
 struct protocol_1_s
 {
-  u_int8_t packetid;
-};
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+    unsigned int ihl:4;
+    unsigned int version:4;
+#elif __BYTE_ORDER == __BIG_ENDIAN
+    unsigned int version:4;
+    unsigned int ihl:4;
+#else
+# error "Please fix <bits/endian.h>"
+#endif
+} __attribute((packed));
 
 /* Protocol 1 Identifier */
 struct protocol_1id_s
 {
-  u_int8_t packetid;
+  struct protocol_1_s base;
   struct protocol_peer_s peer;
-};
+} __attribute((packed));
 
 /* Protocol 1 Keep Alive
  * Structure implemented */
 struct protocol_1ka_s
 {
-  u_int8_t packetid;
+  struct protocol_1_s base;
   u_int8_t len;
 //struct protocol_peer_s peer[];
-};
+} __attribute((packed));
 
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
 			  struct udpsrvsession_s *session);
