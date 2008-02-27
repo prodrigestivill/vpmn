@@ -64,20 +64,23 @@ protocol_processpeer (struct peer_s *peer,
   for (i = 0; i < peer->shared_networks_len; i++)
     {
       netpair =
-	(struct protocol_netpair_s *) fragment +
-	sizeof (struct protocol_peer_s) +
-	i * sizeof (struct protocol_netpair_s);
+	(struct protocol_netpair_s *) ((void *) fragment +
+				       sizeof (struct protocol_peer_s) +
+				       (i *
+					sizeof (struct protocol_netpair_s)));
       peer->shared_networks[i].addr.s_addr = netpair->addr;
       peer->shared_networks[i].netmask.s_addr = netpair->netmask;
     }
   for (i = 0; i < peer->addrs_len; i++)
     {
       addrpair =
-	(struct protocol_addrpair_s *) fragment +
-	sizeof (struct protocol_peer_s) +
-	peer->shared_networks_len *
-	sizeof (struct protocol_netpair_s) +
-	i * sizeof (struct protocol_addrpair_s);
+	(struct protocol_addrpair_s *) ((void *) fragment +
+					sizeof (struct protocol_peer_s) +
+					(peer->shared_networks_len *
+					 sizeof (struct protocol_netpair_s)) +
+					(i *
+					 sizeof (struct
+						 protocol_addrpair_s)));
       peer->addrs[i].sin_family = AF_INET;
       peer->addrs[i].sin_port = addrpair->port;
       peer->addrs[i].sin_addr.s_addr = addrpair->addr;
@@ -294,21 +297,25 @@ protocol_init ()
   for (i = 0; i < protocol_v1id->peer.len_net; i++)
     {
       netpair =
-	(struct protocol_netpair_s *) protocol_v1id +
-	sizeof (struct protocol_1id_s) +
-	i * sizeof (struct protocol_netpair_s);
+	(struct protocol_netpair_s *) ((void *) protocol_v1id +
+				       sizeof (struct protocol_1id_s) +
+				       (i *
+					sizeof (struct protocol_netpair_s)));
       netpair->addr = tun_selfpeer.shared_networks[i].addr.s_addr;
       netpair->netmask = tun_selfpeer.shared_networks[i].netmask.s_addr;
     }
   for (i = 0; i < protocol_v1id->peer.len_addr; i++)
     {
       addrpair =
-	(struct protocol_addrpair_s *) protocol_v1id +
-	sizeof (struct protocol_1id_s) +
-	protocol_v1id->peer.len_net * sizeof (struct protocol_netpair_s) +
-	i * sizeof (struct protocol_addrpair_s);
+	(struct protocol_addrpair_s *) ((void *) protocol_v1id +
+					sizeof (struct protocol_1id_s) +
+					(protocol_v1id->peer.len_net *
+					 sizeof (struct protocol_netpair_s)) +
+					(i *
+					 sizeof (struct
+						 protocol_addrpair_s)));
       addrpair->addr = tun_selfpeer.addrs[i].sin_addr.s_addr;
-	  addrpair->port = tun_selfpeer.addrs[i].sin_port;
+      addrpair->port = tun_selfpeer.addrs[i].sin_port;
     }
   protocol_v1ka_maxlen =
     sizeof (struct protocol_1ka_s) +

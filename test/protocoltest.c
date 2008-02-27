@@ -45,7 +45,6 @@ main ()
   struct peer_s *peer = peer_create ();
   config_load ();
   protocol_init ();
-
   for (i = 0; i < protocol_v1id_len; i++)
     log_debug ("%d ", *((char *) protocol_v1id + i));
   i = protocol_processpeer (peer, &protocol_v1id->peer, protocol_v1id_len -
@@ -54,7 +53,7 @@ main ()
   if (i < 0)
     return;
   log_debug ("\n%d\n", i);
-  //peer = &tun_selfpeer;
+//peer = &tun_selfpeer;
   for (i = 0; i < peer->addrs_len; i++)
     {
       log_info ("%s:", inet_ntoa (peer->addrs[i].sin_addr));
