@@ -22,23 +22,49 @@
  */
 
 #include "../src/protocol.h"
+#include "../src/debug.h"
+#include "../src/peer.h"
+#include "../src/config.h"
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 struct protocol_1id_s *protocol_v1id;
 int protocol_v1id_len;
-struct protocol_1_s *protocol_v1ida;
-int protocol_v1ida_len;
+struct protocol_1_s protocol_v1ida;
+#define protocol_v1ida_len sizeof (struct protocol_1_s);
 struct protocol_1ka_s *protocol_v1ka;
 int protocol_v1ka_len;
+int protocol_v1ka_maxlen;
 int protocol_v1ka_pos;
 
 void
 main ()
 {
   int i;
+  struct peer_s *peer = peer_create ();
   config_load ();
-  protocol_init ();	
+  protocol_init ();
+/*
   for (i = 0; i < protocol_v1id_len; i++)
     log_debug ("%s.1", ((char *) protocol_v1id + i));
+*/
+  i = protocol_processpeer (peer, &protocol_v1id->peer, protocol_v1id_len -
+			    sizeof (struct protocol_1id_s) +
+			    sizeof (struct protocol_peer_s));
+  if (i < 0)
+    return;
+  //peer = &tun_selfpeer;
+  for (i = 0; i < peer->addrs_len; i++)
+    {
+      log_info ("%s:", inet_ntoa (peer->addrs[i].sin_addr));
+      log_info ("%d\n", ntohs (peer->addrs[i].sin_port));
+    }
+  for (i = 0; i < peer->shared_networks_len; i++)
+    {
+      log_info ("%s:", inet_ntoa (peer->shared_networks[i].addr));
+      log_info ("%s\n", inet_ntoa (peer->shared_networks[i].netmask));
+    }
 }
 
 void

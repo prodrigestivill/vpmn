@@ -39,21 +39,21 @@
 
 struct protocol_addrpair_s
 {
-  u_int32_t addr;
-  u_int16_t port;
+  uint32_t addr;
+  uint16_t port;
 } __attribute((packed));
 
 struct protocol_netpair_s
 {
-  u_int32_t addr;
-  u_int32_t netmask;
+  uint32_t addr;
+  uint32_t netmask;
 } __attribute((packed));
 
 /* Structure implemented */
 struct protocol_peer_s
 {
-  u_int8_t len_net;
-  u_int8_t len_addr;
+  uint8_t len_net;
+  uint8_t len_addr;
 //struct protocol_netpair_s networks[];
 //struct protocol_addrpair_s addrpairs[];
 } __attribute((packed));
@@ -84,15 +84,18 @@ struct protocol_1id_s
 struct protocol_1ka_s
 {
   struct protocol_1_s base;
-  u_int8_t len;
+  uint8_t len;
 //struct protocol_peer_s peer[];
 } __attribute((packed));
 
+void protocol_init ();
 void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
 			  struct udpsrvsession_s *session);
 int protocol_sendframe (const char *buffer, const int buffer_len);
 int protocol_sendpacket (struct udpsrvsession_s *session,
 			 const int type);
+int protocol_processpeer (struct peer_s *peer,
+             struct protocol_peer_s *fragment, int max_size);
 void protocol_maintainerthread ();
 
 #endif /* _PROTOCOL_H */

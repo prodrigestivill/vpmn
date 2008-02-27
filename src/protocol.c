@@ -68,7 +68,7 @@ protocol_processpeer (struct peer_s *peer,
 	sizeof (struct protocol_peer_s) +
 	i * sizeof (struct protocol_netpair_s);
       peer->shared_networks[i].addr.s_addr = netpair->addr;
-      peer->shared_networks[i].addr.s_addr = netpair->netmask;
+      peer->shared_networks[i].netmask.s_addr = netpair->netmask;
     }
   for (i = 0; i < peer->addrs_len; i++)
     {
@@ -117,7 +117,7 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
     {
       if (ip->ihl == PROTOCOL1_IDA && session->peer != NULL)
 	{
-	  peer->recivack = 1;
+	  session->peer->recivack = 1;
 	  //Packets are combinable IDACK+ID
 	  begin = begin + sizeof (struct protocol_1_s);
 	  if (begin + 4 > buffer_len)
@@ -133,7 +133,6 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 	  if (peer->stat != PEER_STAT_ID)
 	    {
 	      if (protocol_processpeer (peer,
-					(struct protocol_peer_s *)
 					&((struct protocol_1id_s *)
 					  &buffer[begin])->peer,
 					buffer_len - begin -
