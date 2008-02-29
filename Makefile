@@ -14,26 +14,10 @@ normal: $(normal).pdf $(normal)$(annex).pdf
 
 epsc: $(epsc).pdf $(epsc)$(annex).pdf $(epsc)$(withannex).pdf
 
-
 #PDF Output files
-pdflatex = pdflatex
-$(paper).pdf:
-	$(pdflatex) $(paper)
-
-$(normal).pdf:
-	$(pdflatex) $(normal)
-
-$(normal)$(annex).pdf:
-	$(pdflatex) $(normal)$(annex)
-
-$(epsc).pdf:
-	$(pdflatex) $(epsc)
-
-$(epsc)$(annex).pdf:
-	$(pdflatex) $(epsc)$(annex)
-
-$(epsc)$(withannex).pdf:
-	$(pdflatex) $(epsc)$(withannex)
+%.pdf: %.tex
+	pdflatex --draftmode $<
+	pdflatex $<
 
 #Clean
 cmdcleanpdf = rm -vf *.pdf
