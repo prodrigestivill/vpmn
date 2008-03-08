@@ -43,7 +43,7 @@ struct peer_s
   int recivack;
 };
 
-void peer_add (struct peer_s *peer, struct udpsrvsession_s *session);
+int peer_add (struct peer_s *peer, struct udpsrvsession_s *session);
 struct peer_s *peer_create ();
 void peer_destroy (struct peer_s *oldpeer);
 

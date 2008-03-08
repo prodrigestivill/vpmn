@@ -57,6 +57,21 @@ router_searchdst (const struct in_addr *dst)
   return NULL;
 }
 
+int
+router_existroute (struct in_network *network)
+{
+  struct router_table_l *current = router_table;
+  network->addr.s_addr = network->addr.s_addr & network->netmask.s_addr;
+  while (current != NULL)
+    {
+      if ((network->addr.s_addr == current->network->addr.s_addr) &&
+	  (network->netmask.s_addr == current->network->netmask.s_addr))
+	return 1;
+      current = current->next;
+    }
+  return 0;
+}
+
 void
 router_addroute (struct in_network *network, struct peer_s *peer)
 {

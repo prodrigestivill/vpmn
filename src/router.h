@@ -34,6 +34,7 @@ struct in_network
 };
 
 struct peer_s *router_searchdst (const struct in_addr *dst);
+int router_existroute (struct in_network *network);
 //struct peer_s *router_searchdst6 (struct in6_addr *dst);
 int router_checksrc (const struct in_addr *src, const struct peer_s *peer);
 //int router_checksrc6 (struct in6_addr *src);

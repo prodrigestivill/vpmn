@@ -44,7 +44,12 @@ udpsrvsession_create (const struct sockaddr_in *source)
   struct udpsrvsession_s *newsession =
     malloc (sizeof (struct udpsrvsession_s));
   struct sockaddr_in *addr = malloc (sizeof (struct sockaddr_in));
-  memcpy (addr, source, sizeof (const struct sockaddr_in));
+  addr->sin_family = source->sin_family;
+  addr->sin_addr.s_addr = source->sin_addr.s_addr;
+  addr->sin_port = source->sin_port;
+  newsession->netacl.filled = 0;
+  newsession->netacl.permitted_len = 0;
+  newsession->netacl.excluded_len = 0;
   newsession->addr = addr;
   newsession->peer = NULL;
   pthread_mutex_init (&newsession->dtls_mutex, NULL);

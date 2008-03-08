@@ -27,7 +27,17 @@
 #include <pthread.h>
 #include <sys/socket.h>
 #include <openssl/ssl.h>
+#include "router.h"
 #include "peer.h"
+ 
+struct udpsrvsession_netacl_s
+{
+	int filled;
+	int permitted_len;
+	int excluded_len;
+	struct in_network *permitted;
+	struct in_network *excluded;
+};
 
 struct udpsrvsession_s
 {
@@ -36,6 +46,7 @@ struct udpsrvsession_s
   pthread_mutex_t dtls_mutex;
   struct sockaddr_in *addr;
   struct peer_s *peer;
+  struct udpsrvsession_netacl_s netacl;
 };
 
 struct udpsrvsession_s *udpsrvsession_search (const struct sockaddr_in

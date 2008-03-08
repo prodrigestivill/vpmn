@@ -141,17 +141,15 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 					buffer_len - begin -
 					sizeof (struct protocol_1id_s) +
 					sizeof (struct protocol_peer_s)) < 0)
-		return;
-
+			{
+				peer_destroy (peer);
+				return;
+			}
+		  
+	      /* Check for valid routes shared */
 	      peer->stat = PEER_STAT_ID;
-	      /* add local routes to router ¿?
-	         if (peer_compare (&tun_selfpeer, peer))
-	         {
-	         peer_destroy (peer);
-	         return;
-	         }
-	       */
-	      peer_add (peer, session);
+	      if (peer_add (peer, session)<1)
+				peer_destroy (peer);
 	    }
 	  //-TODO: JOIN packets
 	  protocol_sendpacket (session, PROTOCOL1_IDA);

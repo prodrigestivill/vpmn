@@ -126,6 +126,7 @@ udpsrvdtls_read (const char *buffer, const int buffer_len, char *bufferout,
 		 const int bufferout_len, struct udpsrvsession_s *session)
 {
   int len, retry = 0;
+  X509 *sessionx509peer;
   unsigned long err;
   BIO *wbio, *rbio;
   if (session == NULL)
@@ -155,6 +156,10 @@ udpsrvdtls_read (const char *buffer, const int buffer_len, char *bufferout,
   while (retry > 0 && retry < 5);
   BIO_free (session->dtls->rbio);
   session->dtls->rbio = udpsrvdtls_mbio;
+  if (session->netacl.filled == 0 && SSL_in_init(session->dtls)){
+	 sessionx509peer = SSL_get_peer_certificate(session->dtls);
+	 //TODO- NameConstrains
+  }
   pthread_mutex_unlock (&session->dtls_mutex);
   if (len > 0 && retry == 0)
     udpsrvsession_update_timeout (session);
