@@ -1,5 +1,4 @@
 \documentclass[12pt,twoside,a4paper]{report/tesis}
-
 \usepackage{report/a4}
 \usepackage{latexsym}
 \usepackage[catalan,spanish,english]{babel}
@@ -10,6 +9,8 @@
 \usepackage{graphicx}
 \usepackage{pdfpages}
 
+\input{report/config}
+
 % ifpdf package
 \RequirePackage{ifpdf}
 
@@ -19,8 +20,7 @@
   \RequirePackage[pdftex]{hyperref}
 \else
   \RequirePackage[dvips]{hyperref}\fi
-\AtEndOfClass{%
-  \AtBeginDocument{%
+\AtBeginDocument{%
     \hypersetup{%
       breaklinks,
       baseurl       = http://,
@@ -33,13 +33,11 @@
       pdfsubject    = ANNEX~\titledockind,%
       pdfkeywords   = \titledockind~\titledoc~\titledocCA~Annex,
       pdfcreator    = \LaTeX{},%
-      pdfproducer   = \LaTeX}}}
+      pdfproducer   = \LaTeX}}
 \urlstyle{tt}
 
 \selectlanguage{catalan}
 \setlength{\headheight}{15pt}
-
-\input{report/config}
 
 \newcommand{\clearemptydoublepage}{\newpage{\pagestyle{empty}\cleardoublepage}}
 \makeindex

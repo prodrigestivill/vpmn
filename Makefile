@@ -21,7 +21,7 @@ epsc: $(epsc).pdf $(epsc)$(annex).pdf $(epsc)$(withannex).pdf
 
 #Clean
 cmdcleanpdf = rm -vf *.pdf
-cmdclean = rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.idx *.log *.lot *.lof *.prv *.toc *~
+cmdclean = rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.idx *.log *.lot *.lof *.prv *.toc *~ *.out
 cleanpdf:
 	$(cmdcleanpdf)
 
