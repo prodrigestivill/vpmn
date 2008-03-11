@@ -8,6 +8,33 @@
 \usepackage{makeidx}
 \usepackage{amsmath}
 \usepackage{graphicx}
+\usepackage{pdfpages}
+
+% ifpdf package
+\RequirePackage{ifpdf}
+
+% hyperrefs
+\RequirePackage{url}
+\ifpdf
+  \RequirePackage[pdftex]{hyperref}
+\else
+  \RequirePackage[dvips]{hyperref}\fi
+\AtEndOfClass{%
+  \AtBeginDocument{%
+    \hypersetup{%
+      breaklinks,
+      baseurl       = http://,
+      pdfborder     = 0 0 0,
+      pdfpagemode   = None,
+      pdfstartview  = XYZ,
+      pdfstartpage  = 1,
+      pdfauthor     = \authordoc,%
+      pdftitle      = \titledoc~-~Annex,%
+      pdfsubject    = ANNEX~\titledockind,%
+      pdfkeywords   = \titledockind~\titledoc~\titledocCA~Annex,
+      pdfcreator    = \LaTeX{},%
+      pdfproducer   = \LaTeX}}}
+\urlstyle{tt}
 
 \selectlanguage{catalan}
 \setlength{\headheight}{15pt}

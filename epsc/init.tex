@@ -39,3 +39,32 @@
 
 %% Permet canviar els colors del document
 %\usepackage{color,colortbl}
+
+%% Permet incloure pdfs
+\usepackage{pdfpages}
+
+% ifpdf package
+\RequirePackage{ifpdf}
+
+% hyperrefs
+\RequirePackage{url}
+\ifpdf
+  \RequirePackage[pdftex]{hyperref}
+\else
+  \RequirePackage[dvips]{hyperref}\fi
+\AtEndOfClass{%
+  \AtBeginDocument{%
+    \hypersetup{%
+      breaklinks,
+      baseurl       = http://,
+      pdfborder     = 0 0 0,
+      pdfpagemode   = None,
+      pdfstartview  = XYZ,
+      pdfstartpage  = 1,
+      pdfauthor     = \authordoc,%
+      pdftitle      = \titledocE,%
+      pdfsubject    = \titledoc,%
+      pdfkeywords   = \titledoc~\titledocE,
+      pdfcreator    = \LaTeX{},%
+      pdfproducer   = \LaTeX}}}
+\urlstyle{tt}

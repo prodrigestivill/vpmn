@@ -1,5 +1,5 @@
 all: pdf
-pdf: cleanpdf normal
+pdf: cleanpdf allextra normal
 
 #Default Output PDFs
 paper = paper
@@ -27,9 +27,15 @@ cleanpdf:
 
 clean:
 	$(cmdclean)
-	cd report; $(cmdclean)
-	cd paper; $(cmdclean)
-	cd epsc; $(cmdclean)
+	cd report && $(cmdclean)
+	cd paper && $(cmdclean)
+	cd epsc && $(cmdclean)
+
+distclean: clean cleanpdf cleanextra
+
+#Extra
+%extra:
+	cd extra && $(MAKE) $@
 
 #Upload and Subversion Features
 file1 = $(normal).pdf
