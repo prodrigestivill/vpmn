@@ -1,16 +1,18 @@
+.PHONY: all pdf paper report epsc %extra clean distclean cleanupload upload 
+
 all: pdf
-pdf: cleanpdf allextra normal
+pdf: cleanpdf allextra report
 
 #Default Output PDFs
 paper = paper
-normal = report
+report = report
 epsc = epsc_vpmn
 annex = _annex
 withannex = _all
 
 paper: $(paper).pdf
 
-normal: $(normal).pdf $(normal)$(annex).pdf
+report: $(report).pdf $(report)$(annex).pdf
 
 epsc: $(epsc).pdf $(epsc)$(annex).pdf $(epsc)$(withannex).pdf
 
@@ -55,13 +57,3 @@ upload: cleanupload
 	googlecode_upload.py -s "$(file1)" -p $(projectname) -l Featured -l Type-Docs -u $(uploaduser) --config-dir=none "$(file1)"
 	googlecode_upload.py -s "$(file2)" -p $(projectname) -l Featured -l Type-Docs -u $(uploaduser) --config-dir=none "$(file2)"
 	googlecode_upload.py -s "$(file3)" -p $(projectname) -l Featured -l Type-Docs -u $(uploaduser) --config-dir=none "$(file3)"
-
-ci: commit
-
-commit:
-	svn ci
-
-up: update
-
-update:
-	svn up
