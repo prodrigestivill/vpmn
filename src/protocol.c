@@ -114,13 +114,14 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
       if (router_checksrc ((struct in_addr *) &ip->saddr, session->peer) != 0)
 	return;
       tundev_write (buffer, buffer_len);
+      return;
     }
 //else if (ip->version == 6) //IPv6 Packet
   else if (ip->version == PROTOCOL1_V)	//Internal packets v1
     {
       if (ip->ihl == PROTOCOL1_IDA && session->peer != NULL)
 	{
-	  session->peer->recivack = 1;
+	  session->peer->stat |= PEER_STAT_IDK;
 	  //Packets are combinable IDACK+ID
 	  begin = begin + sizeof (struct protocol_1_s);
 	  if (begin + 4 > buffer_len)
@@ -133,7 +134,7 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 	  if (session->peer == NULL)
 	    session->peer = peer_create ();
 	  peer = session->peer;
-	  if (peer->stat != PEER_STAT_ID)
+	  if ((peer->stat & PEER_STAT_ID) != 0)
 	    {
 	      if (protocol_processpeer (peer,
 					&((struct protocol_1id_s *)
@@ -142,18 +143,19 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 					sizeof (struct protocol_1id_s) +
 					sizeof (struct protocol_peer_s)) < 0)
 			{
+                //-TODO: Check
 				peer_destroy (peer);
 				return;
 			}
 		  
 	      /* Check for valid routes shared */
-	      peer->stat = PEER_STAT_ID;
+	      peer->stat |= PEER_STAT_ID;
 	      if (peer_add (peer, session)<1)
 				peer_destroy (peer);
 	    }
 	  //-TODO: JOIN packets
 	  protocol_sendpacket (session, PROTOCOL1_IDA);
-	  if (peer->recivack == 0)
+	  if ((peer->stat & PEER_STAT_IDK) == 0)
 	    protocol_sendpacket (session, PROTOCOL1_ID);
 	  //Packets are combinable ID+KA
 	  begin = begin + sizeof (struct protocol_1id_s) +
@@ -165,7 +167,8 @@ protocol_recvpacket (const char *buffer, const int buffer_len,
 	    return;
 	  ip = (struct iphdr *) &buffer[begin];
 	}
-      if (ip->ihl == PROTOCOL1_KA)
+      if (ip->ihl == PROTOCOL1_KA && session->peer != NULL &&
+          (peer->session->peer & PEER_STAT_ID) != 0)
 	{
 	  p = (void *) &buffer[begin] + sizeof (struct protocol_1ka_s);
 	  while (p <= (void *) &buffer[buffer_len - 1])

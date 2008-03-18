@@ -1,5 +1,5 @@
 /***************************************************************************
- *            peer.h
+ *            timeout.c
  *
  *  VPMN  -  Virtual Private Mesh Network
  *  Copyright  2008  Pau Rodriguez-Estivill
@@ -21,30 +21,5 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _PEER_H
-#define _PEER_H
-
-#include <netinet/in.h>
-#include "router.h"
-#include "udpsrvsession.h"
-
-#define PEER_STAT_NEW 0x00
-#define PEER_STAT_ID  0x01		//IDENTIFIED
-#define PEER_STAT_IDK 0x02		//ID ACK
-#define PEER_STAT_TO  0x80		//TIMEOUT
-
-struct peer_s
-{
-  struct udpsrvsession_s *udpsrvsession;
-  struct in_network *shared_networks;
-  unsigned int shared_networks_len;
-  struct sockaddr_in *addrs;
-  unsigned int addrs_len;
-  int stat;
-};
-
-int peer_add (struct peer_s *peer, struct udpsrvsession_s *session);
-struct peer_s *peer_create ();
-void peer_destroy (struct peer_s *oldpeer);
-
-#endif /* _PEER_H */
+//gettimeofday (&elapsed, (struct timezone *) 0);
+//clock_t clock(void);

@@ -53,7 +53,7 @@ peer_create ()
   newpeer->addrs_len = 0;
   newpeer->shared_networks = NULL;
   newpeer->shared_networks_len = 0;
-  newpeer->recivack = 0;
+  newpeer->stat = PEER_STAT_NEW;
   return newpeer;
 }
 

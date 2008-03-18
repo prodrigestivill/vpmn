@@ -34,7 +34,8 @@ vpmnd_SOURCES = \
 	vpmnd.c \
 	srv.h \
 	protocol.c \
-	protocol.h 
+	protocol.h \
+	timeout.c
 
 vpmnd_LDFLAGS = \
 	-lpthread\
