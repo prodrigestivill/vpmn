@@ -36,98 +36,95 @@
 #define TUNDEVICE "/dev/net/tun"
 int tundev_fd = -1;
 
-int
-tundev_initdev ()
+int tundev_initdev()
 {
-  int sd_sock = -1, tunname_len = strlen (tunname);
+  int sd_sock = -1, tunname_len = strlen(tunname);
   struct sockaddr_in *tunaddr;
   struct ifreq ifr;
 
 
   if (tundev_fd != -1)
     {
-      log_error ("Already initalitzed.\n");
+      log_error("Already initalitzed.\n");
       return -1;
     }
-  if ((tundev_fd = open (TUNDEVICE, O_RDWR)) < 0)
+  if ((tundev_fd = open(TUNDEVICE, O_RDWR)) < 0)
     {
-      log_error ("Could not open %s.\n", TUNDEVICE);
+      log_error("Could not open %s.\n", TUNDEVICE);
       return -1;
     }
 
-  memset (&ifr, 0, sizeof (ifr));
+  memset(&ifr, 0, sizeof(ifr));
   ifr.ifr_flags = IFF_TUN | IFF_NO_PI;
   if (tunname_len > 0)
-    strncpy (ifr.ifr_name, tunname, IFNAMSIZ);
+    strncpy(ifr.ifr_name, tunname, IFNAMSIZ);
 
-  if (ioctl (tundev_fd, TUNSETIFF, &ifr) < 0)
+  if (ioctl(tundev_fd, TUNSETIFF, &ifr) < 0)
     {
-      close (tundev_fd);
+      close(tundev_fd);
       return -1;
     }
   if (tunname_len == 0)
-    strncpy (tunname, ifr.ifr_name, IFNAMSIZ);
+    strncpy(tunname, ifr.ifr_name, IFNAMSIZ);
 
-  if ((sd_sock = socket (AF_INET, SOCK_DGRAM, 0)) < 0)
+  if ((sd_sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-      log_error ("Cannot open socket and configure the interface %s.\n",
-		 tunname);
+      log_error("Cannot open socket and configure the interface %s.\n",
+                tunname);
     }
   else
     {
       ifr.ifr_flags = 0;
       ifr.ifr_mtu = TUNBUFFERSIZE;
-      ioctl (sd_sock, SIOCSIFMTU, &ifr);
+      ioctl(sd_sock, SIOCSIFMTU, &ifr);
 
       tunaddr = (struct sockaddr_in *) &ifr.ifr_addr;
       tunaddr->sin_family = AF_INET;
       tunaddr->sin_addr.s_addr = tunaddr_ip.addr.s_addr;
-      if (ioctl (sd_sock, SIOCSIFADDR, &ifr) < 0)
-	{
-	  log_error ("Could not configure inet addr %s in the interface.\n",
-		     inet_ntoa (tunaddr_ip.addr));
-	}
+      if (ioctl(sd_sock, SIOCSIFADDR, &ifr) < 0)
+        {
+          log_error("Could not configure inet addr %s in the interface.\n",
+                    inet_ntoa(tunaddr_ip.addr));
+        }
       tunaddr = (struct sockaddr_in *) &ifr.ifr_netmask;
       tunaddr->sin_family = AF_INET;
       tunaddr->sin_addr.s_addr = tunaddr_ip.netmask.s_addr;
-      if (ioctl (sd_sock, SIOCSIFNETMASK, &ifr) < 0)
-	{
-	  log_error ("Could not configure netmask %s in the interface.\n",
-		     inet_ntoa (tunaddr_ip.netmask));
-	}
+      if (ioctl(sd_sock, SIOCSIFNETMASK, &ifr) < 0)
+        {
+          log_error("Could not configure netmask %s in the interface.\n",
+                    inet_ntoa(tunaddr_ip.netmask));
+        }
       tunaddr = (struct sockaddr_in *) &ifr.ifr_dstaddr;
       tunaddr->sin_family = AF_INET;
       tunaddr->sin_addr.s_addr = tunaddr_ip.addr.s_addr &
-	tunaddr_ip.netmask.s_addr;
-      if (ioctl (sd_sock, SIOCSIFDSTADDR, &ifr) < 0)
-	{
-	  log_error ("Could not configure net addr %s in the interface.\n",
-		     inet_ntoa (tunaddr->sin_addr));
-	}
-      ioctl (sd_sock, SIOCGIFFLAGS, &ifr);
+        tunaddr_ip.netmask.s_addr;
+      if (ioctl(sd_sock, SIOCSIFDSTADDR, &ifr) < 0)
+        {
+          log_error("Could not configure net addr %s in the interface.\n",
+                    inet_ntoa(tunaddr->sin_addr));
+        }
+      ioctl(sd_sock, SIOCGIFFLAGS, &ifr);
       ifr.ifr_flags |= IFF_UP;
-      if (ioctl (sd_sock, SIOCSIFFLAGS, &ifr) < 0)
-	{
-	  log_error ("Could not configure flags of the interface.\n");
-	}
-      close (sd_sock);
+      if (ioctl(sd_sock, SIOCSIFFLAGS, &ifr) < 0)
+        {
+          log_error("Could not configure flags of the interface.\n");
+        }
+      close(sd_sock);
     }
 
   return tundev_fd;
 }
 
-int
-tundev_write (const void *buf, const int count)
+int tundev_write(const void *buf, const int count)
 {
   if (tundev_fd >= 0 && count > 0 && count <= TUNBUFFERSIZE)
-    return write (tundev_fd, buf, count);
+    return write(tundev_fd, buf, count);
   return -1;
 }
 
-int
-tundev_read (void *buf, const int count)
+int tundev_read(void *buf, const int count)
 {
   if (tundev_fd >= 0 && count > 0 && count <= TUNBUFFERSIZE)
-    return read (tundev_fd, buf, count);
+    return read(tundev_fd, buf, count);
   return -1;
 }

@@ -27,29 +27,26 @@
 #include <stdio.h>
 #endif
 
-void
-log_debug (const char *format, void **args)
+void log_debug(const char *format, void **args)
 {
 #ifdef DEBUG
-  fprintf (stdout, format, args);
-  fflush (stdout);
+  fprintf(stdout, format, args);
+  fflush(stdout);
 #endif
 }
 
-void
-log_info (const char *format, void **args)
+void log_info(const char *format, void **args)
 {
 #ifdef DEBUG
-  fprintf (stdout, format, args);
-  fflush (stdout);
+  fprintf(stdout, format, args);
+  fflush(stdout);
 #endif
 }
 
-void
-log_error (const char *format, void **args)
+void log_error(const char *format, void **args)
 {
 #ifdef DEBUG
-  fprintf (stderr, format, args);
-  fflush (stderr);
+  fprintf(stderr, format, args);
+  fflush(stderr);
 #endif
 }

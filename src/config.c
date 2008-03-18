@@ -31,8 +31,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-void
-config_load ()
+void config_load()
 {
   vpmnd_uid = 1000;
   vpmnd_gid = 1000;
@@ -47,18 +46,18 @@ config_load ()
 
   char *tunaddr_ip_str = "10.0.0.5";
   char *tunaddr_nm_str = "255.255.255.0";
-  if (inet_aton (tunaddr_ip_str, &tunaddr_ip.addr) == 0
-      || inet_aton (tunaddr_nm_str, &tunaddr_ip.netmask) == 0)
-    log_error ("Unable to load IP configurations.\n");
+  if (inet_aton(tunaddr_ip_str, &tunaddr_ip.addr) == 0
+      || inet_aton(tunaddr_nm_str, &tunaddr_ip.netmask) == 0)
+    log_error("Unable to load IP configurations.\n");
 
-  tun_selfpeer.shared_networks = calloc (1 + 1, sizeof (struct in_network));
+  tun_selfpeer.shared_networks = calloc(1 + 1, sizeof(struct in_network));
   tun_selfpeer.shared_networks[0].addr.s_addr = tunaddr_ip.addr.s_addr;
   tun_selfpeer.shared_networks[0].netmask.s_addr = 0xffffffff;
 
   char *tunaddr_net0_ip_str = "10.1.0.5";
   char *tunaddr_net0_nm_str = "255.255.255.0";
-  inet_aton (tunaddr_net0_ip_str, &tun_selfpeer.shared_networks[1].addr);
-  inet_aton (tunaddr_net0_nm_str, &tun_selfpeer.shared_networks[1].netmask);
+  inet_aton(tunaddr_net0_ip_str, &tun_selfpeer.shared_networks[1].addr);
+  inet_aton(tunaddr_net0_nm_str, &tun_selfpeer.shared_networks[1].netmask);
   tun_selfpeer.shared_networks[1].addr.s_addr =
     tun_selfpeer.shared_networks[1].addr.s_addr & tun_selfpeer.
     shared_networks[1].netmask.s_addr;
@@ -68,9 +67,9 @@ config_load ()
   num_udpsrvthreads = 5;
   port_udp = 1090;
   char *updsrv_ip_str = "192.168.0.2";
-  tun_selfpeer.addrs = calloc (1, sizeof (struct sockaddr_in));
-  inet_aton (updsrv_ip_str, &tun_selfpeer.addrs[0].sin_addr);
-  tun_selfpeer.addrs[0].sin_port = htons (port_udp);
+  tun_selfpeer.addrs = calloc(1, sizeof(struct sockaddr_in));
+  inet_aton(updsrv_ip_str, &tun_selfpeer.addrs[0].sin_addr);
+  tun_selfpeer.addrs[0].sin_port = htons(port_udp);
   tun_selfpeer.addrs_len = 1;
 
   //DTLS
@@ -79,13 +78,12 @@ config_load ()
   char *sslpkey_str = "../test/client1pkey.pem";
   ssl_verifydepth = 1;
   ssl_cipherlist = "DEFAULT";
-  udpsrvdtls_init ();
-  if (udpsrvdtls_loadcerts (sslcacert_str, sslcert_str, sslpkey_str) != 0)
-    log_error ("Unable to load certs.\n");
+  udpsrvdtls_init();
+  if (udpsrvdtls_loadcerts(sslcacert_str, sslcert_str, sslpkey_str) != 0)
+    log_error("Unable to load certs.\n");
 }
 
-void
-config_fistpeersinit ()
+void config_fistpeersinit()
 {
 /*
   struct sockaddr_in *peeraddr;

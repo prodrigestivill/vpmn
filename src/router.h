@@ -33,12 +33,12 @@ struct in_network
   struct in_addr netmask;
 };
 
-struct peer_s *router_searchdst (const struct in_addr *dst);
-int router_existroute (struct in_network *network);
+struct peer_s *router_searchdst(const struct in_addr *dst);
+int router_existroute(struct in_network *network);
 //struct peer_s *router_searchdst6 (struct in6_addr *dst);
-int router_checksrc (const struct in_addr *src, const struct peer_s *peer);
+int router_checksrc(const struct in_addr *src, const struct peer_s *peer);
 //int router_checksrc6 (struct in6_addr *src);
-void router_addroute (struct in_network *network, struct peer_s *peer);
-void router_flush (const struct peer_s *peer);
+void router_addroute(struct in_network *network, struct peer_s *peer);
+void router_flush(const struct peer_s *peer);
 
-#endif /* _ROUTER_H */
+#endif                          /* _ROUTER_H */

@@ -43,53 +43,50 @@ pthread_mutex_t router_expired_table_mutex = PTHREAD_MUTEX_INITIALIZER;
 struct router_table_l **router_expired_table;
 int router_expired_table_len = 0;
 
-struct peer_s *
-router_searchdst (const struct in_addr *dst)
+struct peer_s *router_searchdst(const struct in_addr *dst)
 {
   struct router_table_l *current = router_table;
   while (current != NULL)
     {
       if ((dst->s_addr & current->network->netmask.s_addr) ==
-	  current->network->addr.s_addr)
-	return current->peer;
+          current->network->addr.s_addr)
+        return current->peer;
       current = current->next;
     }
   return NULL;
 }
 
-int
-router_existroute (struct in_network *network)
+int router_existroute(struct in_network *network)
 {
   struct router_table_l *current = router_table;
   network->addr.s_addr = network->addr.s_addr & network->netmask.s_addr;
   while (current != NULL)
     {
       if ((network->addr.s_addr == current->network->addr.s_addr) &&
-	  (network->netmask.s_addr == current->network->netmask.s_addr))
-	return 1;
+          (network->netmask.s_addr == current->network->netmask.s_addr))
+        return 1;
       current = current->next;
     }
   return 0;
 }
 
-void
-router_addroute (struct in_network *network, struct peer_s *peer)
+void router_addroute(struct in_network *network, struct peer_s *peer)
 {
   struct router_table_l *current;
   struct router_table_l *current_last;
   struct router_table_l *newroute;
   network->addr.s_addr = network->addr.s_addr & network->netmask.s_addr;
-  newroute = malloc (sizeof (struct router_table_l));
+  newroute = malloc(sizeof(struct router_table_l));
   newroute->network = network;
   newroute->peer = peer;
   //peer->shared_networks[peer->shared_networks_len] = network;
   //peer->shared_networks_len++;
-  pthread_mutex_lock (&router_table_mutex);
+  pthread_mutex_lock(&router_table_mutex);
   if (router_table == NULL)
     {
       newroute->next = NULL;
       router_table = newroute;
-      pthread_mutex_unlock (&router_table_mutex);
+      pthread_mutex_unlock(&router_table_mutex);
       return;
     }
   current_last = NULL;
@@ -97,49 +94,48 @@ router_addroute (struct in_network *network, struct peer_s *peer)
   while (current != NULL)
     {
       if (current->network->netmask.s_addr < network->netmask.s_addr)
-	break;
+        break;
       current_last = current;
       current = current->next;
     }
   newroute->next = current;
   current_last->next = newroute;
-  pthread_mutex_unlock (&router_table_mutex);
+  pthread_mutex_unlock(&router_table_mutex);
   return;
 }
 
-void
-router_flushexpired ()
+void router_flushexpired()
 {
   int i;
   if (router_expired_table_len < 1)
     return;
-  pthread_mutex_lock (&router_expired_table_mutex);
+  pthread_mutex_lock(&router_expired_table_mutex);
   for (i = 0; i < router_expired_table_len; i++)
     {
-      free (router_expired_table[i]);
+      free(router_expired_table[i]);
     }
-  free (router_expired_table);
+  free(router_expired_table);
   router_expired_table_len = 0;
   router_expired_table = NULL;
-  pthread_mutex_unlock (&router_expired_table_mutex);
+  pthread_mutex_unlock(&router_expired_table_mutex);
 }
 
-void
-router_flush (const struct peer_s *peer)
+void router_flush(const struct peer_s *peer)
 {
   struct router_table_l *current;
   struct router_table_l *current_last;
   if (router_table == NULL)
     return;
-  pthread_mutex_lock (&router_table_mutex);
-  pthread_mutex_lock (&router_expired_table_mutex);
+  pthread_mutex_lock(&router_table_mutex);
+  pthread_mutex_lock(&router_expired_table_mutex);
   current = router_table;
   while (current != NULL && current->peer == peer)
     {
       router_expired_table_len++;
       router_expired_table =
-	realloc (router_expired_table,
-		 router_expired_table_len * sizeof (struct router_table_l *));
+        realloc(router_expired_table,
+                router_expired_table_len *
+                sizeof(struct router_table_l *));
       router_expired_table[router_expired_table_len - 1] = current;
       router_table = current->next;
       current = router_table;
@@ -149,29 +145,28 @@ router_flush (const struct peer_s *peer)
   while (current != NULL)
     {
       if (current->peer == peer)
-	{
-	  current_last->next = current->next;
-	  router_expired_table_len++;
-	  router_expired_table =
-	    realloc (router_expired_table,
-		     router_expired_table_len *
-		     sizeof (struct router_table_l *));
-	  router_expired_table[router_expired_table_len - 1] = current;
-	  current = current_last->next;
-	}
+        {
+          current_last->next = current->next;
+          router_expired_table_len++;
+          router_expired_table =
+            realloc(router_expired_table,
+                    router_expired_table_len *
+                    sizeof(struct router_table_l *));
+          router_expired_table[router_expired_table_len - 1] = current;
+          current = current_last->next;
+        }
       else
-	{
-	  current_last = current;
-	  current = current->next;
-	}
+        {
+          current_last = current;
+          current = current->next;
+        }
     }
-  pthread_mutex_unlock (&router_expired_table_mutex);
-  pthread_mutex_unlock (&router_table_mutex);
-  router_flushexpired ();	//CAUTION
+  pthread_mutex_unlock(&router_expired_table_mutex);
+  pthread_mutex_unlock(&router_table_mutex);
+  router_flushexpired();        //CAUTION
 }
 
-int
-router_checksrc (const struct in_addr *src, const struct peer_s *peer)
+int router_checksrc(const struct in_addr *src, const struct peer_s *peer)
 {
   int n;
   if (peer->shared_networks == NULL || peer->shared_networks_len < 1)
@@ -179,8 +174,8 @@ router_checksrc (const struct in_addr *src, const struct peer_s *peer)
   for (n = 0; n < peer->shared_networks_len; n++)
     {
       if ((src->s_addr & peer->shared_networks[n].netmask.s_addr) ==
-	  peer->shared_networks[n].addr.s_addr)
-	return 0;
+          peer->shared_networks[n].addr.s_addr)
+        return 0;
     }
   return -2;
 }

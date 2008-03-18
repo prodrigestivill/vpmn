@@ -38,55 +38,52 @@ int protocol_v1ka_len;
 int protocol_v1ka_maxlen;
 int protocol_v1ka_pos;
 
-void
-main ()
+void main()
 {
   int i;
-  struct peer_s *peer = peer_create ();
-  config_load ();
-  protocol_init ();
+  struct peer_s *peer = peer_create();
+  config_load();
+  protocol_init();
   for (i = 0; i < protocol_v1id_len; i++)
-    log_debug ("%d ", *((char *) protocol_v1id + i));
-  i = protocol_processpeer (peer, &protocol_v1id->peer, protocol_v1id_len -
-			    sizeof (struct protocol_1id_s) +
-			    sizeof (struct protocol_peer_s));
+    log_debug("%d ", *((char *) protocol_v1id + i));
+  i = protocol_processpeer(peer, &protocol_v1id->peer, protocol_v1id_len -
+                           sizeof(struct protocol_1id_s) +
+                           sizeof(struct protocol_peer_s));
   if (i < 0)
     return;
-  log_debug ("\n%d\n", i);
+  log_debug("\n%d\n", i);
 //peer = &tun_selfpeer;
   for (i = 0; i < peer->addrs_len; i++)
     {
-      log_info ("%s:", inet_ntoa (peer->addrs[i].sin_addr));
-      log_info ("%d\n", ntohs (peer->addrs[i].sin_port));
+      log_info("%s:", inet_ntoa(peer->addrs[i].sin_addr));
+      log_info("%d\n", ntohs(peer->addrs[i].sin_port));
     }
   for (i = 0; i < peer->shared_networks_len; i++)
     {
-      log_info ("%s:", inet_ntoa (peer->shared_networks[i].addr));
-      log_info ("%s\n", inet_ntoa (peer->shared_networks[i].netmask));
+      log_info("%s:", inet_ntoa(peer->shared_networks[i].addr));
+      log_info("%s\n", inet_ntoa(peer->shared_networks[i].netmask));
     }
 }
 
-void
-udpsrvdtls_init ()
+void udpsrvdtls_init()
 {
 }
 
 int
-udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
-		      const char *pkeyfile)
-{
-  return 0;
-}
-
-int
-udpsrvdtls_write (const char *buffer, const int buffer_len,
-		  struct udpsrvsession_s *session)
+udpsrvdtls_loadcerts(const char *cafile, const char *certfile,
+                     const char *pkeyfile)
 {
   return 0;
 }
 
 int
-tundev_write (const void *buf, const int count)
+udpsrvdtls_write(const char *buffer, const int buffer_len,
+                 struct udpsrvsession_s *session)
+{
+  return 0;
+}
+
+int tundev_write(const void *buf, const int count)
 {
   return 0;
 }

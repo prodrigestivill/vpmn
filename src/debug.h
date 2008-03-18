@@ -25,8 +25,8 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
-void log_debug (const char *format, ...);
-void log_info (const char *format, ...);
-void log_error (const char *format, ...);
+void log_debug(const char *format, ...);
+void log_info(const char *format, ...);
+void log_error(const char *format, ...);
 
-#endif /* _DEBUG_H */
+#endif                          /* _DEBUG_H */

@@ -24,30 +24,28 @@
 #include <stdlib.h>
 #include "router.h"
 #include "peer.h"
- 
+
 struct peer_l
 {
   struct peer_s *current;
   struct peer_l *next;
 };
 
-int
-peer_add (struct peer_s *peer, struct udpsrvsession_s *session)
+int peer_add(struct peer_s *peer, struct udpsrvsession_s *session)
 {
   int i;
-  if (peer->shared_networks_len<1)
-		return -1;
-  for (i=0; i< peer->shared_networks_len; i++)
-	  if (router_existroute (&peer->shared_networks[i])>0)
-		  return -1;
-  
+  if (peer->shared_networks_len < 1)
+    return -1;
+  for (i = 0; i < peer->shared_networks_len; i++)
+    if (router_existroute(&peer->shared_networks[i]) > 0)
+      return -1;
+
   //-TODO
 }
 
-struct peer_s *
-peer_create ()
+struct peer_s *peer_create()
 {
-  struct peer_s *newpeer = malloc (sizeof (struct peer_s));
+  struct peer_s *newpeer = malloc(sizeof(struct peer_s));
   newpeer->udpsrvsession = NULL;
   newpeer->addrs = NULL;
   newpeer->addrs_len = 0;
@@ -57,17 +55,16 @@ peer_create ()
   return newpeer;
 }
 
-void
-peer_destroy (struct peer_s *oldpeer)
+void peer_destroy(struct peer_s *oldpeer)
 {
   int i;
   if (oldpeer == NULL)
-	  return;
+    return;
   //router_flush (oldpeer); Only by timeout function.
-  udpsrvsession_destroy (oldpeer->udpsrvsession);
+  udpsrvsession_destroy(oldpeer->udpsrvsession);
   if (oldpeer->shared_networks != NULL)
-    free (oldpeer->shared_networks);
+    free(oldpeer->shared_networks);
   if (oldpeer->addrs != NULL)
-    free (oldpeer->addrs);
-  free (oldpeer);
+    free(oldpeer->addrs);
+  free(oldpeer);
 }

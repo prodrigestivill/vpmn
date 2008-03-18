@@ -30,87 +30,81 @@
 #include "../src/peer.h"
 #include "../src/router.h"
 
-struct peer_s *
-addpeer (const char *ip, int port)
+struct peer_s *addpeer(const char *ip, int port)
 {
-  struct peer_s *peer = peer_create ();
-  struct sockaddr_in *spaddr = malloc (sizeof (struct sockaddr_in));
-  inet_aton (ip, &spaddr->sin_addr);
-  spaddr->sin_port = htons (port);
-  peer->udpsrvsessions = calloc (1, sizeof (struct udpsrvsession *));
-  peer->udpsrvsessions[0] = udpsrvsession_search (spaddr);
+  struct peer_s *peer = peer_create();
+  struct sockaddr_in *spaddr = malloc(sizeof(struct sockaddr_in));
+  inet_aton(ip, &spaddr->sin_addr);
+  spaddr->sin_port = htons(port);
+  peer->udpsrvsessions = calloc(1, sizeof(struct udpsrvsession *));
+  peer->udpsrvsessions[0] = udpsrvsession_search(spaddr);
   peer->udpsrvsessions_len = 1;
   return peer;
 }
 
-void
-addpeerroute (struct peer_s *peer, const char *ip, const char *nm)
+void addpeerroute(struct peer_s *peer, const char *ip, const char *nm)
 {
-  struct in_network *network = malloc (sizeof (struct in_network));
-  inet_aton (ip, &network->addr);
-  inet_aton (nm, &network->netmask);
-  router_addroute (network, peer);
+  struct in_network *network = malloc(sizeof(struct in_network));
+  inet_aton(ip, &network->addr);
+  inet_aton(nm, &network->netmask);
+  router_addroute(network, peer);
 }
 
-struct peer_s *
-searchdst (const char *ip)
+struct peer_s *searchdst(const char *ip)
 {
-  struct in_addr *dst = malloc (sizeof (struct in_addr));
-  inet_aton (ip, dst);
-  return router_searchdst (dst);
+  struct in_addr *dst = malloc(sizeof(struct in_addr));
+  inet_aton(ip, dst);
+  return router_searchdst(dst);
 }
 
-void
-main ()
+void main()
 {
   struct peer_s *peer;
-  config_load ();
+  config_load();
 
-  peer = addpeer ("10.0.5.1", 1901);
-  addpeerroute (peer, "10.2.0.1", "255.255.255.255");
-  addpeerroute (peer, "10.5.1.1", "255.255.255.0");
+  peer = addpeer("10.0.5.1", 1901);
+  addpeerroute(peer, "10.2.0.1", "255.255.255.255");
+  addpeerroute(peer, "10.5.1.1", "255.255.255.0");
 
-  peer = addpeer ("10.0.5.2", 1902);
-  addpeerroute (peer, "10.2.0.2", "255.255.255.255");
-  addpeerroute (peer, "10.5.2.2", "255.255.0.0");
+  peer = addpeer("10.0.5.2", 1902);
+  addpeerroute(peer, "10.2.0.2", "255.255.255.255");
+  addpeerroute(peer, "10.5.2.2", "255.255.0.0");
 
-  peer = addpeer ("10.0.5.3", 1903);
-  addpeerroute (peer, "10.2.0.3", "255.255.255.255");
-  addpeerroute (peer, "10.3.3.3", "255.255.0.0");
-  addpeerroute (peer, "10.5.3.3", "255.255.255.0");
+  peer = addpeer("10.0.5.3", 1903);
+  addpeerroute(peer, "10.2.0.3", "255.255.255.255");
+  addpeerroute(peer, "10.3.3.3", "255.255.0.0");
+  addpeerroute(peer, "10.5.3.3", "255.255.255.0");
 
   char *test = "10.2.0.3";
-  log_debug ("%s", test);
-  log_debug ("-> %d\n",
-	     ntohs (searchdst (test)->udpsrvsessions[0]->addr->sin_port));
+  log_debug("%s", test);
+  log_debug("-> %d\n",
+            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
   test = "10.3.10.2";
-  log_debug ("%s", test);
-  log_debug ("-> %d\n",
-	     ntohs (searchdst (test)->udpsrvsessions[0]->addr->sin_port));
+  log_debug("%s", test);
+  log_debug("-> %d\n",
+            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
   test = "10.5.1.250";
-  log_debug ("%s", test);
-  log_debug ("-> %d\n",
-	     ntohs (searchdst (test)->udpsrvsessions[0]->addr->sin_port));
+  log_debug("%s", test);
+  log_debug("-> %d\n",
+            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
   test = "10.5.20.2";
-  log_debug ("%s", test);
-  log_debug ("-> %d\n",
-	     ntohs (searchdst (test)->udpsrvsessions[0]->addr->sin_port));
+  log_debug("%s", test);
+  log_debug("-> %d\n",
+            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
 }
 
-void
-protocol_sendroutes (const struct peer_s *dstpeer)
+void protocol_sendroutes(const struct peer_s *dstpeer)
 {
-  log_debug ("Sending routes... (not implemented)");
+  log_debug("Sending routes... (not implemented)");
 }
 
-void
-udpsrvdtls_init ()
+void udpsrvdtls_init()
 {
 }
 
 int
-udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
-		      const char *pkeyfile)
+udpsrvdtls_loadcerts(const char *cafile, const char *certfile,
+                     const char *pkeyfile)
 {
   return 0;
 }

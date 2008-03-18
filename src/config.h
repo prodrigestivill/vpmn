@@ -28,8 +28,8 @@
 #include "peer.h"
 #include "../config.h"
 
-void config_load ();
-void config_fistpeersinit ();
+void config_load();
+void config_fistpeersinit();
 
 #define DEBUG 1
 
@@ -58,4 +58,4 @@ struct udpsrvsession_s **udpsrv_firstpeers;
 char *ssl_cipherlist;
 int ssl_verifydepth;
 
-#endif /* _CONFIG_H */
+#endif                          /* _CONFIG_H */

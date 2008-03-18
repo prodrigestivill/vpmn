@@ -30,9 +30,9 @@
 
 #define MAXKAPEERS 200
 
-#define PROTOCOL1_V    1 //IP version for internal packets
+#define PROTOCOL1_V    1        //IP version for internal packets
 #define PROTOCOL1_ID   0
-#define PROTOCOL1_IDA  1 //ACK
+#define PROTOCOL1_IDA  1        //ACK
 #define PROTOCOL1_KA   2
 
 /*-TOCHECK __attribute((packed)) */
@@ -62,11 +62,11 @@ struct protocol_peer_s
 struct protocol_1_s
 {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-    unsigned int ihl:4;
-    unsigned int version:4;
+  unsigned int ihl:4;
+  unsigned int version:4;
 #elif __BYTE_ORDER == __BIG_ENDIAN
-    unsigned int version:4;
-    unsigned int ihl:4;
+  unsigned int version:4;
+  unsigned int ihl:4;
 #else
 # error "Please fix <bits/endian.h>"
 #endif
@@ -88,14 +88,13 @@ struct protocol_1ka_s
 //struct protocol_peer_s peer[];
 } __attribute((packed));
 
-void protocol_init ();
-void protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
-			  struct udpsrvsession_s *session);
-int protocol_sendframe (const char *buffer, const int buffer_len);
-int protocol_sendpacket (struct udpsrvsession_s *session,
-			 const int type);
-int protocol_processpeer (struct peer_s *peer,
-             struct protocol_peer_s *fragment, int max_size);
-void protocol_maintainerthread ();
+void protocol_init();
+void protocol_recvpacket(const char *tunbuffer, const int tunbuffer_len,
+                         struct udpsrvsession_s *session);
+int protocol_sendframe(const char *buffer, const int buffer_len);
+int protocol_sendpacket(struct udpsrvsession_s *session, const int type);
+int protocol_processpeer(struct peer_s *peer,
+                         struct protocol_peer_s *fragment, int max_size);
+void protocol_maintainerthread();
 
-#endif /* _PROTOCOL_H */
+#endif                          /* _PROTOCOL_H */

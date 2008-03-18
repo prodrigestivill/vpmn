@@ -24,8 +24,8 @@
 #ifndef _TUNDEV_H
 #define _TUNDEV_H
 
-int tundev_initdev ();
-int tundev_write (const void *buf, const int count);
-int tundev_read (void *buf, const int count);
+int tundev_initdev();
+int tundev_write(const void *buf, const int count);
+int tundev_read(void *buf, const int count);
 
-#endif /* _TUNDEV_H */
+#endif                          /* _TUNDEV_H */

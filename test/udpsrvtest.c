@@ -25,34 +25,31 @@
 #include "../src/config.h"
 #include "../src/srv.h"
 
-int
-main ()
+int main()
 {
-  config_load ();
-  if (udpsrv_init () < 0)
+  config_load();
+  if (udpsrv_init() < 0)
     {
-      log_error ("Could not create the interface.\n");
+      log_error("Could not create the interface.\n");
       return -1;
     }
-  udpsrv ();
+  udpsrv();
   return 0;
 }
 
 void
-protocol_recvpacket (const char *tunbuffer, const int tunbuffer_len,
-		     void *session, const int sessiontype)
+protocol_recvpacket(const char *tunbuffer, const int tunbuffer_len,
+                    void *session, const int sessiontype)
 {
-  log_debug ("Recv: %s", tunbuffer);
+  log_debug("Recv: %s", tunbuffer);
 }
 
-void
-protocol_sendframe (const char *buffer, const int buffer_len)
+void protocol_sendframe(const char *buffer, const int buffer_len)
 {
-  log_debug ("Sending frame... (not implemented)");
+  log_debug("Sending frame... (not implemented)");
 }
 
-void
-protocol_sendroutes (const struct peer_s *dstpeer)
+void protocol_sendroutes(const struct peer_s *dstpeer)
 {
-  log_debug ("Sending routes... (not implemented)");
+  log_debug("Sending routes... (not implemented)");
 }

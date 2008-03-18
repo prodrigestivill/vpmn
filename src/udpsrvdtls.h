@@ -26,15 +26,15 @@
 
 #include "udpsrvsession.h"
 
-void udpsrvdtls_init ();
-int udpsrvdtls_loadcerts (const char *cafile, const char *certfile,
-			  const char *pkeyfile);
-int udpsrvdtls_read (const char *buffer, const int buffer_len,
-		     char *bufferout, const int bufferout_len,
-		     struct udpsrvsession_s *session);
-int udpsrvdtls_write (const char *buffer, const int buffer_len,
-		      struct udpsrvsession_s *session);
-void udpsrvdtls_sessionerr (const unsigned long err,
-			    struct udpsrvsession_s *session);
+void udpsrvdtls_init();
+int udpsrvdtls_loadcerts(const char *cafile, const char *certfile,
+                         const char *pkeyfile);
+int udpsrvdtls_read(const char *buffer, const int buffer_len,
+                    char *bufferout, const int bufferout_len,
+                    struct udpsrvsession_s *session);
+int udpsrvdtls_write(const char *buffer, const int buffer_len,
+                     struct udpsrvsession_s *session);
+void udpsrvdtls_sessionerr(const unsigned long err,
+                           struct udpsrvsession_s *session);
 
-#endif /* _UDPSRVDTLS_H */
+#endif                          /* _UDPSRVDTLS_H */

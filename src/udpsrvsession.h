@@ -29,14 +29,14 @@
 #include <openssl/ssl.h>
 #include "router.h"
 #include "peer.h"
- 
+
 struct udpsrvsession_netacl_s
 {
-	int filled;
-	int permitted_len;
-	int excluded_len;
-	struct in_network *permitted;
-	struct in_network *excluded;
+  int filled;
+  int permitted_len;
+  int excluded_len;
+  struct in_network *permitted;
+  struct in_network *excluded;
 };
 
 struct udpsrvsession_s
@@ -49,13 +49,13 @@ struct udpsrvsession_s
   struct udpsrvsession_netacl_s netacl;
 };
 
-struct udpsrvsession_s *udpsrvsession_search (const struct sockaddr_in
-					      *source);
-struct udpsrvsession_s *udpsrvsession_searchcreate (const struct sockaddr_in
-						    *source);
-void udpsrvsession_update_timeout (struct udpsrvsession_s *cursession);
-void udpsrvsession_destroy (struct udpsrvsession_s *cursession);
-int udpsrvsession_dumpsocks (void *out, const int outlen, const int start,
-			     const int num);
+struct udpsrvsession_s *udpsrvsession_search(const struct sockaddr_in
+                                             *source);
+struct udpsrvsession_s *udpsrvsession_searchcreate(const struct sockaddr_in
+                                                   *source);
+void udpsrvsession_update_timeout(struct udpsrvsession_s *cursession);
+void udpsrvsession_destroy(struct udpsrvsession_s *cursession);
+int udpsrvsession_dumpsocks(void *out, const int outlen, const int start,
+                            const int num);
 
-#endif /* _UDPSRVSESSION_H */
+#endif                          /* _UDPSRVSESSION_H */

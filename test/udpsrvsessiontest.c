@@ -35,48 +35,47 @@
 #include "../src/udpsrvdtls.h"
 #include "../src/srv.h"
 
-int
-main ()
+int main()
 {
-  config_load ();
+  config_load();
   char buffer[UDPBUFFERSIZE], bufferout[TUNBUFFERSIZE];
   int buffer_len, bufferout_len;
   struct udpsrvsession_s *udpsession;
   struct sockaddr_in addr;
   struct sockaddr_in *addr2;
   socklen_t addr_len;
-  log_debug ("Starting...\n");
+  log_debug("Starting...\n");
   struct sockaddr_in bind_addr;
-  bzero (&bind_addr, sizeof (bind_addr));
-  udpsrv_fd = socket (PF_INET, SOCK_DGRAM, 0);
+  bzero(&bind_addr, sizeof(bind_addr));
+  udpsrv_fd = socket(PF_INET, SOCK_DGRAM, 0);
   bind_addr.sin_family = AF_INET;
-  bind_addr.sin_addr.s_addr = htonl (INADDR_ANY);
-  bind_addr.sin_port = htons (port_udp);
-  if (bind (udpsrv_fd, (struct sockaddr *) &bind_addr, sizeof (bind_addr)) != 0)
-    log_error ("Bind error\n");
-  log_debug ("Listening...\n");
+  bind_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  bind_addr.sin_port = htons(port_udp);
+  if (bind(udpsrv_fd, (struct sockaddr *) &bind_addr, sizeof(bind_addr)) !=
+      0)
+    log_error("Bind error\n");
+  log_debug("Listening...\n");
   while (1)
     {
-      addr_len = sizeof (addr);
-      bzero (&addr, addr_len);
+      addr_len = sizeof(addr);
+      bzero(&addr, addr_len);
       buffer_len =
-	recvfrom (udpsrv_fd, buffer, sizeof (buffer), 0,
-		  (struct sockaddr *) &(addr), &(addr_len));
-      addr2 = malloc (sizeof (struct sockaddr_in));
-      bcopy (&addr, addr2, addr_len);
-      udpsession = udpsrvsession_search (addr2);
+        recvfrom(udpsrv_fd, buffer, sizeof(buffer), 0,
+                 (struct sockaddr *) &(addr), &(addr_len));
+      addr2 = malloc(sizeof(struct sockaddr_in));
+      bcopy(&addr, addr2, addr_len);
+      udpsession = udpsrvsession_search(addr2);
       bufferout_len =
-	udpsrvdtls_read (buffer, buffer_len, bufferout, TUNBUFFERSIZE,
-			 udpsession);
+        udpsrvdtls_read(buffer, buffer_len, bufferout, TUNBUFFERSIZE,
+                        udpsession);
       if (bufferout_len > 0)
-	log_debug ("Decoded: %s \n", bufferout);
+        log_debug("Decoded: %s \n", bufferout);
       else
-	log_error ("No decoded data.\n");
+        log_error("No decoded data.\n");
     }
 }
 
-void
-protocol_sendroutes (const struct peer_s *dstpeer)
+void protocol_sendroutes(const struct peer_s *dstpeer)
 {
-  log_debug ("Sending routes... (not implemented)");
+  log_debug("Sending routes... (not implemented)");
 }

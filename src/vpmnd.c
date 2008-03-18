@@ -30,78 +30,75 @@
 #include "srv.h"
 #include "tundev.h"
 
-void
-vpmnd_signalhandler (const int sig)
+void vpmnd_signalhandler(const int sig)
 {
 
   switch (sig)
     {
-    case SIGHUP:
-      log_info ("Received SIGHUP signal.\n");
-      break;
-    default:
-      log_info ("Unhandled signal %s.\n", sig);
-      break;
+      case SIGHUP:
+        log_info("Received SIGHUP signal.\n");
+        break;
+      default:
+        log_info("Unhandled signal %s.\n", sig);
+        break;
     }
 }
 
-int
-vpmnd_start ()
+int vpmnd_start()
 {
   pthread_t tunsrv_thread, udpsrv_thread;
   pid_t pid, sid;
 
-  signal (SIGHUP, vpmnd_signalhandler);
+  signal(SIGHUP, vpmnd_signalhandler);
   //signal (SIGTERM, vpmnd_signalhandler);
   //signal (SIGINT, vpmnd_signalhandler);
   //signal (SIGQUIT, vpmnd_signalhandler);
 
   if (daemonize)
     {
-      pid = fork ();
+      pid = fork();
       if (pid < 0)
-	return 129;
+        return 129;
       /* If we got a good PID, then
          we can exit the parent process. */
       if (pid > 0)
-	return 0;
+        return 0;
 
       /* Create a new SID for the child process */
-      sid = setsid ();
+      sid = setsid();
       if (sid < 0)
-	return 130;
+        return 130;
 
       /* Close out the standard file descriptors */
-      fclose (stdin);
-      fclose (stdout);
-      fclose (stderr);
+      fclose(stdin);
+      fclose(stdout);
+      fclose(stderr);
     }
 
-  if (tundev_initdev () < 0)
+  if (tundev_initdev() < 0)
     {
-      log_error ("Could not create the interface.\n");
+      log_error("Could not create the interface.\n");
       return -1;
     }
-  if (udpsrv_init () < 0)
+  if (udpsrv_init() < 0)
     {
-      log_error ("Could not start the udp server.\n");
+      log_error("Could not start the udp server.\n");
       return -1;
     }
-  if (!((setgid (vpmnd_gid) == 0) && (setuid (vpmnd_uid) == 0)))
+  if (!((setgid(vpmnd_gid) == 0) && (setuid(vpmnd_uid) == 0)))
     {
-      log_error ("Could not set UID and/or GID to the servers.\n");
+      log_error("Could not set UID and/or GID to the servers.\n");
       return -1;
     }
-  pthread_create (&tunsrv_thread, NULL, (void *) &tunsrv, NULL);
-  pthread_create (&udpsrv_thread, NULL, (void *) &udpsrv, NULL);
-  config_fistpeersinit ();
-  pthread_join (tunsrv_thread, NULL);
+  pthread_create(&tunsrv_thread, NULL, (void *) &tunsrv, NULL);
+  pthread_create(&udpsrv_thread, NULL, (void *) &udpsrv, NULL);
+  config_fistpeersinit();
+  pthread_join(tunsrv_thread, NULL);
   return 0;
 }
 
-int
-main ()
+int main()
 {
-  config_load ();
-  return vpmnd_start ();
+  config_load();
+  return vpmnd_start();
 }

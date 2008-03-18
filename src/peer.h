@@ -29,9 +29,9 @@
 #include "udpsrvsession.h"
 
 #define PEER_STAT_NEW 0x00
-#define PEER_STAT_ID  0x01		//IDENTIFIED
-#define PEER_STAT_IDK 0x02		//ID ACK
-#define PEER_STAT_TO  0x80		//TIMEOUT
+#define PEER_STAT_ID  0x01      //IDENTIFIED
+#define PEER_STAT_IDK 0x02      //ID ACK
+#define PEER_STAT_TO  0x80      //TIMEOUT
 
 struct peer_s
 {
@@ -43,8 +43,8 @@ struct peer_s
   int stat;
 };
 
-int peer_add (struct peer_s *peer, struct udpsrvsession_s *session);
-struct peer_s *peer_create ();
-void peer_destroy (struct peer_s *oldpeer);
+int peer_add(struct peer_s *peer, struct udpsrvsession_s *session);
+struct peer_s *peer_create();
+void peer_destroy(struct peer_s *oldpeer);
 
-#endif /* _PEER_H */
+#endif                          /* _PEER_H */

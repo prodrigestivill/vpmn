@@ -24,9 +24,9 @@
 #ifndef _SRV_H
 #define _SRV_H
 
-void tunsrv ();
-void udpsrv ();
-int udpsrv_init ();
+void tunsrv();
+void udpsrv();
+int udpsrv_init();
 int udpsrv_fd;
 
-#endif /* _SRV_H */
+#endif                          /* _SRV_H */
