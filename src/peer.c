@@ -57,7 +57,6 @@ struct peer_s *peer_create()
 
 void peer_destroy(struct peer_s *oldpeer)
 {
-  int i;
   if (oldpeer == NULL)
     return;
   //router_flush (oldpeer); Only by timeout function.

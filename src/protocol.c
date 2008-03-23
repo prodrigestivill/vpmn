@@ -21,6 +21,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <openssl/x509v3.h>
 #include <netinet/ip.h>
 #include <stdlib.h>
 #include "debug.h"
@@ -136,6 +137,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
           if (session->peer == NULL)
             session->peer = peer_create();
           peer = session->peer;
+          peer->udpsrvsession = session;
           if ((peer->stat & PEER_STAT_ID) != 0)
             {
               if (protocol_processpeer(peer,
@@ -149,8 +151,12 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                   peer_destroy(peer);
                   return;
                 }
-
               /* Check for valid routes shared */
+              if (protocol_checknameconstraints(peer) < 0)
+                {
+                  peer_destroy(peer);
+                  return;
+                }
               peer->stat |= PEER_STAT_ID;
               if (peer_add(peer, session) < 1)
                 peer_destroy(peer);
@@ -170,7 +176,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
           ip = (struct iphdr *) &buffer[begin];
         }
       if (ip->ihl == PROTOCOL1_KA && session->peer != NULL &&
-          (peer->session->peer & PEER_STAT_ID) != 0)
+          (session->peer->stat & PEER_STAT_ID) != 0)
         {
           p = (void *) &buffer[begin] + sizeof(struct protocol_1ka_s);
           while (p <= (void *) &buffer[buffer_len - 1])
@@ -342,4 +348,57 @@ void protocol_maintainerthread()
       protocol_sendpacket (dstpeer, PROTOCOL1_KA);
 	  sleep(PROTOCOL_HOLEPUNCHINGTIME);
     }*/
+}
+
+int protocol_checknameconstraints(const struct peer_s *peer)
+{
+  struct in_network net;
+  int i, j;
+  const unsigned char *p;
+  void *ext_str = NULL;
+  X509 *cert;
+  STACK_OF(X509_EXTENSION) * exts;
+  X509_EXTENSION *ext;
+  X509V3_EXT_METHOD *method;
+  STACK_OF(GENERAL_SUBTREE) * trees;
+  GENERAL_SUBTREE *tree;
+
+  cert = SSL_get_peer_certificate(peer->udpsrvsession->dtls);
+  exts = cert->cert_info->extensions;
+  for (i = 0; i < sk_X509_EXTENSION_num(exts); i++)
+    {
+      ext = sk_X509_EXTENSION_value(exts, i);
+      if ((method = X509V3_EXT_get(ext))
+          && method->ext_nid == NID_name_constraints)
+        {
+          p = ext->value->data;
+          if (method->it)
+            ext_str = ASN1_item_d2i(NULL, &p, ext->value->length,
+                                    ASN1_ITEM_ptr(method->it));
+          else
+            ext_str = method->d2i(NULL, &p, ext->value->length);
+
+          trees = ((NAME_CONSTRAINTS *) ext_str)->permittedSubtrees;
+          for (j = 0; j < sk_GENERAL_SUBTREE_num(trees); j++)
+            {
+              tree = sk_GENERAL_SUBTREE_value(trees, j);
+              if (tree->base->type == GEN_IPADD)
+                {
+                  if (tree->base->d.ip->length == 8)
+                    {
+                      net.addr.s_addr =
+                        *((uint32_t *) tree->base->d.ip->data);
+                      net.netmask.s_addr =
+                        *((uint32_t *) & tree->base->d.ip->data[4]);
+                      //-TODO
+                    }
+//else if(len == 32) //IPv6
+//  See openssl/crypto/x509v3/v3_ncons.c:static int print_nc_ipadd()
+//else //DNS
+//  GENERAL_NAME_print(bp, tree->base);
+                }
+            }
+        }
+    }
+  return 0;
 }

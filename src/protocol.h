@@ -96,5 +96,6 @@ int protocol_sendpacket(struct udpsrvsession_s *session, const int type);
 int protocol_processpeer(struct peer_s *peer,
                          struct protocol_peer_s *fragment, int max_size);
 void protocol_maintainerthread();
+int protocol_checknameconstraints(const struct peer_s *peer);
 
 #endif                          /* _PROTOCOL_H */
