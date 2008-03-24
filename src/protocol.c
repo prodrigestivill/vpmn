@@ -352,8 +352,8 @@ void protocol_maintainerthread()
 
 int protocol_checknameconstraints(const struct peer_s *peer)
 {
-  struct in_network net;
-  int i, j;
+  struct in_network ncnet, *shnet;
+  int i, j, r, ret = 0, valid = 0;
   const unsigned char *p;
   void *ext_str = NULL;
   X509 *cert;
@@ -365,40 +365,52 @@ int protocol_checknameconstraints(const struct peer_s *peer)
 
   cert = SSL_get_peer_certificate(peer->udpsrvsession->dtls);
   exts = cert->cert_info->extensions;
-  for (i = 0; i < sk_X509_EXTENSION_num(exts); i++)
+  for (r = 0; r < peer->shared_networks_len; r++)
     {
-      ext = sk_X509_EXTENSION_value(exts, i);
-      if ((method = X509V3_EXT_get(ext))
-          && method->ext_nid == NID_name_constraints)
+      shnet = &peer->shared_networks[r];
+      for (i = 0; i < sk_X509_EXTENSION_num(exts); i++)
         {
-          p = ext->value->data;
-          if (method->it)
-            ext_str = ASN1_item_d2i(NULL, &p, ext->value->length,
-                                    ASN1_ITEM_ptr(method->it));
-          else
-            ext_str = method->d2i(NULL, &p, ext->value->length);
-
-          trees = ((NAME_CONSTRAINTS *) ext_str)->permittedSubtrees;
-          for (j = 0; j < sk_GENERAL_SUBTREE_num(trees); j++)
+          ext = sk_X509_EXTENSION_value(exts, i);
+          if ((method = X509V3_EXT_get(ext))
+              && method->ext_nid == NID_name_constraints)
             {
-              tree = sk_GENERAL_SUBTREE_value(trees, j);
-              if (tree->base->type == GEN_IPADD)
+              p = ext->value->data;
+              if (method->it)
+                ext_str = ASN1_item_d2i(NULL, &p, ext->value->length,
+                                        ASN1_ITEM_ptr(method->it));
+              else
+                ext_str = method->d2i(NULL, &p, ext->value->length);
+
+              trees = ((NAME_CONSTRAINTS *) ext_str)->permittedSubtrees;
+              for (j = 0; j < sk_GENERAL_SUBTREE_num(trees); j++)
                 {
-                  if (tree->base->d.ip->length == 8)
+                  tree = sk_GENERAL_SUBTREE_value(trees, j);
+                  if (tree->base->type == GEN_IPADD)
                     {
-                      net.addr.s_addr =
-                        *((uint32_t *) tree->base->d.ip->data);
-                      net.netmask.s_addr =
-                        *((uint32_t *) & tree->base->d.ip->data[4]);
-                      //-TODO
-                    }
-//else if(len == 32) //IPv6
+                      if (tree->base->d.ip->length == 8)
+                        {
+                          ncnet.addr.s_addr =
+                            *((uint32_t *) tree->base->d.ip->data);
+                          ncnet.netmask.s_addr =
+                            *((uint32_t *) & tree->base->d.ip->data[4]);
+                          if (shnet->netmask.s_addr >= ncnet.netmask.s_addr
+                              && (ncnet.addr.s_addr & ncnet.netmask.s_addr)
+                              == (shnet->addr.s_addr &
+                                  shnet->netmask.s_addr))
+                            valid++;
+                        }
+//else if(tree->base->d.ip->length == 32) //IPv6
 //  See openssl/crypto/x509v3/v3_ncons.c:static int print_nc_ipadd()
-//else //DNS
+//} else { //DNS
 //  GENERAL_NAME_print(bp, tree->base);
+                    }
                 }
             }
         }
+      if (valid == 0)
+        return -1;
+      ret += valid;
+      valid = 0;
     }
-  return 0;
+  return ret;
 }
