@@ -47,14 +47,11 @@ struct udpsrvsession_s *udpsrvsession_create(const struct sockaddr_in
   addr->sin_family = source->sin_family;
   addr->sin_addr.s_addr = source->sin_addr.s_addr;
   addr->sin_port = source->sin_port;
-  newsession->netacl.filled = 0;
-  newsession->netacl.permitted_len = 0;
-  newsession->netacl.excluded_len = 0;
   newsession->addr = addr;
   newsession->peer = NULL;
   pthread_mutex_init(&newsession->dtls_mutex, NULL);
   newsession->dtls = NULL;
-  udpsrvsession_update_timeout(newsession);
+  timeout_update(&newsession->timeout);
   return newsession;
 }
 
@@ -133,10 +130,4 @@ struct udpsrvsession_s *udpsrvsession_searchcreate(const struct sockaddr_in
 void udpsrvsession_destroy(struct udpsrvsession_s *cursession)
 {
 
-}
-
-void udpsrvsession_update_timeout(struct udpsrvsession_s *cursession)
-{
-  if (cursession != NULL)
-    cursession->timeout = 0;
 }

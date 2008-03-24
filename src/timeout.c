@@ -21,5 +21,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//gettimeofday (&elapsed, (struct timezone *) 0);
-//clock_t clock(void);
+#include "timeout.h"
+#include <sys/time.h>
+
+void timeout_update(timeout_t * tv)
+{
+  gettimeofday(tv, (struct timezone *) 0);
+//Alternativaly consider clock_t clock(void);
+}
+
+time_t timeout_get(const timeout_t * tv)
+{
+  struct timeval now, res;
+  gettimeofday(&now, (struct timezone *) 0);
+  timersub(&now, tv, &res);
+  return res.tv_sec;
+}

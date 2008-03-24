@@ -27,6 +27,7 @@
 #include <openssl/err.h>
 #include <sys/socket.h>
 #include "config.h"
+#include "timeout.h"
 #include "debug.h"
 #include "udpsrvdtls.h"
 #include "udpsrvsession.h"
@@ -124,7 +125,6 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
                     struct udpsrvsession_s *session)
 {
   int len, retry = 0;
-  X509 *sessionx509peer;
   unsigned long err;
   BIO *wbio, *rbio;
   if (session == NULL)
@@ -154,14 +154,9 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
   while (retry > 0 && retry < 5);
   BIO_free(session->dtls->rbio);
   session->dtls->rbio = udpsrvdtls_mbio;
-  if (session->netacl.filled == 0 && SSL_in_init(session->dtls))
-    {
-      sessionx509peer = SSL_get_peer_certificate(session->dtls);
-      //TODO- NameConstrains
-    }
   pthread_mutex_unlock(&session->dtls_mutex);
   if (len > 0 && retry == 0)
-    udpsrvsession_update_timeout(session);
+    timeout_update(&session->timeout);
   else
     udpsrvdtls_sessionerr(err, session);
   return len;

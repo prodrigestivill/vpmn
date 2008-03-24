@@ -25,6 +25,7 @@
 #define _PEER_H
 
 #include <netinet/in.h>
+#include "timeout.h"
 #include "router.h"
 #include "udpsrvsession.h"
 
@@ -40,6 +41,7 @@ struct peer_s
   unsigned int shared_networks_len;
   struct sockaddr_in *addrs;
   unsigned int addrs_len;
+  timeout_t timeout;
   int stat;
 };
 

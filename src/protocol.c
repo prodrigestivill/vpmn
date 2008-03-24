@@ -158,6 +158,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                   return;
                 }
               peer->stat |= PEER_STAT_ID;
+              timeout_update(&peer->timeout);
               if (peer_add(peer, session) < 1)
                 peer_destroy(peer);
             }
@@ -178,6 +179,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
       if (ip->ihl == PROTOCOL1_KA && session->peer != NULL &&
           (session->peer->stat & PEER_STAT_ID) != 0)
         {
+          timeout_update(&session->peer->timeout);
           p = (void *) &buffer[begin] + sizeof(struct protocol_1ka_s);
           while (p <= (void *) &buffer[buffer_len - 1])
             {

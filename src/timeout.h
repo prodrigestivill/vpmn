@@ -1,5 +1,5 @@
 /***************************************************************************
- *            udpsrvsession.h
+ *            timeout.h
  *
  *  VPMN  -  Virtual Private Mesh Network
  *  Copyright  2008  Pau Rodriguez-Estivill
@@ -21,31 +21,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _UDPSRVSESSION_H
-#define _UDPSRVSESSION_H
+#ifndef _TIMEOUT_H
+#define _TIMEOUT_H
 
-#include <pthread.h>
-#include <sys/socket.h>
-#include <openssl/ssl.h>
-#include "timeout.h"
-#include "router.h"
-#include "peer.h"
+#include <time.h>
 
-struct udpsrvsession_s
-{
-  timeout_t timeout;
-  SSL *dtls;
-  pthread_mutex_t dtls_mutex;
-  struct sockaddr_in *addr;
-  struct peer_s *peer;
-};
+typedef struct timeval timeout_t;
+void timeout_update(timeout_t * tv);
+time_t timeout_get(const timeout_t * tv);
 
-struct udpsrvsession_s *udpsrvsession_search(const struct sockaddr_in
-                                             *source);
-struct udpsrvsession_s *udpsrvsession_searchcreate(const struct sockaddr_in
-                                                   *source);
-void udpsrvsession_destroy(struct udpsrvsession_s *cursession);
-int udpsrvsession_dumpsocks(void *out, const int outlen, const int start,
-                            const int num);
-
-#endif                          /* _UDPSRVSESSION_H */
+#endif                          /* _TIMEOUT_H */
