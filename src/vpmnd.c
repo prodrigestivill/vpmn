@@ -97,8 +97,15 @@ int vpmnd_start()
   return 0;
 }
 
-int main()
+int vpmnd_help()
 {
-  config_load();
+  printf("Use the configuration file as a parameter.\n");
+}
+
+int main(int argc, char *argv[])
+{
+  if (argc != 2)
+    return vpmnd_help();
+  config_load(argv[1]);
   return vpmnd_start();
 }

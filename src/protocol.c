@@ -154,6 +154,8 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
               /* Check for valid routes shared */
               if (protocol_checknameconstraints(peer) < 0)
                 {
+                  log_debug
+                    ("Peer trying to request for unallowed network...");
                   peer_destroy(peer);
                   return;
                 }
@@ -230,7 +232,7 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
     }
   else
     log_error("Unknow protocol not implemented.\n");
-  if (buffer_len > 0 && dstpeer->udpsrvsession != NULL)
+  if (buffer_len > 0 && dstpeer != NULL && dstpeer->udpsrvsession != NULL)
     {
       udpsrvdtls_write(buffer, buffer_len, dstpeer->udpsrvsession);
       return 0;

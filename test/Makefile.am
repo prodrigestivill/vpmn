@@ -16,7 +16,36 @@ bin_PROGRAMS = \
 	udpsrvsessiontest \
 	tundevtest \
 	routertest \
-	protocoltest
+	protocoltest \
+	ptptest
+
+ptptest_SOURCES = \
+	ptptest.c\
+	../src/config.c \
+	../src/debug.c \
+	../src/peer.c \
+	../src/protocol.c \
+	../src/router.c \
+	../src/timeout.c \
+	../src/tundev.c \
+	../src/tunsrv.c \
+	../src/udpsrv.c \
+	../src/udpsrvdtls.c \
+	../src/udpsrvsession.c \
+	../src/config.h \
+	../src/debug.h \
+	../src/peer.h \
+	../src/protocol.h \
+	../src/router.h \
+	../src/srv.h \
+	../src/timeout.h \
+	../src/tundev.h \
+	../src/udpsrvdtls.h \
+	../src/udpsrvsession.h
+
+ptptest_LDFLAGS = \
+	-lpthread \
+	-lssl
 
 protocoltest_SOURCES = \
 	../src/config.c\

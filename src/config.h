@@ -28,7 +28,7 @@
 #include "peer.h"
 #include "../config.h"
 
-void config_load();
+void config_load(char cfgfile);
 void config_fistpeersinit();
 
 #define DEBUG 1
