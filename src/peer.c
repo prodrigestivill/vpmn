@@ -36,10 +36,15 @@ int peer_add(struct peer_s *peer, struct udpsrvsession_s *session)
   int i;
   if (peer->shared_networks_len < 1)
     return -1;
-  for (i = 0; i < peer->shared_networks_len; i++)
-    if (router_existroute(&peer->shared_networks[i]) > 0)
-      return -1;
+  /*
+     for (i = 0; i < peer->shared_networks_len; i++)
+     if (router_existroute(&peer->shared_networks[i]) > 0)
+     return -1;
+   */
 
+  for (i = 0; i < peer->shared_networks_len; i++)
+    router_addroute(&peer->shared_networks[i], peer);
+  log_debug("Routes added.");
   //-TODO
 }
 

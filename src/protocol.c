@@ -102,7 +102,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
   unsigned int begin = 0;
   struct iphdr *ip = NULL;
   struct peer_s *peer;
-
+  log_debug("Recived packet.\n");
   if (buffer_len < 4)
     return;
   ip = (struct iphdr *) &buffer[begin];
@@ -134,6 +134,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
 
       if (ip->ihl == PROTOCOL1_ID)
         {
+          log_debug("Identifing...\n");
           if (session->peer == NULL)
             session->peer = peer_create();
           peer = session->peer;
@@ -147,10 +148,12 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                                        sizeof(struct protocol_1id_s) +
                                        sizeof(struct protocol_peer_s)) < 0)
                 {
+                  log_error("invalid ID\n");
                   //-TODO: Check
                   peer_destroy(peer);
                   return;
                 }
+              log_debug("validating id.\n");
               /* Check for valid routes shared */
               if (protocol_checknameconstraints(peer) < 0)
                 {
@@ -234,9 +237,11 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
     log_error("Unknow protocol not implemented.\n");
   if (buffer_len > 0 && dstpeer != NULL && dstpeer->udpsrvsession != NULL)
     {
+      log_debug("Sending frame.\n");
       udpsrvdtls_write(buffer, buffer_len, dstpeer->udpsrvsession);
       return 0;
     }
+  log_debug("Frame lost.\n");
   return -1;
 }
 
@@ -247,19 +252,22 @@ int protocol_sendpacket(struct udpsrvsession_s *session, const int type)
   switch (type)
     {
       case PROTOCOL1_ID:
+        log_debug("Sending ID packet.\n");
         packet = (char *) protocol_v1id;
         packet_len = protocol_v1id_len;
         break;
       case PROTOCOL1_IDA:
+        log_debug("Sending IDA packet.\n");
         packet = (char *) &protocol_v1ida;
         packet_len = protocol_v1ida_len;
         break;
       case PROTOCOL1_KA:
+        log_debug("Sending KA packet.\n");
         packet = (char *) protocol_v1ka;
         packet_len = protocol_v1ka_len;
         break;
     }
-  if (packet_len < 1 && session != NULL)
+  if (packet_len > 0 && session != NULL)
     {
       udpsrvdtls_write(packet, packet_len, session);
       return 0;

@@ -108,7 +108,9 @@ udpsrvsessiontest_SOURCES = \
 	../src/config.c \
 	../src/config.h \
 	../src/router.c \
-	../src/router.h
+	../src/router.h \
+	../src/timeout.c \
+	../src/timeout.h
 
 udpsrvsessiontest_LDFLAGS = \
 	-lpthread            \

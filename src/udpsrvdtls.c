@@ -99,6 +99,7 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
       wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
       BIO_dgram_set_peer(wbio, session->addr);
       SSL_set_bio(session->dtls, udpsrvdtls_mbio, wbio);
+      log_debug("New session created.\n");
     }
   //-TODO: Need to lock mutex on write?
   do

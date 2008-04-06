@@ -73,6 +73,7 @@ int
 udpsrvdtls_loadcerts(const char *cafile, const char *certfile,
                      const char *pkeyfile)
 {
+  log_error("Not implemented\n");
   return 0;
 }
 
@@ -80,10 +81,12 @@ int
 udpsrvdtls_write(const char *buffer, const int buffer_len,
                  struct udpsrvsession_s *session)
 {
+  log_error("Not implemented\n");
   return 0;
 }
 
 int tundev_write(const void *buf, const int count)
 {
+  log_error("Not implemented\n");
   return 0;
 }

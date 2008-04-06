@@ -93,13 +93,17 @@ int main(int argc, char *argv[])
   pthread_create(&tunsrv_thread, NULL, (void *) &tunsrv, NULL);
   pthread_create(&udpsrv_thread, NULL, (void *) &udpsrv, NULL);
   //Start fist connection
-  peeraddr = malloc(sizeof(struct sockaddr_in));
-  peeraddr->sin_port = htons(1090);
-  peeraddr->sin_family = AF_INET;
-  inet_aton(argv[1], &peeraddr->sin_addr);
-  udpsrv_firstpeers = calloc(1, sizeof(struct udpsrvsession_s *));
-  udpsrv_firstpeers[0] = udpsrvsession_searchcreate(peeraddr);
-  protocol_sendpacket(udpsrv_firstpeers[0], PROTOCOL1_ID);
+  if (argv[1][0] != '-')
+    {
+      peeraddr = malloc(sizeof(struct sockaddr_in));
+      peeraddr->sin_port = htons(1090);
+      peeraddr->sin_family = AF_INET;
+      inet_aton(argv[1], &peeraddr->sin_addr);
+      udpsrv_firstpeers = calloc(1, sizeof(struct udpsrvsession_s *));
+      udpsrv_firstpeers[0] = udpsrvsession_searchcreate(peeraddr);
+      protocol_sendpacket(udpsrv_firstpeers[0], PROTOCOL1_ID);
+      protocol_sendpacket(udpsrv_firstpeers[0], PROTOCOL1_ID); //twice
+    }
   //Program ended
   pthread_join(tunsrv_thread, NULL);
 }

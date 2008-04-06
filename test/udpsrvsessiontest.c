@@ -37,7 +37,7 @@
 
 int main()
 {
-  config_load();
+  config_load("");
   char buffer[UDPBUFFERSIZE], bufferout[TUNBUFFERSIZE];
   int buffer_len, bufferout_len;
   struct udpsrvsession_s *udpsession;
@@ -64,7 +64,7 @@ int main()
                  (struct sockaddr *) &(addr), &(addr_len));
       addr2 = malloc(sizeof(struct sockaddr_in));
       bcopy(&addr, addr2, addr_len);
-      udpsession = udpsrvsession_search(addr2);
+      udpsession = udpsrvsession_searchcreate(addr2);
       bufferout_len =
         udpsrvdtls_read(buffer, buffer_len, bufferout, TUNBUFFERSIZE,
                         udpsession);
