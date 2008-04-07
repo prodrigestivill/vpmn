@@ -31,7 +31,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-void config_load(char cfgfile)
+void config_load(char *cfgfile)
 {
   vpmnd_uid = 1000;
   vpmnd_gid = 1000;
@@ -42,7 +42,8 @@ void config_load(char cfgfile)
 #endif
   //TUNDEV
   tunname = "vpmn0";
-  num_tunsrvthreads = 5;
+  num_tunsrvthreads = 4;
+  num_tunsrvbuffers = 20;
 
   char *tunaddr_ip_str = "10.0.0.5";
   char *tunaddr_nm_str = "255.255.255.0";
@@ -64,7 +65,8 @@ void config_load(char cfgfile)
   tun_selfpeer.shared_networks_len = 1 + 1;
 
   //UDPSRV
-  num_udpsrvthreads = 5;
+  num_udpsrvthreads = 4;
+  num_udpsrvbuffers = 20;
   port_udp = 1090;
   char *updsrv_ip_str = "192.168.0.2";
   tun_selfpeer.addrs = calloc(1, sizeof(struct sockaddr_in));

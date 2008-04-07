@@ -111,7 +111,10 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
       err = SSL_get_error(session->dtls, len);
       if (len <= 0
           && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
-        retry++;
+        {
+          sleep(1);             //-TODO: Improve
+          retry++;
+        }
       else
         retry = 0;
     }
@@ -148,7 +151,10 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
       err = SSL_get_error(session->dtls, len);
       if (len <= 0
           && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
-        retry++;
+        {
+          sleep(1);             //-TODO: Improve
+          retry++;
+        }
       else
         retry = 0;
     }

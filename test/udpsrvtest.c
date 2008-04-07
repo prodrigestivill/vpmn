@@ -27,7 +27,7 @@
 
 int main()
 {
-  config_load();
+  config_load("");
   if (udpsrv_init() < 0)
     {
       log_error("Could not create the interface.\n");

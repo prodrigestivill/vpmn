@@ -30,89 +30,125 @@
 #include "config.h"
 #include "debug.h"
 
-pthread_cond_t tunsrv_waitcond;
-pthread_mutex_t tunsrv_waitmutex;
+int tunsrv_pendbufferwait = 0;
+int tunsrv_pendbuffer = 0;
+pthread_mutex_t tunsrv_pendbuffermutex;
+pthread_cond_t tunsrv_mainwaitcond;
+pthread_mutex_t tunsrv_mainwaitmutex;
+pthread_cond_t tunsrv_threadwaitcond;
+pthread_mutex_t tunsrv_threadwaitmutex;
 
-struct tunsrv_thread_s
+struct tunsrv_buffer_s
 {
-  pthread_t thread;
-  pthread_mutex_t thread_mutex;
-  pthread_cond_t cond;
-  pthread_mutex_t cond_mutex;
+  pthread_mutex_t buffer_mutex;
+  int free;
   char buffer[TUNBUFFERSIZE];
   int buffer_len;
-};
+} *tunsrv_buffer;
 
-void tunsrv_thread(struct tunsrv_thread_s *me)
+void tunsrv_thread()
 {
-  pthread_mutex_lock(&me->cond_mutex);
+  int i;
   while (1)
     {
-      pthread_cond_wait(&me->cond, &me->cond_mutex);
-      protocol_sendframe(me->buffer, me->buffer_len);
-      pthread_mutex_unlock(&me->thread_mutex);
-      //Notify main loop about finished job
-      pthread_mutex_lock(&tunsrv_waitmutex);
-      pthread_cond_signal(&tunsrv_waitcond);
-      pthread_mutex_unlock(&tunsrv_waitmutex);
+      pthread_mutex_lock(&tunsrv_threadwaitmutex);
+      pthread_cond_wait(&tunsrv_threadwaitcond, &tunsrv_threadwaitmutex);
+      pthread_mutex_unlock(&tunsrv_threadwaitmutex);
+      for (i = 0; i < num_tunsrvbuffers; i++)
+        {
+          if (pthread_mutex_trylock(&tunsrv_buffer[i].buffer_mutex) == 0)
+            {
+              if (tunsrv_buffer[i].free)
+                pthread_mutex_unlock(&tunsrv_buffer[i].buffer_mutex);
+              else
+                {
+                  protocol_sendframe(tunsrv_buffer[i].buffer,
+                                     tunsrv_buffer[i].buffer_len);
+                  tunsrv_buffer[i].free = 1;
+                  pthread_mutex_unlock(&tunsrv_buffer[i].buffer_mutex);
+                  pthread_mutex_lock(&tunsrv_pendbuffermutex);
+                  tunsrv_pendbuffer--;
+                  pthread_mutex_unlock(&tunsrv_pendbuffermutex);
+                  //Notify main loop about finished job
+                  if (tunsrv_pendbufferwait)
+                    {
+                      pthread_mutex_lock(&tunsrv_mainwaitmutex);
+                      pthread_cond_signal(&tunsrv_mainwaitcond);
+                      pthread_mutex_unlock(&tunsrv_mainwaitmutex);
+                    }
+                }
+            }
+        }
     }
-  pthread_mutex_unlock(&me->cond_mutex);
-}
-
-int tunsrv_threadcreate(struct tunsrv_thread_s *new)
-{
-  pthread_mutex_init(&new->thread_mutex, NULL);
-  pthread_mutex_init(&new->cond_mutex, NULL);
-  pthread_cond_init(&new->cond, NULL);
-  return pthread_create(&new->thread, NULL, (void *) &tunsrv_thread, new);
 }
 
 void tunsrv()
 {
-  int rc, th;
-  struct tunsrv_thread_s tunsrvthreads[num_tunsrvthreads];
-
-  pthread_mutex_init(&tunsrv_waitmutex, NULL);
-  pthread_cond_init(&tunsrv_waitcond, NULL);
-
-
-  for (th = 0; th < num_tunsrvthreads; th++)
+  int rc, i;
+  pthread_t tunsrvthreads[num_tunsrvthreads];
+  pthread_mutex_init(&tunsrv_mainwaitmutex, NULL);
+  pthread_cond_init(&tunsrv_mainwaitcond, NULL);
+  pthread_mutex_init(&tunsrv_threadwaitmutex, NULL);
+  pthread_cond_init(&tunsrv_threadwaitcond, NULL);
+  tunsrv_buffer =
+    malloc(num_tunsrvbuffers * sizeof(struct tunsrv_buffer_s));
+  for (i = 0; i < num_tunsrvbuffers; i++)
     {
-      if ((rc = tunsrv_threadcreate(&(tunsrvthreads[th]))))
+      pthread_mutex_init(&tunsrv_buffer[i].buffer_mutex, NULL);
+      tunsrv_buffer[i].free = 1;
+    }
+  for (i = 0; i < num_tunsrvthreads; i++)
+    {
+      if ((rc =
+           pthread_create(&tunsrvthreads[i], NULL, (void *) &tunsrv_thread,
+                          NULL)))
         {
-          log_error("Thread %d creation failed: %d\n", th, rc);
+          log_error("Thread %d creation failed: %d\n", i, rc);
           break;
         }
     }
+
   while (1)
     {
-      for (th = 0; th < num_tunsrvthreads; th++)
+      for (i = 0; i < num_tunsrvbuffers; i++)
         {
-          if (pthread_mutex_trylock(&tunsrvthreads[th].thread_mutex) == 0)
+          if (pthread_mutex_trylock(&tunsrv_buffer[i].buffer_mutex) == 0)
             {
-              pthread_mutex_lock(&tunsrvthreads[th].cond_mutex);
-              tunsrvthreads[th].buffer_len =
-                tundev_read(tunsrvthreads[th].buffer,
-                            sizeof(tunsrvthreads[th].buffer));
-              if (tunsrvthreads[th].buffer_len > 0)
+              if (tunsrv_buffer[i].free)
                 {
-                  pthread_cond_signal(&tunsrvthreads[th].cond);
+                  tunsrv_buffer[i].free = 0;
+                  tunsrv_buffer[i].buffer_len =
+                    tundev_read(tunsrv_buffer[i].buffer,
+                                sizeof(tunsrv_buffer[i].buffer));
+                  if (tunsrv_buffer[i].buffer_len > 0)
+                    {
+                      pthread_mutex_unlock(&tunsrv_buffer[i].buffer_mutex);
+                      pthread_mutex_lock(&tunsrv_pendbuffermutex);
+                      tunsrv_pendbuffer++;
+                      pthread_mutex_unlock(&tunsrv_pendbuffermutex);
+                      pthread_mutex_lock(&tunsrv_threadwaitmutex);
+                      pthread_cond_signal(&tunsrv_threadwaitcond);
+                      pthread_mutex_unlock(&tunsrv_threadwaitmutex);
+                    }
+                  else
+                    {
+                      tunsrv_buffer[i].free = 1;
+                      pthread_mutex_unlock(&tunsrv_buffer[i].buffer_mutex);
+                      log_error("Error reading form interface.\n");
+                    }
                 }
               else
-                {
-                  pthread_mutex_unlock(&tunsrvthreads[th].thread_mutex);
-                  log_error("Error reading form interface.\n");
-                }
-              pthread_mutex_unlock(&tunsrvthreads[th].cond_mutex);
-              break;
+                pthread_mutex_unlock(&tunsrv_buffer[i].buffer_mutex);
             }
         }
-      //Wait for free thread
-      if (th >= num_tunsrvthreads)
+      //Wait for free buffer
+      if (tunsrv_pendbuffer >= num_tunsrvbuffers)
         {
-          pthread_mutex_lock(&tunsrv_waitmutex);
-          pthread_cond_wait(&tunsrv_waitcond, &tunsrv_waitmutex);
-          pthread_mutex_unlock(&tunsrv_waitmutex);
+          tunsrv_pendbufferwait = 1;
+          pthread_mutex_lock(&tunsrv_mainwaitmutex);
+          pthread_cond_wait(&tunsrv_mainwaitcond, &tunsrv_mainwaitmutex);
+          pthread_mutex_unlock(&tunsrv_mainwaitmutex);
+          tunsrv_pendbufferwait = 0;
         }
     }
 }

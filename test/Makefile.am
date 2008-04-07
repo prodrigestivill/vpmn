@@ -132,7 +132,9 @@ udpsrvtest_SOURCES = \
 	../src/udpsrvdtls.c \
 	../src/udpsrvdtls.h \
 	../src/srv.h \
-	../src/protocol.h
+	../src/protocol.h \
+	../src/timeout.c \
+	../src/timeout.h
 
 udpsrvtest_LDFLAGS = \
 	-lpthread     \

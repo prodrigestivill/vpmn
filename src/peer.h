@@ -24,6 +24,7 @@
 #ifndef _PEER_H
 #define _PEER_H
 
+#include <pthread.h>
 #include <netinet/in.h>
 #include "timeout.h"
 #include "router.h"
@@ -43,6 +44,7 @@ struct peer_s
   unsigned int addrs_len;
   timeout_t timeout;
   int stat;
+  pthread_mutex_t modify_mutex;
 };
 
 int peer_add(struct peer_s *peer, struct udpsrvsession_s *session);

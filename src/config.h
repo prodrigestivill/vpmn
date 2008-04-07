@@ -28,7 +28,7 @@
 #include "peer.h"
 #include "../config.h"
 
-void config_load(char cfgfile);
+void config_load(char *cfgfile);
 void config_fistpeersinit();
 
 #define DEBUG 1
@@ -45,12 +45,14 @@ int daemonize;
 char *tunname;
 struct in_network tunaddr_ip;
 int num_tunsrvthreads;
+int num_tunsrvbuffers;
 struct peer_s tun_selfpeer;
 
 
 //UDPSRV
 #define UDPBUFFERSIZE 65535
 int num_udpsrvthreads;
+int num_udpsrvbuffers;
 int port_udp;
 struct udpsrvsession_s **udpsrv_firstpeers;
 

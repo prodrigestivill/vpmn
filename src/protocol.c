@@ -21,6 +21,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include <openssl/x509v3.h>
 #include <netinet/ip.h>
 #include <stdlib.h>
@@ -99,32 +103,51 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
 {
   int i;
   void *p;
-  unsigned int begin = 0;
+  int begin = 0;
   struct iphdr *ip = NULL;
   struct peer_s *peer;
-  log_debug("Recived packet.\n");
   if (buffer_len < 4)
     return;
   ip = (struct iphdr *) &buffer[begin];
+  log_debug("Recived (%d) packet %d.\n", buffer_len, ip->ihl);
   if (ip->version == 4)         //IPv4 packet
     {
-      if (session->peer == NULL || buffer_len < 20)
+      if (session->peer == NULL
+          || (session->peer->stat & PEER_STAT_ID) == 0 || buffer_len < 20)
         return;
+      log_debug("From (%d)", buffer_len);
+      log_debug(": %s  ", inet_ntoa(*((struct in_addr *) &ip->saddr)));
+      log_debug("To: %s\n", inet_ntoa(*(struct in_addr *) &ip->daddr));
       if (router_checksrc((struct in_addr *) &ip->daddr, &tun_selfpeer) !=
           0)
-        return;
+        {
+          log_debug("Not for me: %s\n",
+                    inet_ntoa(*(struct in_addr *) &ip->daddr));
+          return;
+        }
       if (router_checksrc((struct in_addr *) &ip->saddr, session->peer) !=
           0)
-        return;
+        {
+          log_debug("Not from there: %s\n",
+                    inet_ntoa(*(struct in_addr *) &ip->saddr));
+          return;
+        }
       tundev_write(buffer, buffer_len);
       return;
     }
 //else if (ip->version == 6) //IPv6 Packet
   else if (ip->version == PROTOCOL1_V)  //Internal packets v1
     {
-      if (ip->ihl == PROTOCOL1_IDA && session->peer != NULL)
+      if (((struct protocol_1_s *) ip)->ihl == PROTOCOL1_IDA)
         {
-          session->peer->stat |= PEER_STAT_IDK;
+          log_debug("ACK...\n");
+          if (session->peer != NULL
+              && (session->peer->stat & PEER_STAT_IDK) == 0)
+            {
+              pthread_mutex_lock(&session->peer->modify_mutex);
+              session->peer->stat |= PEER_STAT_IDK;
+              pthread_mutex_unlock(&session->peer->modify_mutex);
+            }
           //Packets are combinable IDACK+ID
           begin = begin + sizeof(struct protocol_1_s);
           if (begin + 4 > buffer_len)
@@ -132,14 +155,15 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
           ip = (struct iphdr *) &buffer[begin];
         }
 
-      if (ip->ihl == PROTOCOL1_ID)
+      if (((struct protocol_1_s *) ip)->ihl == PROTOCOL1_ID)
         {
-          log_debug("Identifing...\n");
+          log_debug("ID...\n");
           if (session->peer == NULL)
             session->peer = peer_create();
+          pthread_mutex_lock(&session->peer->modify_mutex);
           peer = session->peer;
           peer->udpsrvsession = session;
-          if ((peer->stat & PEER_STAT_ID) != 0)
+          if ((peer->stat & PEER_STAT_ID) == 0)
             {
               if (protocol_processpeer(peer,
                                        &((struct protocol_1id_s *)
@@ -150,20 +174,23 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                 {
                   log_error("invalid ID\n");
                   //-TODO: Check
+                  pthread_mutex_unlock(&peer->modify_mutex);
                   peer_destroy(peer);
                   return;
                 }
-              log_debug("validating id.\n");
+              log_debug("Validating id.\n");
               /* Check for valid routes shared */
               if (protocol_checknameconstraints(peer) < 0)
                 {
                   log_debug
-                    ("Peer trying to request for unallowed network...");
+                    ("Peer trying to request for unallowed network...\n");
+                  pthread_mutex_unlock(&peer->modify_mutex);
                   peer_destroy(peer);
                   return;
                 }
               peer->stat |= PEER_STAT_ID;
               timeout_update(&peer->timeout);
+              pthread_mutex_unlock(&peer->modify_mutex);
               if (peer_add(peer, session) < 1)
                 peer_destroy(peer);
             }
@@ -181,28 +208,34 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
             return;
           ip = (struct iphdr *) &buffer[begin];
         }
-      if (ip->ihl == PROTOCOL1_KA && session->peer != NULL &&
-          (session->peer->stat & PEER_STAT_ID) != 0)
+      if (((struct protocol_1_s *) ip)->ihl == PROTOCOL1_KA)
         {
-          timeout_update(&session->peer->timeout);
-          p = (void *) &buffer[begin] + sizeof(struct protocol_1ka_s);
-          while (p <= (void *) &buffer[buffer_len - 1])
+          log_debug("KA...\n");
+          if (session->peer != NULL
+              && (session->peer->stat & PEER_STAT_ID) != 0)
             {
-              peer = peer_create();
-              i = protocol_processpeer(peer, (struct protocol_peer_s *) p,
-                                       (int) ((void *)
-                                              &buffer[buffer_len - 1] -
-                                              p));
-              if (i < 0)
+              timeout_update(&session->peer->timeout);
+              p = (void *) &buffer[begin] + sizeof(struct protocol_1ka_s);
+              while (p <= (void *) &buffer[buffer_len - 1])
                 {
+                  peer = peer_create();
+                  i =
+                    protocol_processpeer(peer,
+                                         (struct protocol_peer_s *) p,
+                                         (int) ((void *)
+                                                &buffer[buffer_len - 1] -
+                                                p));
+                  if (i < 0)
+                    {
+                      peer_destroy(peer);
+                      return;
+                    }
+                  p += i;
+                  //if (router_exist () == 0)
+                  //-TODO Init conn
+                  //else
                   peer_destroy(peer);
-                  return;
                 }
-              p += i;
-              //if (router_exist () == 0)
-              //-TODO Init conn
-              //else
-              peer_destroy(peer);
             }
         }
     }
@@ -222,6 +255,8 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
           0)
         {
           //-TODO: CHECK BROADCAST
+          log_debug("Searching route for: %s.\n",
+                    inet_ntoa(*(struct in_addr *) &ip->daddr));
           dstpeer = router_searchdst((struct in_addr *) &ip->daddr);
         }
       else
@@ -237,11 +272,11 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
     log_error("Unknow protocol not implemented.\n");
   if (buffer_len > 0 && dstpeer != NULL && dstpeer->udpsrvsession != NULL)
     {
-      log_debug("Sending frame.\n");
+      log_debug("Sending frame. (%d)\n", buffer_len);
       udpsrvdtls_write(buffer, buffer_len, dstpeer->udpsrvsession);
       return 0;
     }
-  log_debug("Frame lost.\n");
+  log_debug("Frame lost. (%d)\n", buffer_len);
   return -1;
 }
 
@@ -272,6 +307,7 @@ int protocol_sendpacket(struct udpsrvsession_s *session, const int type)
       udpsrvdtls_write(packet, packet_len, session);
       return 0;
     }
+  log_debug("not sending packet\n");
   return -1;
 }
 

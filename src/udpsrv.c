@@ -36,20 +36,23 @@
 #include "srv.h"
 
 int udpsrv_fd = -1;
-pthread_cond_t udpsrv_waitcond;
-pthread_mutex_t udpsrv_waitmutex;
+int udpsrv_pendbufferwait = 0;
+int udpsrv_pendbuffer = 0;
+pthread_mutex_t udpsrv_pendbuffermutex;
+pthread_cond_t udpsrv_mainwaitcond;
+pthread_mutex_t udpsrv_mainwaitmutex;
+pthread_cond_t udpsrv_threadwaitcond;
+pthread_mutex_t udpsrv_threadwaitmutex;
 
-struct udpsrv_thread_s
+struct udpsrv_buffer_s
 {
-  pthread_t thread;
-  pthread_mutex_t thread_mutex;
-  pthread_cond_t cond;
-  pthread_mutex_t cond_mutex;
+  pthread_mutex_t buffer_mutex;
+  int free;
   char buffer[UDPBUFFERSIZE];
   int buffer_len;
   struct sockaddr_in addr;
   socklen_t addr_len;
-};
+} *udpsrv_buffer;
 
 int udpsrv_init()
 {
@@ -68,88 +71,123 @@ int udpsrv_init()
   return 0;
 }
 
-void udpsrv_thread(struct udpsrv_thread_s *me)
+void udpsrv_thread()
 {
   char tunbuffer[TUNBUFFERSIZE];
-  int tunbuffer_len;
+  int i, tunbuffer_len;
   struct udpsrvsession_s *udpsession = NULL;
-  pthread_mutex_lock(&me->cond_mutex);
   while (1)
     {
-      pthread_cond_wait(&me->cond, &me->cond_mutex);
-      udpsession = udpsrvsession_searchcreate(&me->addr);
-      tunbuffer_len =
-        udpsrvdtls_read(me->buffer, me->buffer_len, tunbuffer,
-                        TUNBUFFERSIZE, udpsession);
-      if (tunbuffer_len > 0)
-        protocol_recvpacket(tunbuffer, tunbuffer_len, udpsession);
-      pthread_mutex_unlock(&me->thread_mutex);
-      //Notify main loop about finished job
-      pthread_mutex_lock(&udpsrv_waitmutex);
-      pthread_cond_signal(&udpsrv_waitcond);
-      pthread_mutex_unlock(&udpsrv_waitmutex);
+      pthread_mutex_lock(&udpsrv_threadwaitmutex);
+      pthread_cond_wait(&udpsrv_threadwaitcond, &udpsrv_threadwaitmutex);
+      pthread_mutex_unlock(&udpsrv_threadwaitmutex);
+      for (i = 0; i < num_udpsrvbuffers; i++)
+        {
+          if (pthread_mutex_trylock(&udpsrv_buffer[i].buffer_mutex) == 0)
+            {
+              if (udpsrv_buffer[i].free)
+                pthread_mutex_unlock(&udpsrv_buffer[i].buffer_mutex);
+              else
+                {
+                  udpsession =
+                    udpsrvsession_searchcreate(&udpsrv_buffer[i].addr);
+                  tunbuffer_len =
+                    udpsrvdtls_read(udpsrv_buffer[i].buffer,
+                                    udpsrv_buffer[i].buffer_len, tunbuffer,
+                                    TUNBUFFERSIZE, udpsession);
+                  if (tunbuffer_len > 0)
+                    protocol_recvpacket(tunbuffer, tunbuffer_len,
+                                        udpsession);
+                  udpsrv_buffer[i].free = 1;
+                  pthread_mutex_unlock(&udpsrv_buffer[i].buffer_mutex);
+                  pthread_mutex_lock(&udpsrv_pendbuffermutex);
+                  udpsrv_pendbuffer--;
+                  pthread_mutex_unlock(&udpsrv_pendbuffermutex);
+                  //Notify main loop about finished job
+                  if (udpsrv_pendbufferwait)
+                    {
+                      pthread_mutex_lock(&udpsrv_mainwaitmutex);
+                      pthread_cond_signal(&udpsrv_mainwaitcond);
+                      pthread_mutex_unlock(&udpsrv_mainwaitmutex);
+                    }
+                }
+            }
+        }
     }
-  pthread_mutex_unlock(&me->cond_mutex);
-}
-
-int udpsrv_threadcreate(struct udpsrv_thread_s *new)
-{
-  pthread_mutex_init(&new->thread_mutex, NULL);
-  pthread_mutex_init(&new->cond_mutex, NULL);
-  pthread_cond_init(&new->cond, NULL);
-  return pthread_create(&new->thread, NULL, (void *) &udpsrv_thread, new);
 }
 
 void udpsrv()
 {
-  int rc, th;
-  struct udpsrv_thread_s udpsrvthreads[num_udpsrvthreads];
-
-  pthread_mutex_init(&udpsrv_waitmutex, NULL);
-  pthread_cond_init(&udpsrv_waitcond, NULL);
-
-  for (th = 0; th < num_udpsrvthreads; th++)
+  int rc, i;
+  pthread_t udpsrvthreads[num_udpsrvthreads];
+  pthread_mutex_init(&udpsrv_mainwaitmutex, NULL);
+  pthread_cond_init(&udpsrv_mainwaitcond, NULL);
+  pthread_mutex_init(&udpsrv_threadwaitmutex, NULL);
+  pthread_cond_init(&udpsrv_threadwaitcond, NULL);
+  udpsrv_buffer =
+    malloc(num_udpsrvbuffers * sizeof(struct udpsrv_buffer_s));
+  for (i = 0; i < num_udpsrvbuffers; i++)
     {
-      if ((rc = udpsrv_threadcreate(&(udpsrvthreads[th]))))
+      pthread_mutex_init(&udpsrv_buffer[i].buffer_mutex, NULL);
+      udpsrv_buffer[i].free = 1;
+    }
+  for (i = 0; i < num_udpsrvthreads; i++)
+    {
+      if ((rc =
+           pthread_create(&udpsrvthreads[i], NULL, (void *) &udpsrv_thread,
+                          NULL)))
         {
-          log_error("Thread %d creation failed: %d\n", th, rc);
+          log_error("Thread %d creation failed: %d\n", i, rc);
           break;
         }
     }
 
   while (1)
     {
-      for (th = 0; th < num_udpsrvthreads; th++)
+      for (i = 0; i < num_udpsrvbuffers; i++)
         {
-          if (pthread_mutex_trylock(&udpsrvthreads[th].thread_mutex) == 0)
+          if (pthread_mutex_trylock(&udpsrv_buffer[i].buffer_mutex) == 0)
             {
-              pthread_mutex_lock(&udpsrvthreads[th].cond_mutex);
-              udpsrvthreads[th].addr_len = sizeof(udpsrvthreads[th].addr);
-              bzero(&udpsrvthreads[th].addr, udpsrvthreads[th].addr_len);
-              udpsrvthreads[th].buffer_len =
-                recvfrom(udpsrv_fd, udpsrvthreads[th].buffer,
-                         sizeof(udpsrvthreads[th].buffer), 0,
-                         (struct sockaddr *) &udpsrvthreads[th].addr,
-                         &udpsrvthreads[th].addr_len);
-              if (udpsrvthreads[th].buffer_len > 0)
+              if (udpsrv_buffer[i].free)
                 {
-                  pthread_cond_signal(&udpsrvthreads[th].cond);
+                  udpsrv_buffer[i].free = 0;
+                  udpsrv_buffer[i].addr_len =
+                    sizeof(udpsrv_buffer[i].addr);
+                  bzero(&udpsrv_buffer[i].addr, udpsrv_buffer[i].addr_len);
+                  udpsrv_buffer[i].buffer_len =
+                    recvfrom(udpsrv_fd, udpsrv_buffer[i].buffer,
+                             sizeof(udpsrv_buffer[i].buffer), 0,
+                             (struct sockaddr *) &udpsrv_buffer[i].addr,
+                             &udpsrv_buffer[i].addr_len);
+                  if (udpsrv_buffer[i].buffer_len > 0)
+                    {
+                      pthread_mutex_unlock(&udpsrv_buffer[i].buffer_mutex);
+                      pthread_mutex_lock(&udpsrv_pendbuffermutex);
+                      udpsrv_pendbuffer++;
+                      pthread_mutex_unlock(&udpsrv_pendbuffermutex);
+                      pthread_mutex_lock(&udpsrv_threadwaitmutex);
+                      pthread_cond_signal(&udpsrv_threadwaitcond);
+                      pthread_mutex_unlock(&udpsrv_threadwaitmutex);
+                    }
+                  else
+                    {
+                      udpsrv_buffer[i].free = 1;
+                      pthread_mutex_unlock(&udpsrv_buffer[i].buffer_mutex);
+                      log_error("Error reading form socket.\n");
+                    }
                 }
               else
-                {
-                  pthread_mutex_unlock(&udpsrvthreads[th].thread_mutex);
-                  log_error("Error reading form socket.\n");
-                }
-              pthread_mutex_unlock(&udpsrvthreads[th].cond_mutex);
-              break;
+                pthread_mutex_unlock(&udpsrv_buffer[i].buffer_mutex);
             }
         }
-      //Wait for free thread
-      if (th >= num_udpsrvthreads)
+      //Wait for free buffer
+      if (udpsrv_pendbuffer >= num_udpsrvbuffers)
         {
-          pthread_mutex_lock(&udpsrv_waitmutex);
-          pthread_cond_wait(&udpsrv_waitcond, &udpsrv_waitmutex);
-          pthread_mutex_unlock(&udpsrv_waitmutex);
+          udpsrv_pendbufferwait = 1;
+          pthread_mutex_lock(&udpsrv_mainwaitmutex);
+          pthread_cond_wait(&udpsrv_mainwaitcond, &udpsrv_mainwaitmutex);
+          pthread_mutex_unlock(&udpsrv_mainwaitmutex);
+          udpsrv_pendbufferwait = 0;
         }
     }
 }
