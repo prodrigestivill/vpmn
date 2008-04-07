@@ -105,7 +105,6 @@ int main(int argc, char *argv[])
       udpsrv_firstpeers[0] = udpsrvsession_searchcreate(peeraddr);
       if (udpsrv_firstpeers[0]->peer == NULL)
         udpsrv_firstpeers[0]->peer = peer_create();
-      protocol_sendpacket(udpsrv_firstpeers[0], PROTOCOL1_IDA);
       protocol_sendpacket(udpsrv_firstpeers[0], PROTOCOL1_ID);
     }
   //Program ended

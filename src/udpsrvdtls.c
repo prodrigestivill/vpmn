@@ -55,6 +55,7 @@ void udpsrvdtls_init()
     log_error("Error setting cipher list.\n");
   SSL_CTX_set_verify(udpsrvdtls_srvctx, verifymode, NULL);
   SSL_CTX_set_verify_depth(udpsrvdtls_srvctx, ssl_verifydepth);
+  SSL_CTX_set_mode(udpsrvdtls_srvctx, SSL_MODE_AUTO_RETRY);
   udpsrvdtls_mbio = BIO_new(BIO_s_mem());
 }
 
@@ -88,7 +89,7 @@ udpsrvdtls_loadcerts(const char *cafile, const char *certfile,
 int udpsrvdtls_write(const char *buffer, const int buffer_len,
                      struct udpsrvsession_s *session)
 {
-  int len, retry = 0;
+  int len;
   unsigned long err;
   BIO *wbio;
   pthread_mutex_lock(&session->dtls_mutex);
@@ -99,26 +100,11 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
       wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
       BIO_dgram_set_peer(wbio, session->addr);
       SSL_set_bio(session->dtls, udpsrvdtls_mbio, wbio);
-      log_debug("New session created.\n");
     }
   //-TODO: Need to lock mutex on write?
-  do
-    {
-      if (retry > 0)
-        pthread_mutex_lock(&session->dtls_mutex);
-      len = SSL_write(session->dtls, buffer, buffer_len);
-      pthread_mutex_unlock(&session->dtls_mutex);
-      err = SSL_get_error(session->dtls, len);
-      if (len <= 0
-          && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
-        {
-          sleep(1);             //-TODO: Improve
-          retry++;
-        }
-      else
-        retry = 0;
-    }
-  while (retry > 0 && retry < 5 && session->dtls != NULL);
+  len = SSL_write(session->dtls, buffer, buffer_len);
+  pthread_mutex_unlock(&session->dtls_mutex);
+  err = SSL_get_error(session->dtls, len);
   if (len <= 0)
     udpsrvdtls_sessionerr(err, session);
   return len;
@@ -128,7 +114,7 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
                     char *bufferout, const int bufferout_len,
                     struct udpsrvsession_s *session)
 {
-  int len, retry = 0;
+  int len;
   unsigned long err;
   BIO *wbio, *rbio;
   if (session == NULL)
@@ -145,24 +131,12 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
   rbio = BIO_new_mem_buf((void *) buffer, buffer_len);
   BIO_set_mem_eof_return(rbio, -1);
   session->dtls->rbio = rbio;
-  do
-    {
-      len = SSL_read(session->dtls, bufferout, bufferout_len);
-      err = SSL_get_error(session->dtls, len);
-      if (len <= 0
-          && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
-        {
-          sleep(1);             //-TODO: Improve
-          retry++;
-        }
-      else
-        retry = 0;
-    }
-  while (retry > 0 && retry < 5);
+  len = SSL_read(session->dtls, bufferout, bufferout_len);
+  err = SSL_get_error(session->dtls, len);
   BIO_free(session->dtls->rbio);
   session->dtls->rbio = udpsrvdtls_mbio;
   pthread_mutex_unlock(&session->dtls_mutex);
-  if (len > 0 && retry == 0)
+  if (len > 0)
     timeout_update(&session->timeout);
   else
     udpsrvdtls_sessionerr(err, session);
