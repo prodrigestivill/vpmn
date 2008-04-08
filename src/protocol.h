@@ -79,6 +79,14 @@ struct protocol_1id_s
   struct protocol_peer_s peer;
 } __attribute((packed));
 
+/* Protocol 1 Identifier ACK*/
+struct protocol_1ida_s
+{
+  struct protocol_1_s base;
+  uint8_t padding1;
+  uint16_t padding2;
+} __attribute((packed));
+
 /* Protocol 1 Keep Alive
  * Structure implemented */
 struct protocol_1ka_s

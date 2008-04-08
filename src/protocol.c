@@ -39,8 +39,8 @@
 //-TODO MUEXES
 struct protocol_1id_s *protocol_v1id;
 int protocol_v1id_len;
-struct protocol_1_s protocol_v1ida;
-#define protocol_v1ida_len sizeof (struct protocol_1_s);
+struct protocol_1ida_s protocol_v1ida;
+#define protocol_v1ida_len sizeof (struct protocol_1ida_s);
 struct protocol_1ka_s *protocol_v1ka;
 int protocol_v1ka_len;
 int protocol_v1ka_maxlen;
@@ -109,15 +109,11 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
   if (buffer_len < 4)
     return;
   ip = (struct iphdr *) &buffer[begin];
-  log_debug("Recived (%d) packet %d.\n", buffer_len, ip->ihl);
   if (ip->version == 4)         //IPv4 packet
     {
       if (session->peer == NULL
           || (session->peer->stat & PEER_STAT_ID) == 0 || buffer_len < 20)
         return;
-      log_debug("From (%d)", buffer_len);
-      log_debug(": %s  ", inet_ntoa(*((struct in_addr *) &ip->saddr)));
-      log_debug("To: %s\n", inet_ntoa(*(struct in_addr *) &ip->daddr));
       if (router_checksrc((struct in_addr *) &ip->daddr, &tun_selfpeer) !=
           0)
         {
@@ -149,7 +145,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
               pthread_mutex_unlock(&session->peer->modify_mutex);
             }
           //Packets are combinable IDACK+ID
-          begin = begin + sizeof(struct protocol_1_s);
+          begin = begin + sizeof(struct protocol_1ida_s);
           if (begin + 4 > buffer_len)
             return;
           ip = (struct iphdr *) &buffer[begin];
@@ -255,8 +251,6 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
           0)
         {
           //-TODO: CHECK BROADCAST
-          log_debug("Searching route for: %s.\n",
-                    inet_ntoa(*(struct in_addr *) &ip->daddr));
           dstpeer = router_searchdst((struct in_addr *) &ip->daddr);
         }
       else
@@ -333,8 +327,10 @@ void protocol_init()
   struct protocol_addrpair_s *addrpair;
   struct protocol_netpair_s *netpair;
   int i;
-  protocol_v1ida.version = PROTOCOL1_V;
-  protocol_v1ida.ihl = PROTOCOL1_IDA;
+  protocol_v1ida.base.version = PROTOCOL1_V;
+  protocol_v1ida.base.ihl = PROTOCOL1_IDA;
+  protocol_v1ida.padding1 = 0;
+  protocol_v1ida.padding2 = 0;
   protocol_v1id_len = sizeof(struct protocol_1id_s) +
     tun_selfpeer.shared_networks_len * sizeof(struct protocol_netpair_s) +
     tun_selfpeer.addrs_len * sizeof(struct protocol_addrpair_s);

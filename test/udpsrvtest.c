@@ -41,7 +41,7 @@ void
 protocol_recvpacket(const char *tunbuffer, const int tunbuffer_len,
                     void *session, const int sessiontype)
 {
-  log_debug("Recv: %s", tunbuffer);
+  log_debug("Recv (%d): %s", tunbuffer_len, tunbuffer);
 }
 
 void protocol_sendframe(const char *buffer, const int buffer_len)
