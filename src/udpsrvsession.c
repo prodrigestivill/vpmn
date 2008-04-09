@@ -50,6 +50,7 @@ struct udpsrvsession_s *udpsrvsession_create(const struct sockaddr_in
   newsession->addr = addr;
   newsession->peer = NULL;
   pthread_mutex_init(&newsession->dtls_mutex, NULL);
+  pthread_mutex_init(&newsession->dtls_mutex_write, NULL);
   newsession->dtls = NULL;
   timeout_update(&newsession->timeout);
   return newsession;

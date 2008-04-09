@@ -36,6 +36,7 @@ struct udpsrvsession_s
   timeout_t timeout;
   SSL *dtls;
   pthread_mutex_t dtls_mutex;
+  pthread_mutex_t dtls_mutex_write;
   struct sockaddr_in *addr;
   struct peer_s *peer;
 };

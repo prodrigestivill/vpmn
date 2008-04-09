@@ -42,7 +42,7 @@ int daemonize;
 #define MAXPEERS 512
 
 //TUNSRV
-#define TUNBUFFERSIZE 1200 - 160
+#define TUNBUFFERSIZE 1500
 char *tunname;
 struct in_network tunaddr_ip;
 int num_tunsrvthreads;
@@ -51,7 +51,7 @@ struct peer_s tun_selfpeer;
 
 
 //UDPSRV
-#define UDPMTUSIZE 1200
+#define UDPMTUSIZE 1500
 #define UDPBUFFERSIZE 65535     //UDPMTUSIZE - 160 // IPv4
 int num_udpsrvthreads;
 int num_udpsrvbuffers;
