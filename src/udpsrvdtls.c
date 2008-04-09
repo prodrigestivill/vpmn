@@ -118,8 +118,11 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
           SSL_set_connect_state(session->dtls);
           wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
           BIO_dgram_set_peer(wbio, session->addr);
-          BIO_ctrl(wbio, BIO_CTRL_DGRAM_SET_MTU, UDPMTUSIZE, NULL);
+          //BIO_ctrl(wbio, BIO_CTRL_DGRAM_SET_MTU, UDPMTUSIZE, NULL);
+          BIO_ctrl(wbio, BIO_CTRL_DGRAM_MTU_DISCOVER, 0, NULL);
           SSL_set_bio(session->dtls, udpsrvdtls_mbio, wbio);
+          //SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
+          //SSL_set_mtu(session->dtls, UDPMTUSIZE);
         }
       pthread_mutex_unlock(&session->dtls_mutex);
     }
@@ -130,6 +133,9 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
         pthread_mutex_lock(&session->dtls_mutex_write);
       len = SSL_write(session->dtls, buffer, buffer_len);
       err = SSL_get_error(session->dtls, len);
+      log_debug("Write %d:%d MTU %d\n", len, buffer_len,
+                BIO_ctrl(session->dtls->wbio, BIO_CTRL_DGRAM_GET_MTU, 0,
+                         NULL));
       pthread_mutex_unlock(&session->dtls_mutex_write);
       if (len < 0
           && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
@@ -141,9 +147,6 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
         retry = 0;
     }
   while (retry > 0 && retry < 10 && session->dtls != NULL);
-  log_debug("Write %d:%d MTU %d\n", len, buffer_len,
-            BIO_ctrl(session->dtls->wbio, BIO_CTRL_DGRAM_GET_MTU, 0,
-                     NULL));
   if (len <= 0)
     {
       log_debug("err write\n");
@@ -169,8 +172,11 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
       SSL_set_accept_state(session->dtls);
       wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
       BIO_dgram_set_peer(wbio, session->addr);
-      BIO_ctrl(wbio, BIO_CTRL_DGRAM_SET_MTU, UDPMTUSIZE, NULL);
+      //BIO_ctrl(wbio, BIO_CTRL_DGRAM_SET_MTU, UDPMTUSIZE, NULL);
+      BIO_ctrl(wbio, BIO_CTRL_DGRAM_MTU_DISCOVER, 0, NULL);
       SSL_set_bio(session->dtls, NULL, wbio);
+      //SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
+      //SSL_set_mtu(session->dtls, UDPMTUSIZE);
     }
   rbio = BIO_new_mem_buf((void *) buffer, buffer_len);
   BIO_set_mem_eof_return(rbio, -1);
