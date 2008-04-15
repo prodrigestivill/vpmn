@@ -118,8 +118,7 @@ void tunsrv()
                 {
                   tunsrv_buffer[i].free = 0;
                   tunsrv_buffer[i].buffer_len =
-                    tundev_read(tunsrv_buffer[i].buffer,
-                                sizeof(tunsrv_buffer[i].buffer));
+                    tundev_read(tunsrv_buffer[i].buffer, tunmtu);
                   if (tunsrv_buffer[i].buffer_len > 0)
                     {
                       pthread_mutex_unlock(&tunsrv_buffer[i].buffer_mutex);

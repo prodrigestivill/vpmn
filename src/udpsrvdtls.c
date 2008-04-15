@@ -92,6 +92,7 @@ void udpsrvdtls_destroy(struct udpsrvsession_s *session)
   pthread_mutex_lock(&session->dtls_mutex_write);
   pthread_mutex_lock(&session->dtls_mutex);
   //CRYPTO_add(&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
+  session->dtls->rbio = NULL;
   SSL_free(session->dtls);
   session->dtls = NULL;
   if (session->peer != NULL)
@@ -126,7 +127,6 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
         }
       pthread_mutex_unlock(&session->dtls_mutex);
     }
-  //-TODO: Need to lock mutex on write?
   do
     {
       if (retry > 0)
@@ -228,7 +228,8 @@ void udpsrvdtls_sessionerr(const unsigned long err,
         log_error("SSL_ERROR_WANT_WRITE\n");
         break;
       case SSL_ERROR_SYSCALL:
-        //break;
+        log_error("SSL_ERROR_SYSCALL\n");
+        break;
         /* connection closed */
       case SSL_ERROR_ZERO_RETURN:
         log_error("SSL_ERROR_ZERO_RETURN\n");

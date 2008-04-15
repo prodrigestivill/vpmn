@@ -75,7 +75,7 @@ int tundev_initdev()
   else
     {
       ifr.ifr_flags = 0;
-      ifr.ifr_mtu = TUNBUFFERSIZE;
+      ifr.ifr_mtu = tunmtu;
       ioctl(sd_sock, SIOCSIFMTU, &ifr);
 
       tunaddr = (struct sockaddr_in *) &ifr.ifr_addr;
@@ -117,14 +117,14 @@ int tundev_initdev()
 
 int tundev_write(const void *buf, const int count)
 {
-  if (tundev_fd >= 0 && count > 0 && count <= TUNBUFFERSIZE)
+  if (tundev_fd >= 0 && count > 0 && count <= tunmtu)
     return write(tundev_fd, buf, count);
   return -1;
 }
 
 int tundev_read(void *buf, const int count)
 {
-  if (tundev_fd >= 0 && count > 0 && count <= TUNBUFFERSIZE)
+  if (tundev_fd >= 0 && count > 0 && count <= tunmtu)
     return read(tundev_fd, buf, count);
   return -1;
 }

@@ -46,8 +46,9 @@ int main(int argc, char *argv[])
     }
   //TUNDEV
   tunname = "vpmn0";
-  num_tunsrvthreads = 4;
-  num_tunsrvbuffers = 20;
+  tunmtu = 512;
+  num_tunsrvthreads = 10;
+  num_tunsrvbuffers = 50;
 
   if (inet_aton(argv[2], &tunaddr_ip.addr) == 0
       || inet_aton(argv[3], &tunaddr_ip.netmask) == 0)
@@ -65,8 +66,8 @@ int main(int argc, char *argv[])
   tun_selfpeer.shared_networks_len = 1 + 1;
 
   //UDPSRV
-  num_udpsrvthreads = 4;
-  num_udpsrvbuffers = 20;
+  num_udpsrvthreads = 10;
+  num_udpsrvbuffers = 50;
   port_udp = 1090;
   tun_selfpeer.addrs = calloc(1, sizeof(struct sockaddr_in));
   inet_aton(argv[6], &tun_selfpeer.addrs[0].sin_addr);

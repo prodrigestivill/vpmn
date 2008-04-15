@@ -42,6 +42,7 @@ void config_load(char *cfgfile)
 #endif
   //TUNDEV
   tunname = "vpmn0";
+  tunmtu = 900;
   num_tunsrvthreads = 4;
   num_tunsrvbuffers = 20;
 

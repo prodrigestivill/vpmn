@@ -44,6 +44,7 @@ int daemonize;
 //TUNSRV
 #define TUNBUFFERSIZE 1500
 char *tunname;
+int tunmtu;
 struct in_network tunaddr_ip;
 int num_tunsrvthreads;
 int num_tunsrvbuffers;
