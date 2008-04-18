@@ -1,7 +1,7 @@
-.PHONY: all pdf paper report epsc %extra clean distclean cleanupload upload 
+.PHONY: all pdf paper report epsc %extra %images clean distclean cleanupload upload 
 
 all: pdf
-pdf: cleanpdf allextra report
+pdf: cleanpdf cleanimages allextra allimages report
 
 #Default Output PDFs
 paper = paper
@@ -27,7 +27,7 @@ cmdclean = rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.i
 cleanpdf:
 	$(cmdcleanpdf)
 
-clean:
+clean: cleanimages
 	$(cmdclean)
 	cd report && $(cmdclean)
 	cd paper && $(cmdclean)
@@ -38,6 +38,10 @@ distclean: clean cleanpdf cleanextra
 #Extra
 %extra:
 	cd extra && $(MAKE) $@
+
+#Images
+%images:
+	cd images && $(MAKE) $@
 
 #Upload and Subversion Features
 file1 = $(normal).pdf
