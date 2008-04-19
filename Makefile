@@ -1,7 +1,7 @@
 .PHONY: all pdf paper report epsc %extra %images clean distclean cleanupload upload 
 
 all: pdf
-pdf: cleanpdf cleanimages allextra allimages report
+pdf: cleanpdf cleanimages allextra allimages epsc
 
 #Default Output PDFs
 paper = paper
@@ -14,7 +14,7 @@ paper: $(paper).pdf
 
 report: $(report).pdf $(report)$(annex).pdf
 
-epsc: $(epsc).pdf $(epsc)$(annex).pdf $(epsc)$(withannex).pdf
+epsc: $(epsc).pdf $(epsc)$(annex).pdf # $(epsc)$(withannex).pdf
 
 #PDF Output files
 %.pdf: %.tex

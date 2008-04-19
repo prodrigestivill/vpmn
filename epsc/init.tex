@@ -49,15 +49,16 @@
 % hyperrefs
 \RequirePackage{url}
 \ifpdf
-  \RequirePackage[pdftex]{hyperref}
+  \RequirePackage[pdftex,pdfpagelayout=TwoColumnRight]{hyperref}
 \else
-  \RequirePackage[dvips]{hyperref}\fi
+  \RequirePackage[dvips,pdfpagelayout=TwoColumnRight]{hyperref}\fi
 \AtBeginDocument{%
     \hypersetup{%
       breaklinks,
       baseurl       = http://,
       pdfborder     = 0 0 0,
       pdfpagemode   = None,
+      pdfpagelayout = TwoColumnRight,
       pdfstartview  = XYZ,
       pdfstartpage  = 1,
       pdfauthor     = \authordoc,%

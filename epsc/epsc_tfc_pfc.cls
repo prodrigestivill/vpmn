@@ -523,11 +523,11 @@
 \renewcommand{\@makeschapterhead}[1]{%
   \noindent                                                     % No indentation in this paragraph
   \thispagestyle{fancy}
+  \addcontentsline{toc}{chapter}{#1}
   \begin{center}
     \LARGE\sffamily\bfseries \MakeUppercase{#1} \par\nobreak
   \end{center}
   \vspace{3ex}
-  \addcontentsline{toc}{chapter}{\MakeUppercase{#1}}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
