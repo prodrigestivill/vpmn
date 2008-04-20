@@ -202,7 +202,7 @@
 \newlength{\logoEPSCheight}   %% no tocar. nomes descomentar
 \setlength{\logoEPSCheight}{1.5cm}
 \newsavebox{\logoEPSC}
-\sbox{\logoEPSC}{\includegraphics[angle=0, totalheight=\logoEPSCheight]{epsc/logo_epsc_complert.pdf}}
+\sbox{\logoEPSC}{\includegraphics[totalheight=\logoEPSCheight]{epsc/logo_epsc_complert.pdf}}
 
 %% PORTADA ENVIRONMENT
 %%%%%%%%%%%%%%%%%%%%%%
