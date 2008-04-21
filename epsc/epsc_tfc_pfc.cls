@@ -636,7 +636,9 @@
 }
 
 \newcommand{\senseportada}{
-  \vspace*{\stretch{1}}                
+  \vspace*{\stretch{1}}            
+  \phantomsection
+  \addcontentsline{toc}{part}{AP\`ENDIXS}
   \begin{center}                    % Prints chapter name etc...
     \Huge\sffamily\bfseries AP\`ENDIXS  \par
   \end{center}                     
