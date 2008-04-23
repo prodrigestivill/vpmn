@@ -29,6 +29,8 @@ cleanpdf:
 
 clean: cleanimages
 	$(cmdclean)
+	cd annex && $(cmdclean)
+	cd chapters && $(cmdclean)
 	cd report && $(cmdclean)
 	cd paper && $(cmdclean)
 	cd epsc && $(cmdclean)
