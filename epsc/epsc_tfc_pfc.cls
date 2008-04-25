@@ -668,7 +668,6 @@
       }} \\
 
 \end{tabular}
-\setcounter{page}{-1}
 }
 
 

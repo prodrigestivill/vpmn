@@ -1,7 +1,11 @@
 \chapter{Programació}
+El programa en arrancar es posa en contacte amb els nodes que coneix. Per cada node s'intercanvien l'informació necesaria per tal de poder identificar-se i enrutar els paquets.
 \section{Arquitectura del programa}
-\subsection{UDP DTLS}
+La arquitectura del programa es separa entre l'adaptador virtual i el servidor UDP. Els paquets que les aplicacions envien a traves de l'adaptador virtual son enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí.
+Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
 \subsection{Interfície Tun}
+
+\subsection{UDP DTLS}
 
 \section{Disseny del Protocol}
 \subsection{Seguretat}
