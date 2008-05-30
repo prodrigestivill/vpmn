@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     }
   //TUNDEV
   tunname = "vpmn0";
-  tunmtu = 512;
+  tunmtu = 1500;
   num_tunsrvthreads = 10;
   num_tunsrvbuffers = 50;
 

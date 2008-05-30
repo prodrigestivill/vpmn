@@ -120,10 +120,10 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
           wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
           BIO_dgram_set_peer(wbio, session->addr);
           //BIO_ctrl(wbio, BIO_CTRL_DGRAM_SET_MTU, UDPMTUSIZE, NULL);
-          BIO_ctrl(wbio, BIO_CTRL_DGRAM_MTU_DISCOVER, 0, NULL);
+          //BIO_ctrl(wbio, BIO_CTRL_DGRAM_MTU_DISCOVER, 0, NULL);
           SSL_set_bio(session->dtls, udpsrvdtls_mbio, wbio);
-          //SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
-          //SSL_set_mtu(session->dtls, UDPMTUSIZE);
+          SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
+          SSL_set_mtu(session->dtls, SSL3_RT_MAX_PLAIN_LENGTH);
         }
       pthread_mutex_unlock(&session->dtls_mutex);
     }
@@ -173,10 +173,10 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
       wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
       BIO_dgram_set_peer(wbio, session->addr);
       //BIO_ctrl(wbio, BIO_CTRL_DGRAM_SET_MTU, UDPMTUSIZE, NULL);
-      BIO_ctrl(wbio, BIO_CTRL_DGRAM_MTU_DISCOVER, 0, NULL);
+      //BIO_ctrl(wbio, BIO_CTRL_DGRAM_MTU_DISCOVER, 0, NULL);
       SSL_set_bio(session->dtls, NULL, wbio);
-      //SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
-      //SSL_set_mtu(session->dtls, UDPMTUSIZE);
+      SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
+      SSL_set_mtu(session->dtls, SSL3_RT_MAX_PLAIN_LENGTH);
     }
   rbio = BIO_new_mem_buf((void *) buffer, buffer_len);
   BIO_set_mem_eof_return(rbio, -1);

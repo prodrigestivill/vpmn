@@ -57,6 +57,7 @@ struct udpsrv_buffer_s
 int udpsrv_init()
 {
   struct sockaddr_in bind_addr;
+  long sockopt_val = 0;
   bzero(&bind_addr, sizeof(bind_addr));
   udpsrv_fd = socket(PF_INET, SOCK_DGRAM, 0);
   bind_addr.sin_family = AF_INET;
@@ -68,6 +69,13 @@ int udpsrv_init()
       log_error("Bind error\n");
       return -1;
     }
+#if defined(IP_PMTUDISC_DONT)
+  sockopt_val = IP_PMTUDISC_DONT;
+  setsockopt(udpsrv_fd, IPPROTO_IP, IP_MTU_DISCOVER, &sockopt_val, sizeof(sockopt_val));
+#else
+  sockopt_val = 0;
+  setsockopt(udpsrv_fd, IPPROTO_IP, IP_DONTFRAG, &sockopt_val, sizeof(sockopt_val));
+#endif
   return 0;
 }
 
