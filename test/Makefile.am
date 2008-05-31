@@ -22,7 +22,6 @@ bin_PROGRAMS = \
 ptptest_SOURCES = \
 	ptptest.c\
 	../src/config.c \
-	../src/debug.c \
 	../src/peer.c \
 	../src/protocol.c \
 	../src/router.c \
@@ -50,7 +49,6 @@ ptptest_LDFLAGS = \
 protocoltest_SOURCES = \
 	../src/config.c\
 	../src/config.h\
-	../src/debug.c\
 	../src/debug.h \
 	../src/peer.c \
 	../src/peer.h \
@@ -65,7 +63,6 @@ protocoltest_SOURCES = \
 routertest_SOURCES = \
 	../src/config.c\
 	../src/config.h \
-	../src/debug.c \
 	../src/debug.h \
 	../src/peer.c \
 	../src/peer.h \
@@ -77,7 +74,6 @@ routertest_SOURCES = \
 
 tundevtest_SOURCES = \
 	tundevtest.c\
-	../src/debug.c \
 	../src/debug.h \
 	../src/config.h \
 	../src/config.c \
@@ -97,7 +93,6 @@ tundevtest_LDFLAGS = \
 
 udpsrvsessiontest_SOURCES = \
 	udpsrvsessiontest.c\
-	../src/debug.c \
 	../src/debug.h \
 	../src/peer.c \
 	../src/peer.h \
@@ -118,7 +113,6 @@ udpsrvsessiontest_LDFLAGS = \
 
 udpsrvtest_SOURCES = \
 	udpsrvtest.c \
-	../src/debug.c \
 	../src/debug.h \
 	../src/peer.c \
 	../src/peer.h \

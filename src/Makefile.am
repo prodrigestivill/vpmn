@@ -15,7 +15,6 @@ bin_PROGRAMS = \
 	vpmnd
 
 vpmnd_SOURCES = \
-	debug.c\
 	debug.h \
 	peer.c \
 	peer.h \

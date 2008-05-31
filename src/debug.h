@@ -25,8 +25,29 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
-void log_debug(const char *format, ...);
-void log_info(const char *format, ...);
-void log_error(const char *format, ...);
+#define DEBUG 3
+
+#if DEBUG > 0
+#include <stdio.h>
+#define log_print(s, format, ...) { \
+fprintf (stderr, format, ## __VA_ARGS__);\
+fflush(stderr);\
+}
+#endif
+#if DEBUG > 2                   // DEBUG = 3
+#define log_debug(format, ...) log_print (stderr, format, ## __VA_ARGS__)
+#else
+#define log_debug(args...)
+#endif
+#if DEBUG > 1                   // DEBUG = 2
+#define log_info(format, ...)  log_print (stderr, format, ## __VA_ARGS__)
+#else
+#define log_info(args...)
+#endif
+#if DEBUG > 0                   // DEBUG = 1
+#define log_error(format, ...) log_print (stderr, format, ## __VA_ARGS__)
+#else
+#define log_error(args...)
+#endif
 
 #endif                          /* _DEBUG_H */

@@ -32,8 +32,6 @@
 void config_load(char *cfgfile);
 void config_fistpeersinit();
 
-#define DEBUG 1
-
 uid_t vpmnd_uid;
 gid_t vpmnd_gid;
 int daemonize;
@@ -42,7 +40,7 @@ int daemonize;
 #define MAXPEERS 512
 
 //TUNSRV
-#define TUNBUFFERSIZE 1500
+#define TUNBUFFERSIZE 1502
 char *tunname;
 int tunmtu;
 struct in_network tunaddr_ip;
@@ -52,7 +50,6 @@ struct peer_s tun_selfpeer;
 
 
 //UDPSRV
-#define UDPMTUSIZE 1500
 #define UDPBUFFERSIZE 65535     //UDPMTUSIZE - 160 // IPv4
 int num_udpsrvthreads;
 int num_udpsrvbuffers;

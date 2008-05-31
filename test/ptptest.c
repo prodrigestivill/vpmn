@@ -29,6 +29,7 @@
 #include "../src/config.h"
 #include "../src/debug.h"
 #include "../src/srv.h"
+#include "../src/tundev.h"
 #include "../src/udpsrvdtls.h"
 #include "../src/udpsrvsession.h"
 #include "../src/protocol.h"
@@ -110,4 +111,5 @@ int main(int argc, char *argv[])
     }
   //Program ended
   pthread_join(tunsrv_thread, NULL);
+  return 0;
 }

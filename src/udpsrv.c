@@ -71,10 +71,13 @@ int udpsrv_init()
     }
 #if defined(IP_PMTUDISC_DONT)
   sockopt_val = IP_PMTUDISC_DONT;
-  setsockopt(udpsrv_fd, IPPROTO_IP, IP_MTU_DISCOVER, &sockopt_val, sizeof(sockopt_val));
+  setsockopt(udpsrv_fd, IPPROTO_IP, IP_MTU_DISCOVER, &sockopt_val,
+             sizeof(sockopt_val));
+/* Not needed, disabled by default
 #else
   sockopt_val = 0;
   setsockopt(udpsrv_fd, IPPROTO_IP, IP_DONTFRAG, &sockopt_val, sizeof(sockopt_val));
+*/
 #endif
   return 0;
 }

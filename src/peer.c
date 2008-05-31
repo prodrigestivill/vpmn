@@ -22,6 +22,7 @@
  */
 
 #include <stdlib.h>
+#include "debug.h"
 #include "router.h"
 #include "peer.h"
 
