@@ -1,12 +1,37 @@
 \chapter{Programació}
+\section{Funcionament}
 El programa en arrancar es posa en contacte amb els nodes que coneix. Per cada node s'intercanvien l'informació necesaria per tal de poder identificar-se i enrutar els paquets.
-\section{Arquitectura del programa}
-La arquitectura del programa es separa entre l'adaptador virtual i el servidor UDP. Els paquets que les aplicacions envien a traves de l'adaptador virtual son enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí.
-Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
-\subsection{Interfície Tun}
-
-\subsection{UDP DTLS}
-
 \section{Disseny del Protocol}
 \subsection{Seguretat}
+\begin{quote}
+No es necesita nodes relay.
+Validació de rutes.
+\end{quote}
+\subsubsection{DTLS}
+
 \subsection{Definició de paquets}
+Per el disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
+\begin{itemize}
+\item La IP i port del node
+\item La IP publica i port del node
+\item Dupleta IP local i publica
+\item Xarxes que publicita el node
+\end{itemize}
+L'utilització de la IP i el port no és informació suficient degut a l'existència de xarxes privades i publiques, també els NAT simètrics no donen el mateix port per a tots els hosts remots on es connecti un mateix node.
+L'utilització de la IP publica per aquesta tasca no és valida ja que deixa de ser única si hi ha dos nodes al costat privat abans de un NAT. Aquest dos en trobar-se es pensaran que són nodes diferents dels que coneixen amb IP pública.
+
+\begin{quote}
+Fragmentació a quin nivell.
+Hole punching.
+\end{quote}
+
+\section{Arquitectura del programa}
+\begin{quote}
+Llenguatge C.
+Threads.
+\end{quote}
+La arquitectura del programa es separa entre l'adaptador virtual i el servidor UDP. Els paquets que les aplicacions envien a traves de l'adaptador virtual son enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí.
+Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
+\subsection{Interfície TUN}
+
+\subsection{Servidor UDP/DTLS}
