@@ -1,13 +1,19 @@
 \chapter{Programació}
 \section{Funcionament}
-L'aplicació en arrancar es posa en contacte amb els nodes que coneix. Per cada node s'intercanvien l'informació necesaria per tal de poder identificar-se i enrutar els paquets.
+L'aplicació en arrancar es posa en contacte amb els nodes que coneix. Per cada node s'intercanvien l'informació necessària per tal de poder identificar-se i enrutar els paquets.
 \section{Disseny del Protocol}
 \subsection{Seguretat}
+L'objectiu es que tots els nodes puguin realitzar els túnels amb les garanties de les operacions criptogràfiques com el xifrat, la firma digital i el no repudi. De manera que cada node té les garanties de estar entregant l'informació directament al destí correcte i sap que cap altre pot estar ni llegint ni manipulant.
 
-\begin{quote}
-No es necesita nodes relay.
-Validació de rutes.
-\end{quote}
+Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es pot realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. També es necessari un mecanisme de validació de les rutes que cada node ofereix, de manera que cap node no pugui tenir una direcció IP que pertanyi a un altre node. Aquesta última necessitat obliga a fixar un adreçament IP estàtic.
+
+Per tant el primer que cal establir es el funcionament del adreçament IP, per a fer-ho es contemplen dos possibilitats:
+\begin{itemize}
+\item L'utilització de un adreçament que depengui dels identificadors dels certificats
+\item L'incrustació de l'adreçament dins dels camps dels certificats
+\end{itemize}
+La primera opció consisteix en definir una distribució de direccions IP en la que a partir de un certificat se li pugui assignar una única IP.
+
 \subsubsection{DTLS}
 
 \subsection{Definició de paquets}
