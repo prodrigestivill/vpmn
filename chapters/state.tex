@@ -1,6 +1,34 @@
 \chapter{Estudi de la situació actual}
-\section{Protocols i programari existents}
+\section{Protocols i programaris existents}
+Els protocols de seguretat poden proveir alguns dels serveis de seguretat aquí explicats:
+\begin{itemize}
+\item \textbf{Xifrar el tràfic} de manera que no pugi ser llegit per ningú més que les parts a les que s'està dirigint.
+\item \textbf{Validació de la integritat} per assegurar que el tràfic no ha estat modificat durant el seu recorregut.
+\item \textbf{Autenticar els extrems} per assegurar que el tràfic prové d'un extrem de confiança.
+\item \textbf{Anti-repetició} per protegir-se contra la repetició malintencionada de paquets.
+\item \textbf{Evitar el repudi} de l'altre extrem per tal de que no pugui negar haver enviat l'informació.
+\end{itemize}
+
+A continuació s'analitzaran alguns protocols i programaris existents.
 \subsection{IPsec}
+\keyword{IPsec}{Internet Protocol security} és d'ús opcional en IPv4 i serà una obligatori en IPv6. IPsec va ser creat per proporcionar seguretat en mode de transport (extrem a extrem) del tràfic de paquets, en el que els ordenadors dels extrems finals realitzen el processat de seguretat, o en mode túnel (porta a porta) en el que la seguretat del tràfic de paquets es proporcionada a vàries màquines (inclús a tota la LAN) per un únic node.
+
+L'ús principal d'IPsec és el de crear VPNs en qualsevol els dos modes. Però les implicacions de seguretat són bastant diferents entre els dos modes d'operació.
+
+La seguretat de comunicacions extrem a extrem a escala Internet és va desenvolupar més tard i utilitza l'infraestructura de clau pública universal \keyword{DNSSEC}{Domain Name System Security Extensions}.
+
+IPsec va ser introduït per proporcionar serveis de seguretat tals com: xifrar el tràfic, validació d'integritat, autenticar als extrems i anti-repetició.
+
+La majoria de implementacions d'aquest protocol té problemes de compatibilitat amb les altres implementacions del mateix protocol degut a que cada fabricant interpreta el \keyword{RFC}{Request for Comments (IETF: Internet Engineering Task Force)} i peculiaritza el protocol a la seva mida. L'ús de DNSSSEC per l'intercanvi de claus no es troba en gaires implementacions.
+
+Així doncs depenent del nivell en el que actuï l'IPsec, aquest estarà treballant en mode transport o mode túnel.
+\subsubsection{Mode transport}
+En mode transport, només es xifra i/o autentica el \emph{payload} (la carga útil) del paquet IP. Per tant al no tocar les capçaleres IP no afecta al enrutament, però si s'utilitza l'\keyword{AH}{Authentication Header} les direccions IP no poden ser traduïdes (com fa per exemple un \keyword{NAT}{Network Address Translator}) ja que això faria que el valor del \emph{hash} (resum) no coincidís. Aquest mode s'utilitza en comunicacions ordinador a ordinador.
+
+Una forma d'encapsular missatges IPsec per travessar NATs s'ha definit en un un RFC com a mecanisme \keyword{NAT-T}{NAT Traversal in the IKE}.
+\subsubsection{Mode túnel}
+En el mode túnel, es xifra i/o autentica tot el paquet IP sencer (capçalera inclusiva). Aquesta informació s'encapsula dins del \emph{payload} d'un nou paquet IP per tal de que pugui ser enrutat. Aquest mode s'utilitza en comunicacions xarxa a xarxa, per exemple per crear VPNs a traves d'Internet.
+
 \subsection{OpenVPN}
 \subsection{Tinc-VPN}
 \subsection{ELA VPN}
