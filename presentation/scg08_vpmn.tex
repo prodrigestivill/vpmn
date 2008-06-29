@@ -1,0 +1,217 @@
+\documentclass{beamer}
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\setbeamercovered{transparent}
+  % or ...
+  \usetheme{Darmstadt}
+  \usefonttheme[onlylarge]{structurebold}
+  \setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
+  \setbeamertemplate{navigation symbols}{}
+}
+
+\usepackage[english]{babel}
+% or whatever
+
+\usepackage[utf8]{inputenc}
+% or whatever
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+
+
+\title[VPMN]{Virtual Private Mesh Network} % (optional, use only with long paper titles)
+
+\subtitle{Decentralized VPN application} % (optional)
+
+\author[Pau]{Pau~Rodriguez} % (optional, use only with lots of authors)
+
+\institute[EPSC UPC] % (optional, but mostly needed)
+{
+  Escola Polit\`ecnica Superior de Castelldefels\\
+  Universitat Polit\`ecnica de Catalunya
+}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[SCG08] % (optional)
+{Summer Camp Garrotxa 2008}
+
+\subject{Summer Camp Garrotxa 2008 - Talk}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+\pgfdeclareimage[height=0.75em]{scg08-logo}{scg08/logo}
+\logo{\pgfuseimage{scg08-logo}}
+
+% Delete this, if you do not want the table of contents to pop up at
+% the beginning of each section:
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\newcommand*{\comparativeframe}[4]{
+\begin{frame}{#1}
+	#2
+	\begin{block}{Pros}
+		\begin{itemize}
+		#3
+		\end{itemize}
+	\end{block}
+	\begin{block}{Cons}
+		\begin{itemize}
+		#4
+		\end{itemize}
+	\end{block}
+\end{frame}
+}
+
+\begin{document}
+\pdfbookmark[2]{Welcome}{welcome}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+  % You might wish to add the option [pausesections]
+\end{frame}
+
+% However, the talk length of between 15min and 45min and
+% the theme suggest that you stick to the following rules:
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section{Introduction}
+\subsection*{Status}
+\begin{frame}{Internet}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\begin{frame}{VPN}
+	\begin{center}
+	\includegraphics[height=8em]{images/vpn}
+	\end{center}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\begin{frame}{Security}
+	\begin{itemize}
+	\item \textbf{Encrypt the traffic} de manera que no pugi ser llegit per ningú més que les parts a les que s'està dirigint.
+	\item \textbf{Validació de la integritat} per assegurar que el tràfic no ha estat modificat durant el seu recorregut.
+	\item \textbf{Autenticar els extrems} per assegurar que el tràfic prové d'un extrem de confiança.
+	\item \textbf{Anti-repetició} per protegir-se contra la repetició malintencionada de paquets.
+	\item \textbf{Evitar el repudi} de l'altre extrem per tal de que no pugui negar haver enviat l'informació.
+	\end{itemize}
+\end{frame}
+\subsection*{Objectives}
+\begin{frame}{Project Aims}
+	\begin{center}
+	\includegraphics[height=10em]{images/vpn-meshed}
+	\end{center}
+	\begin{itemize}
+	\item A dynamic VPN softwareThe \alert{first main message} of your talk in one or two lines.
+	\item The \alert{second main message} of your talk in one or two lines.
+	\item Perhaps a \alert{third message}, but not more than that.
+	\end{itemize}
+\end{frame}
+
+\section{State of Art}
+\subsection{IPsec}
+\comparativeframe{IPsec vs VPMN}{}
+{
+\item Prova
+}{
+\item Prova2
+}
+\subsection{OpenVPN}
+\begin{frame}{OpenVPN summary}
+	\begin{center}
+	\includegraphics[height=10em]{images/vpn-centralized}
+	\end{center}
+\end{frame}
+\comparativeframe{OpenVPN vs VPMN}{}{
+\item Prova
+}{
+\item Prova2
+}
+\subsection{Tinc VPN}
+\comparativeframe{Tinc VPN vs VPMN}{}
+{
+\item Prova
+}{
+\item Prova2
+}
+
+\section{Internals}
+\subsection{Overview}
+\begin{frame}{Application}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\subsection{Security}
+\begin{frame}{Security summary}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\begin{frame}{DTLS}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\begin{frame}{Packets}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\subsection{Architecture}
+\begin{frame}{UDP Server}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\begin{frame}{TUN Server}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+\subsection{Benefits}
+\begin{frame}{What's done?}
+	\begin{itemize}
+	\item Prova
+	\end{itemize}
+\end{frame}
+%\section{Tests}
+
+\section*{Summary}
+%\subsection*{Summary}
+\begin{frame}{Summary}
+	\begin{itemize}
+	\item \alert{Prova}
+	\end{itemize}
+\end{frame}
+\end{document}
