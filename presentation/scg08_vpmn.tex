@@ -24,9 +24,9 @@
 
 \title[VPMN]{Virtual Private Mesh Network} % (optional, use only with long paper titles)
 
-\subtitle{Decentralized VPN application} % (optional)
+\subtitle{Decentralized VPN Application} % (optional)
 
-\author[Pau]{Pau~Rodriguez} % (optional, use only with lots of authors)
+\author[Pau]{Pau~Rodriguez-Estivill}
 
 \institute[EPSC UPC] % (optional, but mostly needed)
 {
@@ -53,12 +53,18 @@
 \pgfdeclareimage[height=0.75em]{scg08-logo}{scg08/logo}
 \logo{\pgfuseimage{scg08-logo}}
 
-% Delete this, if you do not want the table of contents to pop up at
-% the beginning of each section:
+
 \AtBeginSection[]
 {
   \begin{frame}<beamer>{Outline}
     \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection,currentsubsection]
   \end{frame}
 }
 
@@ -67,19 +73,20 @@
 
 %\beamerdefaultoverlayspecification{<+->}
 
-\newcommand*{\comparativeframe}[4]{
+\newcommand*{\comparativeframe}[5]{
 \begin{frame}{#1}
 	#2
-	\begin{block}{Pros}
+	\begin{exampleblock}{Pros}
 		\begin{itemize}
 		#3
 		\end{itemize}
-	\end{block}
-	\begin{block}{Cons}
+	\end{exampleblock}
+	\begin{alertblock}{Cons}
 		\begin{itemize}
 		#4
 		\end{itemize}
-	\end{block}
+	\end{alertblock}
+	#5
 \end{frame}
 }
 
@@ -111,59 +118,77 @@
 \end{frame}
 \begin{frame}{VPN}
 	\begin{center}
-	\includegraphics[height=8em]{images/vpn}
+	\includegraphics[height=7em]{images/vpn}
 	\end{center}
 	\begin{itemize}
-	\item Prova
+	\item \textbf{Virtual Network}
+		\begin{itemize}
+		\item a tunnel with no routing hops
+		\item own IP addressing
+		\end{itemize}
+	\item \textbf{Private}
+		\begin{itemize}
+		\item exclusive for the trusted parties
+		\item traffic cannot be read by other parties
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 \begin{frame}{Security}
 	\begin{itemize}
-	\item \textbf{Encrypt the traffic} de manera que no pugi ser llegit per ningú més que les parts a les que s'està dirigint.
-	\item \textbf{Validació de la integritat} per assegurar que el tràfic no ha estat modificat durant el seu recorregut.
-	\item \textbf{Autenticar els extrems} per assegurar que el tràfic prové d'un extrem de confiança.
-	\item \textbf{Anti-repetició} per protegir-se contra la repetició malintencionada de paquets.
-	\item \textbf{Evitar el repudi} de l'altre extrem per tal de que no pugui negar haver enviat l'informació.
+	\item \textbf{Encrypting} it cannot be read by other parties
+	\item \textbf{Integrity validation} ensure it has not been modified
+	\item \textbf{Authenticating} ensure that it is from a trusted party
+	\item \textbf{No repudiation} other parties cannot lie
+	\item \textbf{Anti-replay} protect against malicious replay
 	\end{itemize}
 \end{frame}
 \subsection*{Objectives}
 \begin{frame}{Project Aims}
 	\begin{center}
-	\includegraphics[height=10em]{images/vpn-meshed}
+	\includegraphics[height=10em]{images/vpn-fullmeshed}
 	\end{center}
 	\begin{itemize}
-	\item A dynamic VPN softwareThe \alert{first main message} of your talk in one or two lines.
-	\item The \alert{second main message} of your talk in one or two lines.
-	\item Perhaps a \alert{third message}, but not more than that.
+	\item Add dynamically nodes to the fully connected mesh
+	\item Authenticate nodes and IP addressing together
+	\item Low latency and low overhead
+	\item NAT friendly
 	\end{itemize}
 \end{frame}
 
 \section{State of Art}
 \subsection{IPsec}
 \comparativeframe{IPsec vs VPMN}{}
-{
-\item Prova
-}{
-\item Prova2
-}
+{% Pros
+\item Standard
+\item Mandatory in IPv6 implementations
+\item DNSSEC enable possible dynamic
+}{% Cons
+\item Different implementations are \alert{not compatible}
+\item Only one mode supported through NAT
+\item Not using authenticated IP addressing
+}{}
 \subsection{OpenVPN}
-\begin{frame}{OpenVPN summary}
-	\begin{center}
-	\includegraphics[height=10em]{images/vpn-centralized}
-	\end{center}
-\end{frame}
-\comparativeframe{OpenVPN vs VPMN}{}{
-\item Prova
-}{
-\item Prova2
-}
+\comparativeframe{OpenVPN vs VPMN}
+{\begin{center}
+\includegraphics[height=6em]{images/vpn-centralized}
+\end{center}}
+{% Pros
+\item IP configuration pushing
+}{% Cons
+\item Centralized, no easy mesh alternative
+\item Not using authenticated IP addressing
+}{}
 \subsection{Tinc VPN}
-\comparativeframe{Tinc VPN vs VPMN}{}
-{
-\item Prova
-}{
-\item Prova2
-}
+\comparativeframe{Tinc VPN vs VPMN}
+{\begin{center}
+\includegraphics[height=6em]{images/vpn-meshed}
+\end{center}}
+{% Pros
+\item Meshed Network
+}{% Cons
+\item Easy to fall in relay mode (not fully connected)
+\item Not using authenticated IP addressing
+}{}
 
 \section{Internals}
 \subsection{Overview}
@@ -200,11 +225,20 @@
 	\end{itemize}
 \end{frame}
 \subsection{Benefits}
-\begin{frame}{What's done?}
-	\begin{itemize}
-	\item Prova
-	\end{itemize}
-\end{frame}
+\comparativeframe{Result}{}
+{% Pros
+\item Dynamic Meshed Network
+\item Authenticated IP addressing
+\item Standard encryption channel
+}{% Cons
+\item No relay mode
+\item Fragmentation needed
+}{
+\begin{block}{Future tasks}\begin{itemize}
+\item Heterogeneous MTU support
+\item User-space NAT
+\end{itemize}\end{block}
+}
 %\section{Tests}
 
 \section*{Summary}
@@ -213,5 +247,12 @@
 	\begin{itemize}
 	\item \alert{Prova}
 	\end{itemize}
+\end{frame}
+
+% Questions
+\begin{frame}
+\begin{center}
+\usebeamerfont{title}Questions?
+\end{center}
 \end{frame}
 \end{document}
