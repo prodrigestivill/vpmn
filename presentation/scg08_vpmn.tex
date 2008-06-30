@@ -113,7 +113,12 @@
 \subsection*{Status}
 \begin{frame}{Internet}
 	\begin{itemize}
-	\item Prova
+	\item Insecure
+		\begin{itemize}
+		\item Traffic can be read by other parties
+		\item Traffic can be modified by other parties
+		\item Content can be faked (\textbf{phishing})
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 \begin{frame}{VPN}
@@ -145,7 +150,7 @@
 \subsection*{Objectives}
 \begin{frame}{Project Aims}
 	\begin{center}
-	\includegraphics[height=10em]{images/vpn-fullmeshed}
+	\includegraphics[height=10em]{images/vpn-fullymeshed}
 	\end{center}
 	\begin{itemize}
 	\item Add dynamically nodes to the fully connected mesh
@@ -164,6 +169,7 @@
 \item DNSSEC enable possible dynamic
 }{% Cons
 \item Different implementations are \alert{not compatible}
+\item Must be supported in kernel
 \item Only one mode supported through NAT
 \item Not using authenticated IP addressing
 }{}
@@ -186,7 +192,7 @@
 {% Pros
 \item Meshed Network
 }{% Cons
-\item Easy to fall in relay mode (not fully connected)
+\item Not fully connected
 \item Not using authenticated IP addressing
 }{}
 
@@ -194,48 +200,78 @@
 \subsection{Overview}
 \begin{frame}{Application}
 	\begin{itemize}
-	\item Prova
+	\item Threaded
+	\item Written in C
 	\end{itemize}
 \end{frame}
 \subsection{Security}
 \begin{frame}{Security summary}
 	\begin{itemize}
-	\item Prova
+	\item CA for trusting nodes of the same network
+	\item Certificates contain ACL for IP addressing
+	\begin{block}{NameConstraints (x509v3)}
+	nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
+	\end{block}
+	\item Datagram TLS (DTLS)
 	\end{itemize}
 \end{frame}
-\begin{frame}{DTLS}
+\begin{frame}{DTLS: Datagram TLS}
 	\begin{itemize}
-	\item Prova
+	\item\begin{thebibliography}\beamertemplatearticlebibitems
+	\item RFC 4347
+	\end{thebibliography}
+	\item All operations in UDP
+		\begin{itemize}
+		\item Certificate exchange
+		\item Cryptography negotiation
+		\item Data Transport
+		\end{itemize}
+	\item Based on TLSv1
+	\item Cryptography mechanisms as TLS 
+		\begin{itemize}
+		\item Encrypt
+		\item Integrity validation
+		\item Authenticating
+		\item No repudiation
+		\item Anti-replay
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 \begin{frame}{Packets}
-	\begin{itemize}
-	\item Prova
-	\end{itemize}
+	\begin{enumerate}
+	\item Raw IP packets
+	\item Identification packets
+	\item Identification acknowledgment packets
+	\item Keep alive packets
+		\begin{itemize}
+		\item Information of other known nodes
+		\end{itemize}
+	\end{enumerate}
 \end{frame}
 \subsection{Architecture}
-\begin{frame}{UDP Server}
+\begin{frame}{UDP Server Part}
 	\begin{itemize}
-	\item Prova
+	\item Validate source IP with peer certificate
 	\end{itemize}
 \end{frame}
-\begin{frame}{TUN Server}
+\begin{frame}{TUN Server Part}
 	\begin{itemize}
-	\item Prova
+	\item Validate source IP with own certificate (save useless out traffic)
 	\end{itemize}
 \end{frame}
 \subsection{Benefits}
 \comparativeframe{Result}{}
 {% Pros
-\item Dynamic Meshed Network
-\item Authenticated IP addressing
+\item Dynamic Fully Connected Meshed Network
+\item Authenticated IP addressing with certificates
 \item Standard encryption channel
 }{% Cons
-\item No relay mode
+\item No relay mode possible
 \item Fragmentation needed
 }{
 \begin{block}{Future tasks}\begin{itemize}
 \item Heterogeneous MTU support
+\item Let fragmentation be optional
 \item User-space NAT
 \end{itemize}\end{block}
 }
@@ -244,9 +280,9 @@
 \section*{Summary}
 %\subsection*{Summary}
 \begin{frame}{Summary}
-	\begin{itemize}
-	\item \alert{Prova}
-	\end{itemize}
+	%\begin{itemize}
+	%\item \alert{Prova}
+	%\end{itemize}
 \end{frame}
 
 % Questions
