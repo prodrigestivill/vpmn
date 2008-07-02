@@ -119,6 +119,14 @@
 		\item Traffic can be modified by other parties
 		\item Content can be faked (\textbf{phishing})
 		\end{itemize}
+	\item Untrusted
+		\begin{itemize}
+		\item IPs can be spoofed
+		\end{itemize}
+	\item Divided
+		\begin{itemize}
+		\item NATs separate it in multiple private networks
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 \begin{frame}{VPN}
@@ -171,7 +179,7 @@
 \item Different implementations are \alert{not compatible}
 \item Must be supported in kernel
 \item Only one mode supported through NAT
-\item Not using authenticated IP addressing
+\item Not centralized authentication of IP addressing
 }{}
 \subsection{OpenVPN}
 \comparativeframe{OpenVPN vs VPMN}
@@ -199,6 +207,9 @@
 \section{Internals}
 \subsection{Overview}
 \begin{frame}{Application}
+	\begin{center}
+	\includegraphics[height=10em]{images/dia-app}
+	\end{center}
 	\begin{itemize}
 	\item Threaded
 	\item Written in C
@@ -207,12 +218,12 @@
 \subsection{Security}
 \begin{frame}{Security summary}
 	\begin{itemize}
+	\item Datagram TLS (DTLS)
 	\item CA for trusting nodes of the same network
 	\item Certificates contain ACL for IP addressing
 	\begin{block}{NameConstraints (x509v3)}
 	nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
 	\end{block}
-	\item Datagram TLS (DTLS)
 	\end{itemize}
 \end{frame}
 \begin{frame}{DTLS: Datagram TLS}
@@ -232,39 +243,44 @@
 		\item Encrypt
 		\item Integrity validation
 		\item Authenticating
-		\item No repudiation
 		\item Anti-replay
+		\item \emph{No repudiation}
 		\end{itemize}
 	\end{itemize}
 \end{frame}
 \begin{frame}{Packets}
 	\begin{enumerate}
 	\item Raw IP packets
+	\vspace{1em}
 	\item Identification packets
+		\begin{itemize}
+		%\item Other IPs and ports
+		\item Shared networks
+		\end{itemize}
 	\item Identification acknowledgment packets
 	\item Keep alive packets
 		\begin{itemize}
-		\item Information of other known nodes
+		\item Information of other known peers
 		\end{itemize}
 	\end{enumerate}
 \end{frame}
 \subsection{Architecture}
 \begin{frame}{UDP Server Part}
-	\begin{itemize}
-	\item Validate source IP with peer certificate
-	\end{itemize}
+	\begin{center}
+	%\includegraphics[height=18em]{images/dia-udpsrv}
+	\end{center}
 \end{frame}
 \begin{frame}{TUN Server Part}
-	\begin{itemize}
-	\item Validate source IP with own certificate (save useless out traffic)
-	\end{itemize}
+	\begin{center}
+	\includegraphics[height=18em]{images/dia-tunsrv}
+	\end{center}
 \end{frame}
 \subsection{Benefits}
 \comparativeframe{Result}{}
 {% Pros
-\item Dynamic Fully Connected Meshed Network
+\item Dynamic Fully Connected Mesh Network
 \item Authenticated IP addressing with certificates
-\item Standard encryption channel
+\item Standard encryption channel (\textbf{DTLS})
 }{% Cons
 \item No relay mode possible
 \item Fragmentation needed
@@ -280,9 +296,13 @@
 \section*{Summary}
 %\subsection*{Summary}
 \begin{frame}{Summary}
-	%\begin{itemize}
-	%\item \alert{Prova}
-	%\end{itemize}
+	\begin{itemize}
+	\item Internet is \alert{insecure} and \textbf{VPN} is needed
+	\item \textbf{Server-less} architecture
+	\item \textbf{Dynamic} Fully Connected Mesh Network
+	\item \textbf{Authenticated IP} addressing with certificates
+	\item Standard encryption channel (\textbf{DTLS})
+	\end{itemize}
 \end{frame}
 
 % Questions

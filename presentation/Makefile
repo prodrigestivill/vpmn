@@ -2,7 +2,7 @@
 
 pdf: cleanpdf cleanimages allimages presentations
 
-presentations: scg08_vpmn.pdf
+presentations: allimages scg08_vpmn.pdf
 
 #PDF Output files
 %.pdf: %.tex
