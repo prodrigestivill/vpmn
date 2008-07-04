@@ -28,11 +28,11 @@
 
 \author[Pau]{Pau~Rodriguez-Estivill}
 
-\institute[EPSC UPC] % (optional, but mostly needed)
-{
-  Escola Polit\`ecnica Superior de Castelldefels\\
-  Universitat Polit\`ecnica de Catalunya
-}
+%\institute[EPSC UPC] % (optional, but mostly needed)
+%{
+%  Escola Polit\`ecnica Superior de Castelldefels\\
+%  Universitat Polit\`ecnica de Catalunya
+%}
 % - Use the \inst command only if there are several affiliations.
 % - Keep it simple, no one is interested in your street address.
 
@@ -113,17 +113,17 @@
 \subsection*{Status}
 \begin{frame}{Internet}
 	\begin{itemize}
-	\item Insecure
+	\item \textbf{Insecure}
 		\begin{itemize}
 		\item Traffic can be read by other parties
 		\item Traffic can be modified by other parties
 		\item Content can be faked (\textbf{phishing})
 		\end{itemize}
-	\item Untrusted
+	\item \textbf{Untrusted}
 		\begin{itemize}
 		\item IPs can be spoofed
 		\end{itemize}
-	\item Divided
+	\item \textbf{Divided}
 		\begin{itemize}
 		\item NATs separate it in multiple private networks
 		\end{itemize}
@@ -141,7 +141,7 @@
 		\end{itemize}
 	\item \textbf{Private}
 		\begin{itemize}
-		\item exclusive for the trusted parties
+		\item exclusive for trusted parties
 		\item traffic cannot be read by other parties
 		\end{itemize}
 	\end{itemize}
@@ -174,12 +174,12 @@
 {% Pros
 \item Standard
 \item Mandatory in IPv6 implementations
-\item DNSSEC enable possible dynamic
+\item DNSSEC enable possible dynamic tunneling
 }{% Cons
 \item Different implementations are \alert{not compatible}
 \item Must be supported in kernel
 \item Only one mode supported through NAT
-\item Not centralized authentication of IP addressing
+\item IP addressing authentication not centralized
 }{}
 \subsection{OpenVPN}
 \comparativeframe{OpenVPN vs VPMN}
@@ -187,10 +187,11 @@
 \includegraphics[height=6em]{images/vpn-centralized}
 \end{center}}
 {% Pros
-\item IP configuration pushing
+\item IP configurations can be pushed
+\item Standard encryption channel
 }{% Cons
-\item Centralized, no easy mesh alternative
-\item Not using authenticated IP addressing
+\item Centralized, mesh alternative not easy
+\item IP addressing not authenticated
 }{}
 \subsection{Tinc VPN}
 \comparativeframe{Tinc VPN vs VPMN}
@@ -201,7 +202,7 @@
 \item Meshed Network
 }{% Cons
 \item Not fully connected
-\item Not using authenticated IP addressing
+\item IP addressing not authenticated
 }{}
 
 \section{Internals}
@@ -211,16 +212,16 @@
 	\includegraphics[height=10em]{images/dia-app}
 	\end{center}
 	\begin{itemize}
-	\item Threaded
-	\item Written in C
+	\item Multi-thread application 
+	\item Entirely written in C
 	\end{itemize}
 \end{frame}
 \subsection{Security}
 \begin{frame}{Security summary}
 	\begin{itemize}
 	\item Datagram TLS (DTLS)
-	\item CA for trusting nodes of the same network
-	\item Certificates contain ACL for IP addressing
+	\item Uses CA for trusting nodes from the same network
+	\item Certificates contain ACLs for IP addressing
 	\begin{block}{NameConstraints (x509v3)}
 	nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
 	\end{block}
@@ -233,41 +234,44 @@
 	\end{thebibliography}
 	\item All operations in UDP
 		\begin{itemize}
-		\item Certificate exchange
-		\item Cryptography negotiation
-		\item Data Transport
+		\item Exchange of certificates
+		\item Negotiation of cryptography algorithms
+		\item Transport of ciphered data
 		\end{itemize}
 	\item Based on TLSv1
 	\item Cryptography mechanisms as TLS 
 		\begin{itemize}
-		\item Encrypt
+		\item Encryption
 		\item Integrity validation
-		\item Authenticating
-		\item Anti-replay
-		\item \emph{No repudiation}
+		\item Authentication
+		\item Anti-replay mechanism
 		\end{itemize}
 	\end{itemize}
 \end{frame}
-\begin{frame}{Packets}
+\begin{frame}{Type of packets}
 	\begin{enumerate}
 	\item Raw IP packets
 	\vspace{1em}
 	\item Identification packets
 		\begin{itemize}
-		%\item Other IPs and ports
+		\item IP-port pairs
 		\item Shared networks
 		\end{itemize}
 	\item Identification acknowledgment packets
 	\item Keep alive packets
 		\begin{itemize}
 		\item Information of other known peers
+			\begin{itemize}
+			\item All IP-port pairs
+			\item Shared networks
+			\end{itemize}
 		\end{itemize}
 	\end{enumerate}
 \end{frame}
 \subsection{Architecture}
 \begin{frame}{UDP Server Part}
 	\begin{center}
-	%\includegraphics[height=18em]{images/dia-udpsrv}
+	\includegraphics[height=18em]{images/dia-udpsrv}
 	\end{center}
 \end{frame}
 \begin{frame}{TUN Server Part}
@@ -275,8 +279,8 @@
 	\includegraphics[height=18em]{images/dia-tunsrv}
 	\end{center}
 \end{frame}
-\subsection{Benefits}
-\comparativeframe{Result}{}
+\subsection{Conclusions}
+\comparativeframe{Conclusions}{}
 {% Pros
 \item Dynamic Fully Connected Mesh Network
 \item Authenticated IP addressing with certificates

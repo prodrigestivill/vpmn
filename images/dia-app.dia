@@ -190,7 +190,7 @@
         <dia:point val="1.59243,-15.6036"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.54243,-15.6536;4.95444,-13.1464"/>
+        <dia:rectangle val="1.54243,-15.6536;4.95444,-13.1465"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="1.59243,-15.6036"/>
@@ -220,8 +220,7 @@
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#TUN
-server#</dia:string>
+            <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -230,7 +229,7 @@ server#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="3.24844,-14.6575"/>
+            <dia:point val="3.24843,-14.4"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -252,7 +251,7 @@ server#</dia:string>
         <dia:point val="5.74063,-15.6036"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="5.69063,-15.6536;9.10263,-13.1464"/>
+        <dia:rectangle val="5.69063,-15.6536;9.10264,-13.1465"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="5.74063,-15.6036"/>
@@ -282,8 +281,7 @@ server#</dia:string>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#UDP
-server#</dia:string>
+            <dia:string>##</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -292,7 +290,7 @@ server#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="7.39663,-14.6575"/>
+            <dia:point val="7.39663,-14.4"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -314,13 +312,13 @@ server#</dia:string>
         <dia:point val="10.8362,-15.6036"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="10.7862,-15.6536;14.8701,-13.1464"/>
+        <dia:rectangle val="10.7862,-15.6536;14.8701,-13.1465"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
         <dia:point val="10.8362,-15.6036"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
-        <dia:real val="3.983883476483093"/>
+        <dia:real val="3.9838834764831783"/>
       </dia:attribute>
       <dia:attribute name="elem_height">
         <dia:real val="2.4071067811865476"/>
@@ -376,13 +374,13 @@ checker#</dia:string>
         <dia:point val="8.1,-17.9429"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="2.74844,-17.9929;8.15,-15.5536"/>
+        <dia:rectangle val="2.74843,-17.9929;8.15,-15.5536"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="8.1,-17.9429"/>
         <dia:point val="8.1,-16.7732"/>
-        <dia:point val="3.24844,-16.7732"/>
-        <dia:point val="3.24844,-15.6036"/>
+        <dia:point val="3.24843,-16.7732"/>
+        <dia:point val="3.24843,-15.6036"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -510,6 +508,130 @@ checker#</dia:string>
         <dia:connection handle="0" to="O0" connection="1"/>
         <dia:connection handle="1" to="O1" connection="0"/>
       </dia:connections>
+    </dia:object>
+    <dia:object type="SDL - Task" version="0" id="O9">
+      <dia:attribute name="obj_pos">
+        <dia:point val="1.82993,-15.3986"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="1.77993,-15.4486;5.19194,-12.9415"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="1.82993,-15.3986"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="3.3120084764831863"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.4071067811865476"/>
+      </dia:attribute>
+      <dia:attribute name="line_width">
+        <dia:real val="0.10000000000000001"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="fill_colour">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="show_background">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_style">
+        <dia:enum val="0"/>
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="text">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>#TUN
+server#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font family="sans" style="0" name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.80000000000000004"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="3.48593,-14.4525"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="flip_horizontal">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="flip_vertical">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="SDL - Task" version="0" id="O10">
+      <dia:attribute name="obj_pos">
+        <dia:point val="5.97813,-15.3986"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="5.92813,-15.4486;9.34014,-12.9415"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="5.97813,-15.3986"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="3.3120084764831814"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.4071067811865476"/>
+      </dia:attribute>
+      <dia:attribute name="line_width">
+        <dia:real val="0.10000000000000001"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="fill_colour">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="show_background">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_style">
+        <dia:enum val="0"/>
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="text">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>#UDP
+server#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font family="sans" style="0" name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.80000000000000004"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="7.63413,-14.4525"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="flip_horizontal">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="flip_vertical">
+        <dia:boolean val="false"/>
+      </dia:attribute>
     </dia:object>
   </dia:layer>
 </dia:diagram>
