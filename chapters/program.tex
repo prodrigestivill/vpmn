@@ -27,18 +27,143 @@ Per el disseny del protocol es necessita un identificador únic per cada node. E
 L'utilització de la IP i el port no és informació suficient degut a l'existència de xarxes privades i publiques, també els NAT simètrics no donen el mateix port per a tots els hosts remots on es connecti un mateix node.
 L'utilització de la IP publica per aquesta tasca no és valida ja que deixa de ser única si hi ha dos nodes al costat privat abans de un NAT. Aquest dos en trobar-se es pensaran que són nodes diferents dels que coneixen amb IP pública.
 
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.12\linewidth}|p{0.045\linewidth}|p{0.21875\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-18 & \centering 19-31 & \\ \hline \hline
+0 & \centering Version & \centering HLen & \centering ToS & \multicolumn{2}{|c}{Total Lenght} & \\ \hline
+32 & \multicolumn{3}{|c|}{Identification} & \centering Flags & \centering Fragment Offset & \\ \hline
+64 & \multicolumn{2}{|c|}{TTL} & \centering Protocol & \multicolumn{2}{|c}{Header Checksum} & \\ \hline
+96 & \multicolumn{5}{|c}{Source Address} & \\ \hline
+128 & \multicolumn{5}{|c}{Destination Address} & \\ \hline
+160 & \multicolumn{5}{|c}{\em Options (Optional)} & \\ \hline
+=0 & \multicolumn{5}{|c}{Data} & \\
++32 & \multicolumn{5}{|c}{\ldots} & \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Packet IPv4}
+\label{T:ippkt}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering Pkt ID & \centering Total Lenght & \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Capçalera Packet Intern}
+\label{T:inpkt}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x00 & \centering Total Lenght & \\ \hline
+32 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \hline \hline
+48 & \multicolumn{4}{|c}{Network IP} & \\ \hline
+80 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
+112 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+144 & \multicolumn{4}{|c}{\ldots} & \\ \hline \hline
+=0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
++32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++80 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3}
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Packet ID}
+\label{T:pktid}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x01 & \centering 0x04 & \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Packet ID ACK}
+\label{T:pktidack}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x02 & \centering Total Lenght & \\ \hline
+32 & \multicolumn{2}{|c|}{\# Peers} \\ \hline \hline
+40 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \hline
+56 & \multicolumn{4}{|c}{Network IP} & \\ \hline
+88 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
+120 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+152 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+=0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
++32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++80 & \multicolumn{3}{|c|}{\ldots} & \\ \hline \hline
+=0 & \multicolumn{2}{|c|}{\ldots} & \centering \ldots & \\ \hline
++16 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+=0 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++32 & \multicolumn{3}{|c|}{\ldots} & \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Packet KA}
+\label{T:pktka}
+\end{center}
+\end{table}
+
 \begin{quote}
 Fragmentació a quin nivell.
 Hole punching.
 \end{quote}
-
+\clearpage%Optional
 \section{Arquitectura del programa}
 \begin{quote}
 Llenguatge C.
 Threads.
 \end{quote}
-La arquitectura del programa es separa entre l'adaptador virtual i el servidor UDP. Els paquets que les aplicacions envien a traves de l'adaptador virtual son enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí.
+La arquitectura del programa com es veu en la figura \ref{F:dia-app} es separa entre l'adaptador virtual i el servidor UDP. Els paquets que les aplicacions envien a traves de l'adaptador virtual son enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí.
 Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.5\textwidth]{images/dia-app}
+\caption{Diagrama de la aplicació}
+\label{F:dia-app}
+\end{figure}
+\clearpage%Optional
 \subsection{Interfície TUN}
-
+\begin{figure}[htb]
+\centering
+\includegraphics[scale=0.5]{images/dia-tunsrv}
+\caption{Diagrama de flux del thread TUN}
+\label{F:dia-tunsrv}
+\end{figure}
+\clearpage%Optional
 \subsection{Servidor UDP/DTLS}
+\begin{figure}[htb]
+\centering
+\includegraphics[scale=0.5]{images/dia-udpsrv}
+\caption{Diagrama de flux del thread UDP}
+\label{F:dia-udpsrv}
+\end{figure}
