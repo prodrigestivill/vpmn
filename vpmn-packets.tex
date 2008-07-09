@@ -1,0 +1,112 @@
+\documentclass[12pt,a4]{article}
+\title{VPMN Packets Specification}
+\author{Pau~Rodriguez-Estivill}
+\begin{document}
+\maketitle
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.12\linewidth}|p{0.057\linewidth}|p{0.21875\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-18 & \centering 19-31 & \\ \hline \hline
+0 & \centering Version & \centering HLen & \centering ToS & \multicolumn{2}{|c}{Total Lenght} & \\ \hline
+32 & \multicolumn{3}{|c|}{Identification} & \centering Flags & \centering Fragment Offset & \\ \hline
+64 & \multicolumn{2}{|c|}{TTL} & \centering Protocol & \multicolumn{2}{|c}{Header Checksum} & \\ \hline
+96 & \multicolumn{5}{|c}{Source Address} & \\ \hline
+128 & \multicolumn{5}{|c}{Destination Address} & \\ \hline
+160 & \multicolumn{5}{|c}{\em Options (Optional)} & \\ \hline
+=0 & \multicolumn{5}{|c}{Data} & \\
++32 & \multicolumn{5}{|c}{\ldots} & \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{IPv4 Packet}
+\label{T:ippkt}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering Pkt ID & \centering Total Lenght & \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Internal Packet Headers}
+\label{T:inpkt}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x00 & \centering Total Lenght & \\ \hline
+32 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \cline{0-3} \noalign{\vskip 2pt} \hline
+48 & \multicolumn{4}{|c}{Network IP} & \\ \hline
+80 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
+112 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+144 & \multicolumn{4}{|c}{\ldots} & \\ \cline{0-5} \noalign{\vskip 2pt} \cline{0-5}
+=0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
++32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++80 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3}
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{ID Packet}
+\label{T:pktid}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x01 & \centering 0x04 & \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{ID ACK Packet}
+\label{T:pktidack}
+\end{center}
+\end{table}
+
+\begin{table}[htb]
+\begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x02 & \centering Total Lenght & \\ \hline
+32 & \multicolumn{2}{|c|}{\# Peers} \\ \cline{0-2} \noalign{\vskip 2pt} \cline{0-3}
+40 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \hline
+56 & \multicolumn{4}{|c}{Network IP} & \\ \hline
+88 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
+120 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+152 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+=0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
++32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++80 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3} \noalign{\vskip 2pt} \cline{0-3}
+=0 & \multicolumn{2}{|c|}{\ldots} & \centering \ldots & \\ \hline
++16 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+=0 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++32 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3}
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Keep Alive Packet}
+\label{T:pktka}
+\end{center}
+\end{table}
+
+\end{document}
