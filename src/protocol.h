@@ -30,7 +30,7 @@
 
 #define MAXKAPEERS 200
 
-#define PROTOCOL1_V    1        //IP version for internal packets
+#define PROTOCOL1_V    0        //IP version for internal packets
 #define PROTOCOL1_ID   0
 #define PROTOCOL1_IDA  1        //ACK
 #define PROTOCOL1_KA   2
@@ -70,6 +70,8 @@ struct protocol_1_s
 #else
 # error "Please fix <bits/endian.h>"
 #endif
+  uint8_t pid;
+  uint16_t tot_len;
 } __attribute((packed));
 
 /* Protocol 1 Identifier */

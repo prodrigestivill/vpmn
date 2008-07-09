@@ -103,12 +103,11 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
 {
   int i;
   void *p;
-  int begin = 0;
   struct iphdr *ip = NULL;
   struct peer_s *peer;
   if (buffer_len < 4)
     return;
-  ip = (struct iphdr *) &buffer[begin];
+  ip = (struct iphdr *) buffer;
   if (ip->version == 4)         //IPv4 packet
     {
       if (session->peer == NULL
@@ -128,13 +127,18 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                     inet_ntoa(*(struct in_addr *) &ip->saddr));
           return;
         }
-      tundev_write(buffer, buffer_len);
+      if (ip->tot_len > buffer_len)
+        return;
+      tundev_write(buffer, ip->tot_len);
+      if (ip->tot_len + 4 <= buffer_len)
+        protocol_recvpacket(&buffer[ip->tot_len], buffer_len - ip->tot_len,
+                            session);
       return;
     }
 //else if (ip->version == 6) //IPv6 Packet
   else if (ip->version == PROTOCOL1_V)  //Internal packets v1
     {
-      if (((struct protocol_1_s *) ip)->ihl == PROTOCOL1_IDA)
+      if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_IDA)
         {
           log_debug("ACK...\n");
           if (session->peer != NULL
@@ -144,14 +148,12 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
               session->peer->stat |= PEER_STAT_IDK;
               pthread_mutex_unlock(&session->peer->modify_mutex);
             }
-          //Packets are combinable IDACK+ID
-          begin = begin + sizeof(struct protocol_1ida_s);
-          if (begin + 4 > buffer_len)
-            return;
-          ip = (struct iphdr *) &buffer[begin];
+          if (ip->tot_len + 4 <= buffer_len)
+            protocol_recvpacket(&buffer[ip->tot_len],
+                                buffer_len - ip->tot_len, session);
         }
 
-      if (((struct protocol_1_s *) ip)->ihl == PROTOCOL1_ID)
+      if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_ID)
         {
           log_debug("ID...\n");
           if (session->peer == NULL)
@@ -163,8 +165,8 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
             {
               if (protocol_processpeer(peer,
                                        &((struct protocol_1id_s *)
-                                         &buffer[begin])->peer,
-                                       buffer_len - begin -
+                                         buffer)->peer,
+                                       buffer_len -
                                        sizeof(struct protocol_1id_s) +
                                        sizeof(struct protocol_peer_s)) < 0)
                 {
@@ -194,32 +196,29 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
           protocol_sendpacket(session, PROTOCOL1_IDA);
           if ((peer->stat & PEER_STAT_IDK) == 0)
             protocol_sendpacket(session, PROTOCOL1_ID);
-          //Packets are combinable ID+KA
-          begin = begin + sizeof(struct protocol_1id_s) +
-            ((struct protocol_1id_s *) &buffer[begin])->peer.len_addr *
-            sizeof(struct protocol_netpair_s) +
-            ((struct protocol_1id_s *) &buffer[begin])->peer.len_addr *
-            sizeof(struct protocol_addrpair_s);
-          if (begin + 4 > buffer_len)
-            return;
-          ip = (struct iphdr *) &buffer[begin];
+          if (ip->tot_len + 4 <= buffer_len)
+            protocol_recvpacket(&buffer[ip->tot_len],
+                                buffer_len - ip->tot_len, session);
+          return;
         }
-      if (((struct protocol_1_s *) ip)->ihl == PROTOCOL1_KA)
+      if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_KA)
         {
+          if (ip->tot_len > buffer_len)
+            return;
           log_debug("KA...\n");
           if (session->peer != NULL
               && (session->peer->stat & PEER_STAT_ID) != 0)
             {
               timeout_update(&session->peer->timeout);
-              p = (void *) &buffer[begin] + sizeof(struct protocol_1ka_s);
-              while (p <= (void *) &buffer[buffer_len - 1])
+              p = (void *) buffer + sizeof(struct protocol_1ka_s);
+              while (p <= (void *) &buffer[ip->tot_len - 1])
                 {
                   peer = peer_create();
                   i =
                     protocol_processpeer(peer,
                                          (struct protocol_peer_s *) p,
                                          (int) ((void *)
-                                                &buffer[buffer_len - 1] -
+                                                &buffer[ip->tot_len - 1] -
                                                 p));
                   if (i < 0)
                     {
@@ -227,12 +226,18 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                       return;
                     }
                   p += i;
-                  //if (router_exist () == 0)
-                  //-TODO Init conn
-                  //else
-                  peer_destroy(peer);
+                  if (router_existpeer
+                      (peer->shared_networks,
+                       peer->shared_networks_len) == 0)
+                    peer_addnew(peer);
+                  else
+                    peer_destroy(peer);
                 }
             }
+          if (ip->tot_len + 4 <= buffer_len)
+            protocol_recvpacket(&buffer[ip->tot_len],
+                                buffer_len - ip->tot_len, session);
+          return;
         }
     }
 }
@@ -314,11 +319,14 @@ void protocol_slidekeepalive()
   i = udpsrvsession_dumpsocks (protocol_v1ka + sizeof (struct protocol_1ka_s),
 			       protocol_v1idka_maxlen - protocol_v1id_len,
 			       protocol_v1ka_pos, MAXKAPEERS);
-  protocol_v1ka->packetid = PROTOCOL1_KA;
+  protocol_v1ka->base.version = PROTOCOL1_V;
+  protocol_v1ka->base.ihl = 1;
+  protocol_v1ka->base.pid = PROTOCOL1_KA;
   protocol_v1ka->len = i;
   protocol_v1ka_len =
     sizeof (struct protocol_1ka_s) + i * sizeof (struct protocol_addrpair_s);
   protocol_v1ka_pos += i;
+  protocol_v1ka->base.tot_len = protocol_v1ka_len;
 */
 }
 
@@ -328,15 +336,19 @@ void protocol_init()
   struct protocol_netpair_s *netpair;
   int i;
   protocol_v1ida.base.version = PROTOCOL1_V;
-  protocol_v1ida.base.ihl = PROTOCOL1_IDA;
+  protocol_v1ida.base.ihl = 1;
+  protocol_v1ida.base.pid = PROTOCOL1_IDA;
+  protocol_v1ida.base.tot_len = sizeof(struct protocol_1ida_s);
   protocol_v1ida.padding1 = 0;
   protocol_v1ida.padding2 = 0;
   protocol_v1id_len = sizeof(struct protocol_1id_s) +
     tun_selfpeer.shared_networks_len * sizeof(struct protocol_netpair_s) +
     tun_selfpeer.addrs_len * sizeof(struct protocol_addrpair_s);
   protocol_v1id = malloc(protocol_v1id_len);
-  protocol_v1id->base.ihl = PROTOCOL1_ID;
   protocol_v1id->base.version = PROTOCOL1_V;
+  protocol_v1id->base.ihl = 1;
+  protocol_v1id->base.pid = PROTOCOL1_ID;
+  protocol_v1id->base.tot_len = protocol_v1id_len;
   if (tun_selfpeer.addrs_len < 256)
     protocol_v1id->peer.len_addr = tun_selfpeer.addrs_len;
   else
