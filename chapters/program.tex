@@ -71,11 +71,11 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \hline
 bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
 0 & \centering 0000 & \centering 0001 & \centering 0x00 & \centering Total Lenght & \\ \hline
-32 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \hline \hline
+32 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \cline{0-3} \noalign{\vskip 2pt} \hline
 48 & \multicolumn{4}{|c}{Network IP} & \\ \hline
 80 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
 112 & \multicolumn{4}{|c}{\ldots} & \\ \hline
-144 & \multicolumn{4}{|c}{\ldots} & \\ \hline \hline
+144 & \multicolumn{4}{|c}{\ldots} & \\ \cline{0-5} \noalign{\vskip 2pt} \cline{0-5}
 =0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
 +32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
 +48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
@@ -110,7 +110,7 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \hline
 bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
 0 & \centering 0000 & \centering 0001 & \centering 0x02 & \centering Total Lenght & \\ \hline
-32 & \multicolumn{2}{|c|}{\# Peers} \\ \hline \hline
+32 & \multicolumn{2}{|c|}{\# Peers} \\ \cline{0-2} \noalign{\vskip 2pt} \cline{0-3}
 40 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \hline
 56 & \multicolumn{4}{|c}{Network IP} & \\ \hline
 88 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
@@ -119,12 +119,12 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 =0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
 +32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
 +48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
-+80 & \multicolumn{3}{|c|}{\ldots} & \\ \hline \hline
++80 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3} \noalign{\vskip 2pt} \cline{0-3}
 =0 & \multicolumn{2}{|c|}{\ldots} & \centering \ldots & \\ \hline
 +16 & \multicolumn{4}{|c}{\ldots} & \\ \hline
 +48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
 =0 & \multicolumn{4}{|c}{\ldots} & \\ \hline
-+32 & \multicolumn{3}{|c|}{\ldots} & \\ \hline
++32 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3}
 \end{tabular}
 \end{center}
 \begin{center}
