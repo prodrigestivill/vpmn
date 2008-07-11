@@ -30,13 +30,34 @@ Una forma d'encapsular missatges IPsec per travessar NATs s'ha definit en un un 
 En el mode túnel, es xifra i/o autentica tot el paquet IP sencer (capçalera inclusiva). Aquesta informació s'encapsula dins del \emph{payload} d'un nou paquet IP per tal de que pugui ser enrutat. Aquest mode s'utilitza en comunicacions xarxa a xarxa, per exemple per crear VPNs a traves d'Internet.
 
 \subsection{OpenVPN}
+OpenVPN es un software de VPN a nivell de aplicació que fa ús del \emph{driver} genèric i multiplataforma \okeyword{TUN}/\okeyword{TAP}. És una aplicació centralitzada tal com mostra la figura \ref{F:vpn-centralized}.
 
-\subsubsection{Mode pont ethernet}
+\begin{figure}[htb]
+\centering
+\includegraphics[height=0.5\textwidth]{images/vpn-centralized}
+\caption{Diagrama de funcionament d'una VPN centralitzada}
+\label{F:vpn-centralized}
+\end{figure}
 
-\subsubsection{Mode túnel IP}
+La VPN pot operar en dos modes:
+\begin{itemize}
+\item \textbf{Mode pont Ethernet}
+Simula una targeta de xarxa Ethernet i crea una VPN que treballa amb trames de capa 2 del \keywords{OSI}{model OSI}{Open Systems Interconnection Basic Reference Model}.
+\item \textbf{Mode túnel IP}
+Simula una targeta de xarxa punt-a-punt i crea una VPN que treballa amb trames de capa 3 del model OSI.
+\end{itemize}
+\subsection{TincVPN}
+\begin{figure}[htb]
+\centering
+\includegraphics[height=0.5\textwidth]{images/vpn-meshed}
+\caption{Diagrama de funcionament d'una VPN mallada}
+\label{F:vpn-meshed}
+\end{figure}
 
-\subsection{Tinc-VPN}
 \subsection{Hamachi}
 \subsection{Wippien}
 \subsection{ELA VPN}
+\keyword{ELA}{Everywhere Local Area network} es un software de VPN a nivell de aplicació.
+Utilitza una topologia de nodes mallada connectada tant amb túnels TCP com UDP.
+D'aquesta VPN no s'ha trobat cap implementació, el \emph{paper} descriptiu està adjuntat als annexos.
 \section{Comparativa}

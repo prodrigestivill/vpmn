@@ -153,6 +153,17 @@ Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
 \end{figure}
 \clearpage%Optional
 \subsection{Interfície TUN}
+L'aplicació fa ús del \emph{driver} genèric \okeyword{TUN}/\okeyword{TAP}. S'ha escollit aquest \emph{driver} ja que està disponible per la majoria de sistemes operatius i facilitarà la possible futura adaptació de l'aplicació.
+
+\subsubsection{Driver TUN/TAP}
+El \emph{driver} TUN/TAP es un \emph{driver} de \emph{kernel} d'una targeta de xarxa virtual, i per tant no depèn del cap targeta real física. El driver es separa en dos \emph{sub-drivers}:
+\begin{itemize}
+\item \textbf{Driver TAP} simula una targeta de xarxa Ethernet i treballa amb trames de capa 2 del \okeyword{model OSI}.
+\item \textbf{Driver TUN} simula una targeta de xarxa punt-a-punt i treballa amb trames de capa 3 del model OSI.
+\end{itemize}
+
+En aquestes targetes els paquets enviats per el sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats per el \emph{stack} de protocols del \emph{kernel}.
+
 \begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{images/dia-tunsrv}
