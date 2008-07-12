@@ -49,18 +49,13 @@
 % hyperrefs
 \RequirePackage{url}
 \ifpdf
-  \RequirePackage[pdftex,pdfpagelayout=TwoColumnRight]{hyperref}
+  \RequirePackage[pdftex,pdfpagemode=UseOutlines,pdfpagelayout=TwoColumnRight,pdfstartview=XYZ]{hyperref}
 \else
-  \RequirePackage[dvips,pdfpagelayout=TwoColumnRight]{hyperref}\fi
+  \RequirePackage[dvips,pdfpagemode=UseOutlines,pdfpagelayout=TwoColumnRight,pdfstartview=XYZ]{hyperref}\fi
 \AtBeginDocument{%
     \hypersetup{%
       breaklinks,
-      baseurl       = http://,
       pdfborder     = 0 0 0,
-      pdfpagemode   = None,
-      pdfpagelayout = TwoColumnRight,
-      pdfstartview  = XYZ,
-      pdfstartpage  = 1,
       bookmarksnumbered = true,
       pdfauthor     = \authordoc,%
       pdftitle      = \titledocE,%
@@ -69,3 +64,7 @@
       pdfcreator    = \LaTeX{},%
       pdfproducer   = \LaTeX}}
 \urlstyle{tt}
+
+% Permet crear glosaris
+\usepackage[hypertoc=true,hyper=false]{glossary}
+\makeglossary

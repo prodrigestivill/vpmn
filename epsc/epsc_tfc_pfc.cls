@@ -316,6 +316,7 @@
 
 \newenvironment{intro}[1]
 {
+\addcontentsline{toc}{chapter}{#1}
 \chapter*{#1}
 \setcounter{page}{1}
 }
@@ -523,7 +524,7 @@
 \renewcommand{\@makeschapterhead}[1]{%
   \noindent                                                     % No indentation in this paragraph
   \thispagestyle{fancy}
-  \addcontentsline{toc}{chapter}{#1}
+  %\addcontentsline{toc}{chapter}{#1}
   \begin{center}
     \LARGE\sffamily\bfseries \MakeUppercase{#1} \par\nobreak
   \end{center}

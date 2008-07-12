@@ -1,3 +1,10 @@
-\newcommand*{\keyword}[2]{\index{#1}#1\footnote{#1: #2}}
-\newcommand*{\keywords}[3]{\index{#1}#2\footnote{#2: #3}}
+\newcommand*{\keyword}[2]{\glossary{name=#1, description=#2}#1\footnote{#1: #2}}
+\newcommand*{\keywords}[3]{\glossary{name=#1, description=#3}#2\footnote{#2: #3}}
 \newcommand*{\okeyword}[1]{\index{#1}#1}
+
+\newcommand*{\rfckeyword}{
+\glossary{name=RFC, description=Request for Comments from IETF}
+\glossary{name=IETF, description=Internet Engineering Task Force}
+RFC
+\footnote{RFC: Request for Comments from IETF (Internet Engineering Task Force)}
+}
