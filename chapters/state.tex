@@ -59,7 +59,6 @@ Per tant podem dir que és tracta d'una aplicació pensada per VPNs centralitzad
 
 A nivell de seguretat utilitza la llibreria OpenSSL tant per TCP com per UDP, per TCP utilitza l'estàndard \keyword{TLS}{Transport Layer Security} i per UDP utilitza un protocol propi basat en TLS. Permet l'autenticació per claus secretes compartides prèviament, per certificats x509 i per usuari-contrasenya.
 
-\clearpage%optional
 \subsection{TincVPN}
 TincVPN és un programa de \okeyword{VPN} a nivell d'aplicació, que fa ús del \emph{driver} genèric i multiplataforma \okeyword{TUN}/\okeyword{TAP}. Mitjançant aquest \emph{driver} l'aplicació pot crear VPNs en \textbf{mode pont Ethernet} o en \textbf{mode túnel IP}, ja explicats anteriorment. L'aplicació crea una VPN mallada (figura \ref{F:vpn-meshed}) connectant-se a una llista de \emph{peers}, i la resta de \emph{peers} de la VPN hauran de ser enrutats a través d'altres \emph{peers} per arribar als nodes que no tinguin connexió directe.
 \begin{figure}[htb]
@@ -69,12 +68,12 @@ TincVPN és un programa de \okeyword{VPN} a nivell d'aplicació, que fa ús del 
 \label{F:vpn-meshed}
 \end{figure}
 
-Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en el mode \emph{subnet} de OpenVPN. Per tant, és l'aplicació qui s'encarrega del \emph{bridging} (en mode pont Ethernet) o de l'enrutat (en mode túnel IP) de la VPN.
+Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és l'aplicació qui s'encarrega del \emph{bridging} (en mode pont Ethernet) o de l'enrutat (en mode túnel IP) de la VPN.
 
 A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Peter Gutmann va trobar nombroses errades de disseny en la seguretat de la versió 1 d'aquest programa que encara no s'han resolt, a l'annex \refannexmail{} es troba el e-mail on exposa el seu anàlisi.
 
 \subsection{Wippien}
-Wippien és un programa de missatgeria instantània amb funcionalitats de VPN a nivell d'aplicació.
+Wippien és un programa de missatgeria instantània amb funcionalitats de VPN a nivell d'aplicació. Utilitza \keyword{XMPP}{Extensible Messaging and Presence Protocol} com a missatgeria instantània, per autenticar els \emph{peers} i negociar els paràmetres de la VPN (com la IP, els ports, el protocol, \ldots).
 \begin{figure}[htb]
 \centering
 \includegraphics[height=0.5\textwidth]{images/vpn-externalized}
