@@ -1,22 +1,25 @@
 \chapter{Programació}
 \section{Funcionament}
-L'aplicació a l'arrancar es posa en contacte amb els nodes que coneix. Per cada node s'intercanvien la informació necessària per tal de poder-se identificar i enrutar els paquets.
+L'aplicació a l'arrancar es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvien la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets.
+
 \section{Disseny del Protocol}
 \subsection{Seguretat}
-L'objectiu es que tots els nodes puguin realitzar els túnels amb les garanties de les operacions criptogràfiques com el xifrat, la firma digital i el no repudi. De manera que cada node té les garanties de estar entregant l'informació directament al destí correcte i sap que cap altre pot estar ni llegint ni manipulant.
+L'objectiu es que tots els nodes puguin realitzar els túnels amb les garanties de les operacions criptogràfiques com el xifrat, la firma digital i el no repudi. De manera que cada node té les garanties de estar entregant l'informació directament al destí correcte i sap que cap altre pot estar ni llegint ni manipulant, i també viceversa cada node té les garanties de rebre l'informació del origen correcte.
 
-Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es pot realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. També es necessari un mecanisme de validació de les rutes que cada node ofereix, de manera que cap node no pugui tenir una direcció IP que pertanyi a un altre node. Aquesta última necessitat obliga a fixar un adreçament IP estàtic.
+Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es pot realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. També es necessari un mecanisme de validació de les rutes que cada node ofereix, de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat obliga a fixar un adreçament IP estàtic si es vol fer que no depengui de cap servidor \emph{mediator}, que faci de \okeyword{DHCP}.
 
 Per tant el primer que cal establir es el funcionament del adreçament IP, per a fer-ho es contemplen dos possibilitats:
 \begin{itemize}
-\item L'utilització de un adreçament que depengui dels identificadors dels certificats
-\item L'incrustació de l'adreçament dins dels camps dels certificats
+\item L'utilització de un adreçament que es calculi a partir dels certificats.
+\item L'incrustació de l'adreçament dins dels camps dels certificats.
 \end{itemize}
-La primera opció consisteix en definir una distribució de direccions IP en la que a partir de un certificat se li pugui assignar una única IP.
+La primera opció consisteix en definir una distribució de direccions IP de la que a partir de un certificat se li pugui assignar una única IP, això facilita la generació de certificats ja que es poden utilitzar certificats genèrics. En canvi es corre el risc de trobar col·lisions amb l'algoritme esmentat i que hi haguí conflictes amb IPs compartides. Per tant s'optarà per la segona opció, malgrat aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats x509 per emmagatzemar les polítiques d'assignació d'IPs que els administradors de la VPN validin.
 
 \subsubsection{DTLS}
 
 \subsection{Definició de paquets}
+%Fragmentació a quin nivell.
+%Hole punching.
 Per el disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
 \begin{itemize}
 \item La IP i port del node
@@ -133,16 +136,10 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \end{center}
 \end{table}
 
-\begin{quote}
-Fragmentació a quin nivell.
-Hole punching.
-\end{quote}
 \clearpage%Optional
 \section{Arquitectura del programa}
-\begin{quote}
-Llenguatge C.
-Threads.
-\end{quote}
+%Llenguatge C.
+%Threads.
 La arquitectura del programa com es veu en la figura \ref{F:dia-app} es separa entre l'adaptador virtual i el servidor UDP. Els paquets que les aplicacions envien a traves de l'adaptador virtual son enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí.
 Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
 \begin{figure}[htb]
