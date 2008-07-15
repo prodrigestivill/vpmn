@@ -45,21 +45,23 @@ Peter Gutmann va analitzar nombroses aplicacions VPN i en va descriure les nombr
 
 Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UDP, es decideix no utilitzar el TCP i buscar intensament alguna implementació el més segura possible o fins hi tot a poder ser estàndard. Finalment es va trobar un protocol del 2004 basat en TLS, que van dissenyar N. Modadugu i E. Rescorla de la universitat d'Stanford, anomenat \keyword{DTLS}{Datagram Transport Layer Security} i més tard el 2006 va esdevenir el RFC 4347 del IETF. A l'annex \refannexpapers{} es troba el \emph{paper} inicial que descriu el protocol. El mateix equip va treballar en una variant del DTLS (el borrador RFC ha caducat i es diu \emph{Extensions for Datagram Transport Layer Security (TLS) in Low Bandwidth Environments}) per estalviar ample de banda. Proposaven treure els camps repetits a cada \emph{record} de TLS i DTLS que segons ells no són necessaris. Degut a que aquesta variant no va tenir massa èxit i no va esdevenir RFC, en aquest projecte es farà ús del DTLS que descriu el RFC 4347, aquest protocol està implementat en les versions més recents de la llibreria OpenSSL i és la implementació que s'ha decidit utilitzar.
 
-Per acabar la secció, i com a curiositat, a l'annex \refannexmail{} hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Per tal de que sigui significatiu han de coincidir múltiples factors i tampoc no hi ha cap implementació que ho tingui en compte, així que no es tindrà en compte en aquest programari.
+Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Per tal de que sigui significatiu han de coincidir múltiples factors i tampoc no hi ha cap implementació que ho tingui en compte, així que no es tindrà en compte en aquest programari.
 
 \subsection{Definició de paquets}
-%Fragmentació a quin nivell.
-%Hole punching.
 Per el disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
 \begin{itemize}
 \item La IP i port del node
 \item La IP publica i port del node
-\item Dupleta IP local i publica
+\item Agrupació de IPs i ports (locals i públics)
 \item Xarxes que publicita el node
 \end{itemize}
 L'utilització de la IP i el port no és informació suficient degut a l'existència de xarxes privades i publiques, també els NAT simètrics no donen el mateix port per a tots els hosts remots on es connecti un mateix node.
 L'utilització de la IP publica per aquesta tasca no és valida ja que deixa de ser única si hi ha dos nodes al costat privat abans de un NAT. Aquest dos en trobar-se es pensaran que són nodes diferents dels que coneixen amb IP pública.
 
+En el moment de posar ...
+%Fragmentació a quin nivell.
+
+Per evitar afegir més capçaleres (\emph{overhead}) en els paquets més importants i freqüents, l'aplicació enviarà directament els paquets IP sense afegir cap identificador (veure taula \ref{T:ippkt}).
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -81,8 +83,8 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-18 & \c
 \label{T:ippkt}
 \end{center}
 \end{table}
-
-\begin{table}[htb]
+La resta de paquets considerats d'ús exclusivament intern, fan la funció de senyalització de la VPN. Inspirats amb els paquets IP es podran diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). La part de IP destinada a \keyword{ToS}{Type of Service} servirà per definir el tipus de paquet (veure taula \ref{T:inpkt}).
+\begin{table}[hbt]
 \begin{center}
 \scriptsize
 \begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
@@ -96,6 +98,12 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \label{T:inpkt}
 \end{center}
 \end{table}
+Els tipus de paquets i els seus identificadors són:
+\begin{itemize}
+\item \textbf{[0x00] Paquet ID}: Descriu al node que l'envia (taula \ref{T:pktid}).
+\item \textbf{[0x01] Paquet ID ACK}: Confirma haver rebut el paquet ID (taula \ref{T:pktidack}).
+\item \textbf{[0x02] Paquet Keep Alive} (KA): manté el canal obert i envia informació d'altres nodes (taula \ref{T:pktka}).
+\end{itemize}
 
 \begin{table}[htb]
 \begin{center}
@@ -116,7 +124,7 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \end{tabular}
 \end{center}
 \begin{center}
-\caption{Packet ID}
+\caption{Paquet ID}
 \label{T:pktid}
 \end{center}
 \end{table}
@@ -131,10 +139,13 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \end{tabular}
 \end{center}
 \begin{center}
-\caption{Packet ID ACK}
+\caption{Paquet ID ACK}
 \label{T:pktidack}
 \end{center}
 \end{table}
+
+
+%Hole punching.
 
 \begin{table}[htb]
 \begin{center}
@@ -161,7 +172,7 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \end{tabular}
 \end{center}
 \begin{center}
-\caption{Packet KA}
+\caption{Paquet KA}
 \label{T:pktka}
 \end{center}
 \end{table}
