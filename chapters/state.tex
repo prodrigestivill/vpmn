@@ -57,7 +57,7 @@ Per tant podem dir que és tracta d'una aplicació pensada per VPNs centralitzad
 \label{F:vpn-centralized}
 \end{figure}
 
-A nivell de seguretat utilitza la llibreria OpenSSL tant per TCP com per UDP, per TCP utilitza l'estàndard \keyword{TLS}{Transport Layer Security} i per UDP utilitza un protocol propi basat en TLS. Permet l'autenticació per claus secretes compartides prèviament, per certificats x509 i per usuari-contrasenya.
+A nivell de seguretat utilitza la llibreria Open\keyword{SSL}{Secure Socket Layer (la versió 3 en convertir-se en estàndard es va anomenar TLS)} tant per \keyword{TCP}{Transmission Control Protocol} com per \keyword{UDP}{User Datagram Protocol}, en TCP utilitza l'estàndard \keyword{TLS}{Transport Layer Security} i en UDP utilitza un protocol propi basat en TLS. Permet l'autenticació per claus secretes compartides prèviament, per certificats x509 i per usuari-contrasenya.
 
 \subsection{TincVPN}
 TincVPN és un programa de \okeyword{VPN}s a nivell d'aplicació, que fa ús del \emph{driver} genèric i multiplataforma \okeyword{TUN}/\okeyword{TAP}. Mitjançant aquest \emph{driver} l'aplicació pot crear VPNs en \textbf{mode pont Ethernet} o en \textbf{mode túnel IP}, ja explicats anteriorment. L'aplicació crea una VPN mallada (figura \ref{F:vpn-meshed}) connectant-se a una llista de \emph{peers}, i la resta de \emph{peers} de la VPN hauran de ser enrutats a través d'altres \emph{peers} per arribar als nodes que no tinguin connexió directe.
@@ -70,33 +70,33 @@ TincVPN és un programa de \okeyword{VPN}s a nivell d'aplicació, que fa ús del
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega del \emph{bridging} (en mode pont Ethernet) o de l'enrutat (en mode túnel IP) de la VPN a nivell d'aplicació.
 
-A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Peter Gutmann va trobar nombroses errades de disseny en la seguretat en el protocol de la versió 1 d'aquest programa que encara no s'han resolt, a l'annex \refannexmail{} es troba el e-mail on exposa el seu anàlisi.
+A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Peter Gutmann va trobar nombroses errades de disseny en la seguretat del protocol de la versió 1 d'aquest programa que encara no s'han resolt, a l'annex \refannexmail{} es troba l'e-mail on exposa el seu anàlisi.
 
 \subsection{Wippien}
-Wippien és un programa de missatgeria instantània amb funcionalitats de creació de \okeyword{VPN}s a nivell d'aplicació. Utilitza \keyword{XMPP}{Extensible Messaging and Presence Protocol} com a missatgeria instantània. Una vegada connectat al servidor XMPP, l'aplicació mostra a l'usuari la seva llista de contactes per tal de que esculli amb quins contactes vol crear la VPN. Per crear-la negocia els paràmetres de la VPN (com la IP pública, el port i el protocol) a través d'XMPP, també utilitza HTTP cap a un servidor anomenat \emph{mediator}, aquest fa la funció de \keyword{DHCP}{Dynamic Host Configuration Protocol} assignant una IP única per sessió a cada \emph{peer} de la \okeyword{VPN}, d'aquesta manera es garanteix que no hi hagi conflictes d'IPs.
+Wippien és un programa de missatgeria instantània amb funcionalitats de creació de \okeyword{VPN}s a nivell d'aplicació. Utilitza \keyword{XMPP}{Extensible Messaging and Presence Protocol} com a missatgeria instantània. Una vegada connectat al servidor XMPP, l'aplicació mostra a l'usuari la seva llista de contactes per tal que esculli amb quins contactes vol crear la VPN. Per crear-la negocia els paràmetres de la VPN (com la IP pública, el port i el protocol) a través d'XMPP. També utilitza HTTP cap a un servidor anomenat \emph{mediator}, aquest fa la funció de \keyword{DHCP}{Dynamic Host Configuration Protocol} assignant una IP única per sessió a cada \emph{peer} de la \okeyword{VPN}, d'aquesta manera es garanteix que no hi hagi conflictes d'IPs.
 \begin{figure}[htb]
 \centering
 \includegraphics[height=0.5\textwidth]{images/vpn-externalized}
 \caption{Topologia d'una VPN amb autenticació externa}
 \label{F:vpn-externalized}
 \end{figure}
-Per tant podem dir que Wippien crea \okeyword{VPN}s mallades i completament connectades per cada anella de confiança, amb autenticació (i assignació de les IPs) per part de un servidor central extern (veure la figura \ref{F:vpn-externalized}).
+Per tant podem dir que Wippien crea \okeyword{VPN}s mallades i completament connectades per cada anella de confiança, amb autenticació (i assignació de les IPs) per part d'un servidor central extern (veure la figura \ref{F:vpn-externalized}).
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les \okeyword{VPN}s que utilitzin el seu servidor \emph{mediator} pertanyen a la xarxa 5.0.0.0/8.
 
-A nivell de seguretat utilitza un protocol propi amb AES128, mitjançant un component privatiu anomenat \emph{wodVPN ActiveX}, aquest component es \emph{NAT friendly} (està preparat per travessar els routers \okeyword{NAT}) i suporta tant TCP com UDP.
+A nivell de seguretat utilitza un protocol propi amb AES128, mitjançant un component privatiu anomenat \emph{wodVPN ActiveX}, aquest component és \emph{NAT friendly} (està preparat per travessar els routers \okeyword{NAT}) i suporta tant TCP com UDP.
 
 \subsection{Hamachi}
 Hamachi és un programa privatiu de \okeyword{VPN}s a nivell d'aplicació que suporta tant túnels IP com túnels \keyword{IPX}{Internetwork Packet Exchange}.
-El programa utilitza una connexió a un servidor central com a canal de control, en arrancar efectua el procés d'autenticació amb aquest servidor i s'efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT. Finalment el servidor entrega al client la llista de \okeyword{VPN}s del client juntament amb la llista dels seus membres que s'actualitza constantment cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda en el proces dels clients de superar els routers NAT (és una aplicació \emph{NAT friendly}), en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
+El programa utilitza una connexió a un servidor central com a canal de control, en arrancar efectua el procés d'autenticació amb aquest servidor i efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT (per tant és una aplicació \emph{NAT friendly}). Finalment el servidor entrega al client la seva llista de \okeyword{VPN}s juntament amb la llista dels membres que s'actualitza constantment cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda: en el procés de superar els routers NAT, en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
 
 Utilitza una única interfície de xarxa en cada màquina per tota la \okeyword{VPN}. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la \okeyword{VPN} a nivell d'aplicació. Totes les IPs de les \okeyword{VPN}s pertanyen a la xarxa 5.0.0.0/8.
 
-A nivell de seguretat la VPN utilitza un protocol propi sobre de UDP.
+A nivell de seguretat la VPN utilitza un protocol propi sobre UDP.
 
 \subsection{ELA VPN}
 \keyword{ELA}{Everywhere Local Area network} és un programa de VPN a nivell d'aplicació.
-Utilitza una topologia de nodes mallada (figura \ref{F:vpn-meshed}) connectada tant amb un protocol propi tant amb TCP com amb UDP.
+Utilitza una topologia de nodes mallada (veure la figura \ref{F:vpn-meshed}) connectada tant amb un protocol propi tant amb TCP com amb UDP.
 D'aquesta tecnologia no s'ha trobat cap implementació, el \emph{paper} descriptiu es troba adjunt a l'annex \refannexpapers.
 
 %\section{Comparativa}
