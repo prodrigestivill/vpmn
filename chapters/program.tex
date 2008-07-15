@@ -1,21 +1,53 @@
 \chapter{Programació}
 \section{Funcionament}
-L'aplicació a l'arrancar es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvien la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets.
+L'aplicació a l'arrancar es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvien la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets. Per tal de que el NAT no tanqui el port d'entrada, cal que l'aplicació no pari d'enviar paquets a tots el nodes. La idea es aprofitar aquest paquets per informar als altres nodes de l'informació d'altres nodes coneguts, per així garantir una malla completament connectada (veure figura \ref{F:vpn-fullymeshed}).
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.5\textwidth]{images/vpn-fullymeshed}
+\caption{Topologia d'una VPN mallada completament connectada}
+\label{F:vpn-fullymeshed}
+\end{figure}
+Una vegada creada la malla l'aplicació ja pot enrutar directament a cada node el trafic que li correspon, sense haver de passar per cap altre node. Per evitar \emph{overhead} l'aplicació enviarà directament els paquets IP enlloc de les trames Ethernet.
 
 \section{Disseny del Protocol}
 \subsection{Seguretat}
-L'objectiu es que tots els nodes puguin realitzar els túnels amb les garanties de les operacions criptogràfiques com el xifrat, la firma digital i el no repudi. De manera que cada node té les garanties de estar entregant l'informació directament al destí correcte i sap que cap altre pot estar ni llegint ni manipulant, i també viceversa cada node té les garanties de rebre l'informació del origen correcte.
+L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els túnels amb les garanties de les operacions criptogràfiques com el xifrat, la firma digital i el no repudi. De manera que cada node té les garanties de estar entregant l'informació directament al destí correcte i sap que cap altre pot estar ni llegint ni manipulant, i també viceversa cada node té les garanties de rebre l'informació del origen correcte.
 
-Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es pot realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. També es necessari un mecanisme de validació de les rutes que cada node ofereix, de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat obliga a fixar un adreçament IP estàtic si es vol fer que no depengui de cap servidor \emph{mediator}, que faci de \okeyword{DHCP}.
+Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es pot realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans de altres membres de la VPN en els quals no tenen perquè confiar cap dels dos interessats en la comunicació. També es necessari un mecanisme de validació de les rutes que cada node ofereix, de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat si es vol dependre de cap servidor \emph{mediator} (que faci de \okeyword{DHCP}) obligarà a fixar un adreçament IP estàtic.
 
 Per tant el primer que cal establir es el funcionament del adreçament IP, per a fer-ho es contemplen dos possibilitats:
 \begin{itemize}
 \item L'utilització de un adreçament que es calculi a partir dels certificats.
 \item L'incrustació de l'adreçament dins dels camps dels certificats.
 \end{itemize}
-La primera opció consisteix en definir una distribució de direccions IP de la que a partir de un certificat se li pugui assignar una única IP, això facilita la generació de certificats ja que es poden utilitzar certificats genèrics. En canvi es corre el risc de trobar col·lisions amb l'algoritme esmentat i que hi haguí conflictes amb IPs compartides. Per tant s'optarà per la segona opció, malgrat aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats x509 per emmagatzemar les polítiques d'assignació d'IPs que els administradors de la VPN validin.
+La primera opció consisteix en definir una distribució de direccions IP de la que a partir de un certificat se li pugui assignar una única IP, això facilita la generació de certificats ja que es poden utilitzar certificats genèrics. Però, en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant que hi haguí conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat aquesta sigui més costosa pels administradors dels certificats, aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority}.
 
-\subsubsection{DTLS}
+Es va trobar que les extensions x509v3 per a certificats tenien definida una entrada anomenada \emph{nameConstraints}, aquesta entrada permet definir múltiples tipus de permisos tant de permetre com de excloure (veure exemple en la taula \ref{T:nameconstraints}).
+\begin{table}[htb]
+\begin{center}
+\begin{minipage}[htb]{0.6\linewidth}
+\footnotesize
+\begin{verbatim}
+nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
+nameConstraints=permitted;email:.somedomain.com
+nameConstraints=excluded;email:.com
+\end{verbatim}
+\end{minipage}
+\caption{Exemples de x509v3 nameConstraints}
+\label{T:nameconstraints}
+\end{center}
+\end{table}
+Per a aquesta aplicació només es farà ús dels permisos de tipus IP. D'aquesta manera és la \okeyword{CA} l'encarregada de assegurar-se de no validar cap certificat amb una IP ja assignada prèviament, així com també de mantenir un registre de les IPs assignades.
+
+%UDP+DTLS
+El protocol IP està dissenyat per un medi hostil on els paquets es desordenen o es perden, l'ús de \keyword{TCP}{Transmission Control Protocol} permet oblidar-se d'aquest medi ja que s'encarrega de l'ordenació i de la recuperació de les pèrdues. Degut a que la majoria de comunicacions utilitzen TCP una VPN trametrà majoritàriament dins dels paquets IP encapsulats paquets TCP.
+En el cas d'utilitzar una VPN sobre TCP i haver-hi congestió a la xarxa, aquesta provocaria la pèrdua dels paquets de la connexió de la VPN i per tant també dels paquets TCP que hi són encapsulats. Com a conseqüència les dos implementacions de TCP reenviarien els paquets perduts de forma que la xarxa encara es saturaria més tenint cada cop més paquets iguals retransmetent-se.
+El protocol IP permet enviar paquets sense control de pèrdues mitjançant \keyword{UDP}{User Datagram Protocol}, aquest protocol és el que la majoria de VPNs intenten utilitzar per millorar l'eficiència en aquests casos, a més a més no  perjudica en cap mesura ja que com s'ha dit el protocol IP que va dins de la VPN està dissenyat per un medi amb pèrdues.
+
+El programari de VPNs és complica ja que malgrat sembli que UDP sigui la solució no hi ha implementacions conegudes de capes de seguretat sobre UDP. És per això que la majoria d'elles opten per implementar-se els seus protocols propis de seguretat.
+Peter Gutmann va analitzar nombroses aplicacions VPN i descriure les nombroses errades de disseny del protocol de seguretat, l'error que remarcava era que la majoria d'elles volien simplificar els estàndards segurs ja que són complicats, però conclou que fer que un protocol sigui segur en la seva totalitat és complexe (veure l'annex \refannexmail{} on es troba el e-mail on exposa el seu anàlisi).
+%
+%\refannexmail{}
 
 \subsection{Definició de paquets}
 %Fragmentació a quin nivell.
