@@ -13,7 +13,7 @@ Una vegada creada la malla l'aplicació ja pot enrutar directament a cada node e
 \subsection{Seguretat}
 L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els túnels amb les garanties criptogràfiques del xifrat, la firma digital i el no repudi. De manera que cada node té les garanties d'estar entregant la informació directament al destí correcte, sabent que cap altre pot estar ni llegint ni manipulant. També els altres nodes tenen les garanties de rebre la informació de l'origen correcte.
 
-Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es pot realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de \okeyword{DHCP}) obligarà a fixar un adreçament IP estàtic.
+Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es pot realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
 
 Per tant el primer que cal establir és el funcionament de l'adreçament IP. Per a fer-ho es contemplen dues possibilitats: l'utilització d'un adreçament que es calculi a partir dels certificats o la incrustació de l'adreçament dins d'algun camp dels certificats.
 La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi és corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority}.
@@ -33,7 +33,7 @@ nameConstraints=excluded;email:.com
 \label{T:nameconstraints}
 \end{center}
 \end{table}
-Per a aquesta aplicació només es farà ús dels permisos de tipus IP. D'aquesta manera és la \okeyword{CA} l'encarregada d'assegurar-se que no validi cap certificat amb una IP ja assignada prèviament, així com també de mantenir un registre de les IPs assignades.
+Per a aquesta aplicació només es farà ús dels permisos de tipus IP. D'aquesta manera és la CA l'encarregada d'assegurar-se que no validi cap certificat amb una IP ja assignada prèviament, així com també de mantenir un registre de les IPs assignades.
 
 %UDP+DTLS
 El protocol IP està dissenyat per un medi hostil on els paquets es desordenen o es perden, l'ús de TCP permet oblidar-se d'aquest medi ja que s'encarrega de l'ordenació i de la recuperació de les pèrdues. Degut a que la majoria de comunicacions utilitzen TCP, una VPN transmetrà majoritàriament dins dels paquets IP encapsulats paquets TCP.
@@ -67,7 +67,7 @@ Per evitar afegir més capçaleres (\emph{overhead}) en els paquets més importa
 \scriptsize
 \begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.12\linewidth}|p{0.045\linewidth}|p{0.21875\linewidth}c|}
 \hline
-bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-18 & \centering 19-31 & \\ \hline \hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16-18 & \centering 19--31 & \\ \hline \hline
 0 & \centering Version & \centering HLen & \centering ToS & \multicolumn{2}{|c}{Total Lenght} & \\ \hline
 32 & \multicolumn{3}{|c|}{Identification} & \centering Flags & \centering Fragment Offset & \\ \hline
 64 & \multicolumn{2}{|c|}{TTL} & \centering Protocol & \multicolumn{2}{|c}{Header Checksum} & \\ \hline
@@ -89,7 +89,7 @@ La resta de paquets considerats d'ús exclusivament intern, fan la funció de se
 \scriptsize
 \begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
 \hline
-bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 & \\ \hline \hline
 0 & \centering 0000 & \centering 0001 & \centering Pkt ID & \centering Total Lenght & \\ \hline
 \end{tabular}
 \end{center}
@@ -110,7 +110,7 @@ Els tipus de paquets i els seus identificadors són:
 \scriptsize
 \begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
 \hline
-bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 & \\ \hline \hline
 0 & \centering 0000 & \centering 0001 & \centering 0x00 & \centering Total Lenght & \\ \hline
 32 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \cline{0-3} \noalign{\vskip 2pt} \hline
 48 & \multicolumn{4}{|c}{Network IP} & \\ \hline
@@ -134,7 +134,7 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \scriptsize
 \begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
 \hline
-bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 & \\ \hline \hline
 0 & \centering 0000 & \centering 0001 & \centering 0x01 & \centering 0x04 & \\ \hline
 \end{tabular}
 \end{center}
@@ -152,7 +152,7 @@ bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\
 \scriptsize
 \begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
 \hline
-bits & \centering 0-3 & \centering 4-7 & \centering 8-15 & \centering 16-31 & \\ \hline \hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 & \\ \hline \hline
 0 & \centering 0000 & \centering 0001 & \centering 0x02 & \centering Total Lenght & \\ \hline
 32 & \multicolumn{2}{|c|}{\# Peers} \\ \cline{0-2} \noalign{\vskip 2pt} \cline{0-3}
 40 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \hline
@@ -191,12 +191,12 @@ Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
 \end{figure}
 \clearpage%Optional
 \subsection{Interfície TUN}
-L'aplicació fa ús del \emph{driver} genèric \okeyword{TUN}/\okeyword{TAP}. S'ha escollit aquest \emph{driver} ja que està disponible per la majoria de sistemes operatius i facilitarà la possible futura adaptació de l'aplicació.
+L'aplicació fa ús del \emph{driver} genèric TUN/TAP. S'ha escollit aquest \emph{driver} ja que està disponible per la majoria de sistemes operatius i facilitarà la possible futura adaptació de l'aplicació.
 
-\subsubsection{Driver TUN/TAP}
+%\subsubsection{Driver TUN/TAP}
 El \emph{driver} TUN/TAP es un \emph{driver} de \emph{kernel} d'una targeta de xarxa virtual, i per tant no depèn del cap targeta real física. El driver es separa en dos \emph{sub-drivers}:
 \begin{itemize}
-\item \textbf{Driver TAP} simula una interfície de xarxa Ethernet i treballa amb trames de capa 2 del \okeyword{model OSI}.
+\item \textbf{Driver TAP} simula una interfície de xarxa Ethernet i treballa amb trames de capa 2 del model OSI.
 \item \textbf{Driver TUN} simula una interfície de xarxa punt-a-punt i treballa amb trames de capa 3 del model OSI.
 \end{itemize}
 
