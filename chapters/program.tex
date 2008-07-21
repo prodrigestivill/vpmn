@@ -53,11 +53,15 @@ Per el disseny del protocol es necessita un identificador únic per cada node. E
 \item La IP i port del node
 \item La IP publica i port del node
 \item Agrupació de IPs i ports (locals i públics)
-\item Xarxes que publicita el node
+\item Xarxes que publica el node
 \end{itemize}
-L'utilització de la IP i el port no és informació suficient degut a l'existència de xarxes privades i publiques, també els NAT simètrics no donen el mateix port per a tots els hosts remots on es connecti un mateix node.
+L'utilització de la IP i el port no és informació suficient degut a l'existència de xarxes privades i publiques.%, també els NAT simètrics no donen el mateix port per a tots els hosts remots on es connecti un mateix node.
 L'utilització de la IP publica per aquesta tasca no és valida ja que deixa de ser única si hi ha dos nodes al costat privat abans de un NAT. Aquest dos en trobar-se es pensaran que són nodes diferents dels que coneixen amb IP pública.
+L'utilització de l'agrupació de IPs i ports tant locals com públics sembla prou vàlid, però de vegades s'utilitza un NAT per ajuntar diferents subxarxes de mateix identificador de xarxa.
+Les xarxes que publica o ofereix un node és una informació validada per la CA i no pot ser repetida per cap altre node de la VPN. És per això que aquesta última opció serà la utilitzada alhora de identificar els nodes.
 
+Les VPN encapsulen trafic IP dins de IP.
+Abans de definir els paquets 
 En el moment de posar ...
 %Fragmentació a quin nivell.
 
