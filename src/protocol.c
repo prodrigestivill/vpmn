@@ -40,7 +40,7 @@
 struct protocol_1id_s *protocol_v1id;
 int protocol_v1id_len;
 struct protocol_1ida_s protocol_v1ida;
-#define protocol_v1ida_len sizeof (struct protocol_1ida_s);
+#define protocol_v1ida_len sizeof (struct protocol_1ida_s)
 struct protocol_1ka_s *protocol_v1ka;
 int protocol_v1ka_len;
 int protocol_v1ka_maxlen;
@@ -101,13 +101,14 @@ int protocol_processpeer(struct peer_s *peer,
 void protocol_recvpacket(const char *buffer, const int buffer_len,
                          struct udpsrvsession_s *session)
 {
+  uint16_t len;
   int i;
   void *p;
-  struct iphdr *ip = NULL;
+  const struct protocol_ip *ip = (struct protocol_ip *) buffer;
   struct peer_s *peer;
   if (buffer_len < 4)
     return;
-  ip = (struct iphdr *) buffer;
+  len = ntohs(ip->tot_len);
   if (ip->version == 4)         //IPv4 packet
     {
       if (session->peer == NULL
@@ -127,13 +128,12 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                     inet_ntoa(*(struct in_addr *) &ip->saddr));
           return;
         }
-      if (ip->tot_len > buffer_len)
-        return;
-      tundev_write(buffer, ip->tot_len);
-      if (ip->tot_len + 4 <= buffer_len)
-        protocol_recvpacket(&buffer[ip->tot_len], buffer_len - ip->tot_len,
-                            session);
-      return;
+      if (len > buffer_len)
+        {
+          log_error("Invalid size %d > %d.\n", len, buffer_len);
+          return;
+        }
+      tundev_write(buffer, len);
     }
 //else if (ip->version == 6) //IPv6 Packet
   else if (ip->version == PROTOCOL1_V)  //Internal packets v1
@@ -148,12 +148,8 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
               session->peer->stat |= PEER_STAT_IDK;
               pthread_mutex_unlock(&session->peer->modify_mutex);
             }
-          if (ip->tot_len + 4 <= buffer_len)
-            protocol_recvpacket(&buffer[ip->tot_len],
-                                buffer_len - ip->tot_len, session);
         }
-
-      if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_ID)
+      else if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_ID)
         {
           log_debug("ID...\n");
           if (session->peer == NULL)
@@ -190,20 +186,19 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
               timeout_update(&peer->timeout);
               pthread_mutex_unlock(&peer->modify_mutex);
               if (peer_add(peer, session) < 1)
-                peer_destroy(peer);
+                {
+                  peer_destroy(peer);
+                  return;
+                }
             }
           //-TODO: JOIN packets
           protocol_sendpacket(session, PROTOCOL1_IDA);
           if ((peer->stat & PEER_STAT_IDK) == 0)
             protocol_sendpacket(session, PROTOCOL1_ID);
-          if (ip->tot_len + 4 <= buffer_len)
-            protocol_recvpacket(&buffer[ip->tot_len],
-                                buffer_len - ip->tot_len, session);
-          return;
         }
-      if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_KA)
+      else if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_KA)
         {
-          if (ip->tot_len > buffer_len)
+          if (len > buffer_len)
             return;
           log_debug("KA...\n");
           if (session->peer != NULL
@@ -211,15 +206,14 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
             {
               timeout_update(&session->peer->timeout);
               p = (void *) buffer + sizeof(struct protocol_1ka_s);
-              while (p <= (void *) &buffer[ip->tot_len - 1])
+              while (p <= (void *) &buffer[len - 1])
                 {
                   peer = peer_create();
                   i =
                     protocol_processpeer(peer,
                                          (struct protocol_peer_s *) p,
                                          (int) ((void *)
-                                                &buffer[ip->tot_len - 1] -
-                                                p));
+                                                &buffer[len - 1] - p));
                   if (i < 0)
                     {
                       peer_destroy(peer);
@@ -234,32 +228,52 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                     peer_destroy(peer);
                 }
             }
-          if (ip->tot_len + 4 <= buffer_len)
-            protocol_recvpacket(&buffer[ip->tot_len],
-                                buffer_len - ip->tot_len, session);
-          return;
         }
+      else
+        return;
     }
+  else
+    return;
+  if (len + 4 <= buffer_len)
+    protocol_recvpacket(buffer + len, buffer_len - len, session);
 }
 
 int protocol_sendframe(const char *buffer, const int buffer_len)
 {
-  struct iphdr *ip = NULL;
+  int ret = -1;
+  uint16_t len;
+  const struct protocol_ip *ip = (struct protocol_ip *) buffer;
   struct peer_s *dstpeer = NULL;
   if (buffer_len < 20)
     return -1;
-  ip = (struct iphdr *) buffer;
   //Check for IPv4
   if (ip->version == 4)
     {
+      len = ntohs(ip->tot_len);
+      if (len > buffer_len)
+        {
+          log_error("Invalid size %d > %d.\n", len, buffer_len);
+          return -1;
+        }
       if (router_checksrc((struct in_addr *) &ip->saddr, &tun_selfpeer) ==
           0)
         {
           //-TODO: CHECK BROADCAST
           dstpeer = router_searchdst((struct in_addr *) &ip->daddr);
+          if (dstpeer != NULL && dstpeer->udpsrvsession != NULL)
+            {
+              log_debug("Sending frame. (%d)\n", len);
+              udpsrvdtls_write(buffer, len, dstpeer->udpsrvsession);
+              ret = 0;
+            }
+          else
+            log_error("Invalid destination.\n");
         }
       else
         log_error("Invalid source.\n");
+      if (len + 20 <= buffer_len)
+        return protocol_sendframe(buffer + len, buffer_len - len);
+      return ret;
     }
   //Check for IPv6
   else if (ip->version == 6)
@@ -269,12 +283,6 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
     }
   else
     log_error("Unknow protocol not implemented.\n");
-  if (buffer_len > 0 && dstpeer != NULL && dstpeer->udpsrvsession != NULL)
-    {
-      log_debug("Sending frame. (%d)\n", buffer_len);
-      udpsrvdtls_write(buffer, buffer_len, dstpeer->udpsrvsession);
-      return 0;
-    }
   log_debug("Frame lost. (%d)\n", buffer_len);
   return -1;
 }
@@ -326,7 +334,7 @@ void protocol_slidekeepalive()
   protocol_v1ka_len =
     sizeof (struct protocol_1ka_s) + i * sizeof (struct protocol_addrpair_s);
   protocol_v1ka_pos += i;
-  protocol_v1ka->base.tot_len = protocol_v1ka_len;
+  protocol_v1ka->base.tot_len = htons(protocol_v1ka_len);
 */
 }
 
@@ -338,9 +346,7 @@ void protocol_init()
   protocol_v1ida.base.version = PROTOCOL1_V;
   protocol_v1ida.base.ihl = 1;
   protocol_v1ida.base.pid = PROTOCOL1_IDA;
-  protocol_v1ida.base.tot_len = sizeof(struct protocol_1ida_s);
-  protocol_v1ida.padding1 = 0;
-  protocol_v1ida.padding2 = 0;
+  protocol_v1ida.base.tot_len = htons(protocol_v1ida_len);
   protocol_v1id_len = sizeof(struct protocol_1id_s) +
     tun_selfpeer.shared_networks_len * sizeof(struct protocol_netpair_s) +
     tun_selfpeer.addrs_len * sizeof(struct protocol_addrpair_s);
@@ -348,7 +354,7 @@ void protocol_init()
   protocol_v1id->base.version = PROTOCOL1_V;
   protocol_v1id->base.ihl = 1;
   protocol_v1id->base.pid = PROTOCOL1_ID;
-  protocol_v1id->base.tot_len = protocol_v1id_len;
+  protocol_v1id->base.tot_len = htons(protocol_v1id_len);
   if (tun_selfpeer.addrs_len < 256)
     protocol_v1id->peer.len_addr = tun_selfpeer.addrs_len;
   else

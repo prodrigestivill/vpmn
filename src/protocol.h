@@ -24,7 +24,7 @@
 #ifndef _PROTOCOL_H
 #define _PROTOCOL_H
 
-#include <netinet/ip.h>
+#include <sys/types.h>
 #include <bits/endian.h>
 #include "router.h"
 
@@ -58,6 +58,29 @@ struct protocol_peer_s
 //struct protocol_addrpair_s addrpairs[];
 } __attribute((packed));
 
+/* Protocol IPv4 */
+struct protocol_ip
+{
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+  unsigned int ihl:4;
+  unsigned int version:4;
+#elif __BYTE_ORDER == __BIG_ENDIAN
+  unsigned int version:4;
+  unsigned int ihl:4;
+#else
+# error	"Please fix <bits/endian.h>"
+#endif
+  u_int8_t tos;
+  u_int16_t tot_len;
+  u_int16_t id;
+  u_int16_t frag_off;
+  u_int8_t ttl;
+  u_int8_t protocol;
+  u_int16_t check;
+  u_int32_t saddr;
+  u_int32_t daddr;
+} __attribute((packed));
+
 /* Protocol 1 empty */
 struct protocol_1_s
 {
@@ -85,8 +108,6 @@ struct protocol_1id_s
 struct protocol_1ida_s
 {
   struct protocol_1_s base;
-  uint8_t padding1;
-  uint16_t padding2;
 } __attribute((packed));
 
 /* Protocol 1 Keep Alive

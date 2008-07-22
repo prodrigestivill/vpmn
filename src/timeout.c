@@ -28,6 +28,7 @@ void timeout_update(timeout_t * tv)
 {
   gettimeofday(tv, (struct timezone *) 0);
 //Alternativaly consider clock_t clock(void);
+
 }
 
 time_t timeout_get(const timeout_t * tv)

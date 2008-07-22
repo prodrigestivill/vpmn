@@ -56,6 +56,17 @@ struct peer_s *router_searchdst(const struct in_addr *dst)
   return NULL;
 }
 
+int router_existpeer(struct in_network *networks, int len)
+{
+  int i;
+  for (i = 0; i < len; i++)
+    {
+      if (router_existroute(&networks[i]) == 1)
+        return 1;
+    }
+  return 0;
+}
+
 int router_existroute(struct in_network *network)
 {
   struct router_table_l *current = router_table;

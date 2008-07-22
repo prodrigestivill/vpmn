@@ -99,7 +99,7 @@ int vpmnd_start()
 
 int vpmnd_help()
 {
-  printf("Use the configuration file as a parameter.\n");
+  printf("vpmnd [cfgfile]\nUse the configuration file as a parameter.\n");
 }
 
 int main(int argc, char *argv[])

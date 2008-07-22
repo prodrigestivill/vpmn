@@ -32,16 +32,16 @@ struct peer_l
   struct peer_l *next;
 };
 
+int peer_addnew(struct peer_s *peer)
+{
+  //-TODO
+}
+
 int peer_add(struct peer_s *peer, struct udpsrvsession_s *session)
 {
   int i;
   if (peer->shared_networks_len < 1)
     return -1;
-  /*
-     for (i = 0; i < peer->shared_networks_len; i++)
-     if (router_existroute(&peer->shared_networks[i]) > 0)
-     return -1;
-   */
 
   for (i = 0; i < peer->shared_networks_len; i++)
     router_addroute(&peer->shared_networks[i], peer);
@@ -58,7 +58,7 @@ struct peer_s *peer_create()
   newpeer->addrs_len = 0;
   newpeer->shared_networks = NULL;
   newpeer->shared_networks_len = 0;
-  newpeer->stat = PEER_STAT_NEW;
+  newpeer->stat = PEER_STAT_NULL;
   pthread_mutex_init(&newpeer->modify_mutex, NULL);
   return newpeer;
 }

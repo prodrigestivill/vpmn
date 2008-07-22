@@ -29,9 +29,6 @@
 #include "peer.h"
 #include "../config.h"
 
-void config_load(char *cfgfile);
-void config_fistpeersinit();
-
 uid_t vpmnd_uid;
 gid_t vpmnd_gid;
 int daemonize;

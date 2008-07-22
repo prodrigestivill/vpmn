@@ -27,11 +27,16 @@
 
 #define DEBUG 3
 
-#if DEBUG > 0
 #include <stdio.h>
-#define log_print(s, format, ...) { \
+#define log_fail(format, ...) { \
 fprintf (stderr, format, ## __VA_ARGS__);\
 fflush(stderr);\
+exit(128);\
+}
+#if DEBUG > 0
+#define log_print(s, format, ...) { \
+fprintf (s, format, ## __VA_ARGS__);\
+fflush(s);\
 }
 #endif
 #if DEBUG > 2                   // DEBUG = 3
