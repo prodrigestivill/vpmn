@@ -1,5 +1,7 @@
 \chapter{Programació}
-\section{Funcionament}
+\section{Funcionament de l'aplicació}
+L'objectiu de l'aplicació és ser capaç de crear xarxes privades virtuals que no depenguin de cap servidor central, superar els routers NAT i proporcionar una baixa latència.
+
 L'aplicació d'aquest projecte, en arrancar, es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvia la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets. Per tal que el NAT no tanqui el port d'entrada, cal que l'aplicació no pari d'enviar paquets a tots el nodes. La idea és aprofitar aquests paquets per informar dels altres nodes coneguts, per així garantir una malla completament connectada (veure figura \ref{F:vpn-fullymeshed}).
 \begin{figure}[htb]
 \centering
@@ -7,13 +9,13 @@ L'aplicació d'aquest projecte, en arrancar, es posa en contacte amb els nodes q
 \caption{Topologia d'una VPN mallada completament connectada}
 \label{F:vpn-fullymeshed}
 \end{figure}
-Una vegada creada la malla l'aplicació ja pot enrutar directament a cada node el tràfic que li correspon, sense haver de passar per cap altre node. Per evitar afegir més capçaleres de les necessitaries (\emph{overhead}) l'aplicació enviarà directament els paquets IP enlloc de les trames Ethernet.
+Una vegada creada la malla l'aplicació ja pot enrutar directament a cada node el tràfic que li correspon, sense haver de passar per cap altre node i permetent així una baixa latència. Per evitar afegir més capçaleres de les necessitaries (\emph{overhead}) l'aplicació enviarà directament els paquets IP enlloc de les trames Ethernet.
 
 \section{Disseny del Protocol}
 \subsection{Seguretat}
-L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els túnels garantint els serveis criptogràfics del xifrat, l'autenticació i el no repudi. De manera que cada node té les garanties d'estar entregant la informació directament al destí correcte, sabent que cap altre pot estar ni llegint ni manipulant. També els altres nodes tenen les garanties de rebre la informació de l'origen correcte.
+L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els túnels garantint els serveis criptogràfics del xifrat, l'autenticació i el no repudi. De manera que cada node té la certesa d'estar entregant la informació directament al destí indicat, sabent que cap altre pot estar ni llegint ni manipulant. També els altres nodes tenen la mateixa certesa de rebre la informació de l'origen indicat.
 
-Per assolir aquest objectiu s'han de realitzar connexions directes entre tots els nodes, i no es poden realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
+Per assolir aquest objectiu juntament amb el de la baixa latència s'han de realitzar connexions directes entre tots els nodes, i no es poden realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
 
 Per tant el primer que cal establir és el funcionament de l'adreçament IP. Per a fer-ho es contemplen dues possibilitats: l'utilització d'un adreçament que es calculi a partir dels certificats o la incrustació de l'adreçament dins d'algun camp dels certificats.
 La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority}.
@@ -36,8 +38,8 @@ nameConstraints=excluded;email:.com
 Per a aquesta aplicació només es farà ús dels permisos de tipus IP. D'aquesta manera és la CA l'encarregada d'assegurar-se que no validi cap certificat amb una IP ja assignada prèviament, així com també de mantenir un registre de les IPs assignades.
 
 %UDP+DTLS
-El protocol IP està dissenyat per un medi hostil on els paquets es desordenen o es perden, l'ús de TCP permet oblidar-se d'aquest medi ja que s'encarrega de l'ordenació i de la recuperació de les pèrdues. Degut a que la majoria de comunicacions utilitzen TCP, una VPN transmetrà majoritàriament dins dels paquets IP encapsulats paquets TCP.
-En el cas d'utilitzar una VPN sobre TCP i haver-hi congestió a la xarxa, aquesta provocaria la pèrdua dels paquets de la connexió de la VPN i per tant també dels paquets TCP que hi són encapsulats. Com a conseqüència les dos piles (\emph{stacks}) de TCP reenviarien els paquets perduts de forma que la xarxa encara es saturaria més, tenint cada cop més paquets iguals retransmetent-se.
+Pel que fa la informació a transportar, el protocol IP està dissenyat per un medi hostil on els paquets es desordenen o es perden, però l'ús de TCP permet oblidar-se d'aquest medi ja que s'encarrega de l'ordenació i de la recuperació de les pèrdues. Degut a que la majoria de comunicacions utilitzen TCP, una VPN transmetrà majoritàriament paquets TCP encapulats dins del protocol que utilitzin pel transport.
+En el cas d'utilitzar una VPN sobre TCP i haver-hi congestió a la xarxa, aquesta provocaria la pèrdua dels paquets de la connexió de la VPN i per tant també dels paquets TCP que hi són encapsulats. Com a conseqüència, les dos piles (\emph{stacks}) de TCP reenviarien els paquets perduts de forma que la xarxa encara es saturaria més, tenint cada cop més paquets iguals retransmetent-se.
 El protocol IP permet enviar paquets sense control de pèrdues mitjançant UDP, aquest protocol és el que la majoria de VPNs intenten utilitzar per millorar l'eficiència en el cas explicat anteriorment. A més a més no  perjudica en cap mesura, ja que com s'ha dit el protocol IP que va dins de la VPN està dissenyat per un medi amb pèrdues.
 
 El programari de VPNs es complica ja que malgrat sembli que UDP sigui la solució no hi ha implementacions conegudes de capes de seguretat sobre UDP. És per això que la majoria d'elles opten per implementar els seus protocols propis de seguretat.
@@ -45,13 +47,13 @@ Peter Gutmann va analitzar nombroses aplicacions VPN i en va descriure les nombr
 
 Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UDP, es decideix no utilitzar el TCP i buscar intensament alguna implementació el més segura possible o fins hi tot a poder ser estàndard. Finalment es va trobar un protocol del 2004 basat en TLS, que van dissenyar N. Modadugu i E. Rescorla de la universitat d'Stanford, anomenat \keyword{DTLS}{Datagram Transport Layer Security} i més tard el 2006 va esdevenir el RFC 4347 del IETF. A l'annex \refannexpapers{} es troba el \emph{paper} inicial que descriu el protocol. El mateix equip va treballar en una variant del DTLS (el borrador RFC ha caducat i es diu \emph{Extensions for Datagram Transport Layer Security (TLS) in Low Bandwidth Environments}) per estalviar ample de banda. Proposaven treure els camps repetits a cada \emph{record} de TLS i DTLS que segons ells no són necessaris. Degut a que aquesta variant no va tenir massa èxit i no va esdevenir RFC, en aquest projecte es farà ús del DTLS que descriu el RFC 4347, aquest protocol està implementat en les versions més recents de la llibreria OpenSSL i és la implementació que s'ha decidit utilitzar.
 
-Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Per tal de que sigui significatiu han de coincidir múltiples factors i tampoc no hi ha cap implementació que ho tingui en compte, així que no es tindrà en compte en aquest programari.
+Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Si coincidissin múltiples factors el xifratge resultant podria esdevenir menys segur, però no hi ha cap implementació que ho tingui en compte ja que la probabilitat de que coincidissin es molt baixa, així que tampoc no es tindrà en compte en aquest programari.
 
 \subsection{Definició de paquets}
 Per el disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
 \begin{itemize}
 \item La IP i port del node
-\item La IP publica i port del node
+\item La IP pública i port del node
 \item Agrupació de IPs i ports (locals i públics)
 \item Xarxes que publica el node
 \end{itemize}
@@ -87,7 +89,7 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16-18 &
 \label{T:ippkt}
 \end{center}
 \end{table}
-La resta de paquets considerats d'ús exclusivament intern, fan la funció de senyalització de la VPN. Inspirats amb els paquets IP es podran diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). La part de IP destinada a \keyword{ToS}{Type of Service} servirà per definir el tipus de paquet (veure taula \ref{T:inpkt}).
+Els paquets considerats d'ús exclusivament intern, que fan la funció de senyalització de la VPN, tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). La part que IP destinada a \keyword{ToS}{Type of Service} en els paquets de senyalització servirà per definir el tipus de paquet d'intern (veure taula \ref{T:inpkt}).
 \begin{table}[hbt]
 \begin{center}
 \scriptsize
