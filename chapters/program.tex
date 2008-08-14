@@ -202,8 +202,8 @@ L'aplicació fa ús del \emph{driver} genèric TUN/TAP. S'ha escollit aquest \em
 %\subsubsection{Driver TUN/TAP}
 El \emph{driver} TUN/TAP es un \emph{driver} de \emph{kernel} d'una targeta de xarxa virtual, i per tant no depèn del cap targeta real física. El driver es separa en dos \emph{sub-drivers}:
 \begin{itemize}
-\item \textbf{Driver TAP} simula una interfície de xarxa Ethernet i treballa amb trames de capa 2 del model OSI.
-\item \textbf{Driver TUN} simula una interfície de xarxa punt-a-punt i treballa amb trames de capa 3 del model OSI.
+\item \emph{Driver} \textbf{TAP} simula una interfície de xarxa Ethernet i treballa amb trames de capa 2 del model OSI.
+\item \emph{Driver} \textbf{TUN} simula una interfície de xarxa punt-a-punt i treballa amb trames de capa 3 del model OSI.
 \end{itemize}
 
 En aquestes targetes els paquets enviats per el sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats per el \emph{stack} de protocols del \emph{kernel}.
