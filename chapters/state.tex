@@ -59,13 +59,13 @@ L'aplicació independentment de la configuració anterior té diferents modes de
 \item \textbf{Mode servidor}: Permet que se li connectin varis clients.
 \item \textbf{Mode client}: Permet connectar-se al servidor.
 \end{itemize}
-Per tant podem dir que és tracta d'una aplicació pensada per VPNs centralitzades, en la figura \ref{F:vpn-centralized} es mostra un diagrama d'aquesta topologia.
 \begin{figure}[htb]
 \centering
 \includegraphics[height=0.5\textwidth]{images/vpn-centralized}
 \caption{Topologia d'una VPN centralitzada}
 \label{F:vpn-centralized}
 \end{figure}
+Per tant podem dir que és tracta d'una aplicació pensada per VPNs centralitzades, en la figura \ref{F:vpn-centralized} es mostra un diagrama d'aquesta topologia.
 
 A nivell de seguretat utilitza la llibreria Open\keyword{SSL}{Secure Socket Layer (la versió 3 en convertir-se en estàndard es va anomenar TLS)} tant per \keyword{TCP}{Transmission Control Protocol} com per \keyword{UDP}{User Datagram Protocol}: en TCP utilitza l'estàndard \keyword{TLS}{Transport Layer Security} i en UDP utilitza un protocol propi basat en TLS. Permet l'autenticació per claus secretes compartides prèviament, per certificats x509 i per usuari-contrasenya.
 
@@ -106,7 +106,7 @@ A nivell de seguretat la VPN utilitza un protocol propi sobre UDP.
 
 \subsection{ELA VPN}
 \keyword{ELA}{Everywhere Local Area network} és un programa de VPN a nivell d'aplicació.
-Utilitza una topologia de nodes mallada (veure la figura \ref{F:vpn-meshed}) connectada tant amb un protocol propi tant amb TCP com amb UDP.
+Utilitza una topologia de nodes mallada (veure la figura \ref{F:vpn-meshed}) connectada amb un protocol propi tant amb TCP com amb UDP.
 D'aquesta tecnologia no s'ha trobat cap implementació, el \emph{paper} descriptiu es troba adjunt a l'annex \refannexpapers.
 
 \section{Comparativa}
@@ -128,4 +128,4 @@ Nom & Lliure & Topologia & Protocol & Seguretat \\ \hline \hline
 \label{T:statecomp}
 \end{center}
 \end{table}
-Per acabar, la taula (\ref{T:statecomp}) fa un resum de les tecnologies analitzades en aquest capítol. De les tecnologies de nivell d'aplicació disponibles esmentades, només TincVPN permet la creació de VPNs sense necessitar un servidor central. Tot i així, cap d'aquestes tecnologies permet l'utilització d'adreçament autenticat que ha estat definit com a objectiu. Per altre banda IPsec permetria la majoria dels objectius, però degut a que l'implementació necessita estar integrada al nucli dels sistemes operatius i que les diferents implementacions tenen problemes de compatibilitat entre elles, aquesta opció també es descarta.
+Per acabar, la taula \ref{T:statecomp} fa un resum de les tecnologies analitzades en aquest capítol. De les tecnologies de nivell d'aplicació disponibles esmentades, només TincVPN permet la creació de VPNs sense necessitar un servidor central. Tot i així, cap d'aquestes tecnologies permet l'utilització d'adreçament autenticat que ha estat definit com a objectiu. Per altre banda IPsec permetria la majoria dels objectius, però degut a que l'implementació necessita estar integrada al nucli dels sistemes operatius i que les diferents implementacions tenen problemes de compatibilitat entre elles, aquesta opció també es descarta.

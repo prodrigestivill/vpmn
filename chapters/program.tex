@@ -62,10 +62,8 @@ L'utilització de la IP publica per aquesta tasca no és valida ja que deixa de 
 L'utilització de l'agrupació de IPs i ports tant locals com públics sembla prou vàlid, però de vegades s'utilitza un NAT per ajuntar diferents subxarxes de mateix identificador de xarxa.
 Les xarxes que publica o ofereix un node és una informació validada per la CA i no pot ser repetida per cap altre node de la VPN. És per això que aquesta última opció serà la utilitzada alhora de identificar els nodes.
 
-Les VPN encapsulen trafic IP dins de IP.
-Abans de definir els paquets 
-En el moment de posar ...
 %Fragmentació a quin nivell.
+Les VPN encapsulen tràfic IP dins del protocol IP, de manera que la màxima informació que poden contenir els paquets IP encapsulats és menor. El protocol definit per donar seguretat permet tant el xifratge com la compressió, aixó complica el càlcul de la màxima informació que poden contenir els paquets; és per aquest motiu que en primera instància es forçarà que la fragmentació dels paquets la faci el sistema operatiu i els \emph{routers} d'entremig, per tant no s'implementarà cap fragmentació dinàmica dins del programa.
 
 Per evitar afegir més capçaleres (\emph{overhead}) en els paquets més importants i freqüents, l'aplicació enviarà directament els paquets IP sense afegir cap identificador (veure taula \ref{T:ippkt}).
 \begin{table}[htb]
