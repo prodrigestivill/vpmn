@@ -63,9 +63,7 @@ L'utilització de l'agrupació de IPs i ports tant locals com públics sembla pr
 Les xarxes que publica o ofereix un node és una informació validada per la CA i no pot ser repetida per cap altre node de la VPN. És per això que aquesta última opció serà la utilitzada alhora de identificar els nodes.
 
 %Fragmentació a quin nivell.
-Les VPN encapsulen tràfic IP dins del protocol IP, de manera que la màxima informació que poden contenir els paquets IP encapsulats és menor. El protocol definit per donar seguretat permet tant el xifratge com la compressió, aixó complica el càlcul de la màxima informació que poden contenir els paquets; és per aquest motiu que en primera instància es forçarà que la fragmentació dels paquets la faci el sistema operatiu i els \emph{routers} d'entremig, per tant no s'implementarà cap fragmentació dinàmica dins del programa.
-
-Per evitar afegir més capçaleres (\emph{overhead}) en els paquets més importants i freqüents, l'aplicació enviarà directament els paquets IP sense afegir cap identificador (veure taula \ref{T:ippkt}).
+Les VPN encapsulen tràfic IP dins del protocol IP, de manera que la màxima informació que poden contenir els paquets IP encapsulats és menor. El protocol definit per donar seguretat permet tant el xifratge com la compressió, això complica el càlcul de la màxima informació que poden contenir els paquets; és per aquest motiu que en primera instància es forçarà que la fragmentació dels paquets la faci el sistema operatiu i els \emph{routers} d'entremig, per tant no s'implementarà cap fragmentació dinàmica dins del programa. En el futur la implementació de la fragmentació dinàmica dins del programa es faria seguint l'estàndard de IP, d'aquesta manera seria transparent al protocol del programa.
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -87,7 +85,9 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16-18 &
 \label{T:ippkt}
 \end{center}
 \end{table}
-Els paquets considerats d'ús exclusivament intern, que fan la funció de senyalització de la VPN, tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). La part que IP destinada a \keyword{ToS}{Type of Service} en els paquets de senyalització servirà per definir el tipus de paquet d'intern (veure taula \ref{T:inpkt}).
+Per evitar afegir més capçaleres (\emph{overhead}) en aquests paquets, ja que són els més importants i freqüents, l'aplicació els enviarà directament els paquets IP sense afegir cap capçalera ni identificador (veure taula \ref{T:ippkt}).
+
+Els altres paquets, considerats d'ús exclusivament intern, fan la funció de senyalització de la VPN. Aquests tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). El camp equivalent al que en IP està destinat a \keyword{ToS}{Type of Service} en els paquets de senyalització servirà per definir el tipus de paquet d'intern (veure taula \ref{T:inpkt}).
 \begin{table}[hbt]
 \begin{center}
 \scriptsize
@@ -102,13 +102,27 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:inpkt}
 \end{center}
 \end{table}
-Els tipus de paquets i els seus identificadors són:
+Els tipus de paquets són:
 \begin{itemize}
-\item \textbf{[0x00] Paquet ID}: Descriu al node que l'envia (taula \ref{T:pktid}).
-\item \textbf{[0x01] Paquet ID ACK}: Confirma haver rebut el paquet ID (taula \ref{T:pktidack}).
-\item \textbf{[0x02] Paquet Keep Alive} (KA): manté el canal obert i envia informació d'altres nodes (taula \ref{T:pktka}).
+\item \textbf{Paquets \emph{Identification}}: Descriuen al node que l'envia.
+\item \textbf{Paquet \emph{Identification Acknowledgment}}: Confirmen haver rebut el paquet \emph{Identification}.
+\item \textbf{Paquet \emph{Keep Alive}}: Mantenen el canal obert.
 \end{itemize}
+En la figura \ref{F:dia-pktflow} es pot veure un diagrama que mostra el seu ús dins de la comunicació.
+\begin{figure}[htb]
+\centering
+\includegraphics[scale=0.5]{images/dia-pktflow}
+\caption{Diagrama de flux de la comunicació}
+\label{F:dia-pktflow}
+\end{figure}
 
+\subsubsection{Paquet Identification}
+Els paquets \emph{Identification} (ID) descriuen al node que l'envia. Per descriure'l s'envia la següent informació:
+\begin{itemize}
+\item Xarxes que publica el node, també fa d'identificador del node.
+\item Agrupacions de IP i port, altres vies per comunicar-se amb el node.
+\end{itemize}
+En el paquet (taula \ref{T:pktid}) primer s'envien les quantitats de la informació que s'envia, tot seguit s'envien totes les xarxes que el node publica i desprès les agrupacions de IP i port.
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -133,6 +147,8 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \end{center}
 \end{table}
 
+\subsubsection{Paquet Identification Acknowledgment}
+El paquet \emph{Identification Acknowledgment} (ID ACK) confirma haver rebut el paquet ID (taula \ref{T:pktidack}).
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -148,7 +164,8 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \end{center}
 \end{table}
 
-
+\subsubsection{Paquet Keep Alive}
+El paquet \emph{Keep Alive} (KA) manté el canal obert i envia informació d'altres nodes (veure taula \ref{T:pktka}).
 %Hole punching.
 
 \begin{table}[htb]
