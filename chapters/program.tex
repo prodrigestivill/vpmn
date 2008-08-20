@@ -87,7 +87,7 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16-18 &
 \end{table}
 Per evitar afegir més capçaleres (\emph{overhead}) en aquests paquets, ja que són els més importants i freqüents, l'aplicació els enviarà directament els paquets IP sense afegir cap capçalera ni identificador (veure taula \ref{T:ippkt}).
 
-Els altres paquets, considerats d'ús exclusivament intern, fan la funció de senyalització de la VPN. Aquests tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). El camp equivalent al que en IP està destinat a \keyword{ToS}{Type of Service} en els paquets de senyalització servirà per definir el tipus de paquet d'intern (veure taula \ref{T:inpkt}).
+Els altres paquets, considerats d'ús exclusivament intern, fan la funció de senyalització de la VPN.
 \begin{table}[hbt]
 \begin{center}
 \scriptsize
@@ -102,13 +102,8 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:inpkt}
 \end{center}
 \end{table}
-Els tipus de paquets són:
-\begin{itemize}
-\item \textbf{Paquets \emph{Identification}}: Descriuen al node que l'envia.
-\item \textbf{Paquet \emph{Identification Acknowledgment}}: Confirmen haver rebut el paquet \emph{Identification}.
-\item \textbf{Paquet \emph{Keep Alive}}: Mantenen el canal obert.
-\end{itemize}
-En la figura \ref{F:dia-pktflow} es pot veure un diagrama que mostra el seu ús dins de la comunicació.
+Tal com es veu en la taula \ref{T:inpkt}, aquests tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). El camp equivalent al que en IP està destinat a \keyword{ToS}{Type of Service} en els paquets de senyalització servirà per definir el tipus de paquet intern.
+Els tipus de paquets són: paquets \emph{identification} (ID), paquets \emph{identification acknowledgment} (ID ACK) i paquets \emph{keep alive} (KA). El seu ús dins de la comunicació es mostra en la figura \ref{F:dia-pktflow}.
 \begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{images/dia-pktflow}
