@@ -783,7 +783,7 @@ TUN dev#</dia:string>
         <dia:point val="2.2388,6.01023"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.9763,6.01023;2.51836,7.00142"/>
+        <dia:rectangle val="1.9763,6.01023;2.5013,6.95023"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -797,7 +797,7 @@ TUN dev#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="2.2388,6.56979"/>
+            <dia:point val="2.2388,6.55273"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -846,10 +846,10 @@ TUN dev#</dia:string>
     </dia:object>
     <dia:object type="Standard - Text" version="1" id="O17">
       <dia:attribute name="obj_pos">
-        <dia:point val="15.8434,8.42639"/>
+        <dia:point val="14.2989,8.41189"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="13.9934,8.42639;15.8434,9.36639"/>
+        <dia:rectangle val="12.4489,8.41189;14.316,9.40308"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -863,7 +863,7 @@ TUN dev#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="15.8434,8.96889"/>
+            <dia:point val="14.2989,8.97145"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -1285,13 +1285,14 @@ pending DB#</dia:string>
         <dia:point val="17.535,15.9605"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="17.535,15.418;20.7025,17.158"/>
+        <dia:rectangle val="17.535,14.6649;20.1871,17.2561"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string># ID already
- sent?#</dia:string>
+            <dia:string># Own ID
+ already
+ recived?#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="sans" style="0" name="Helvetica"/>
@@ -1300,7 +1301,7 @@ pending DB#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="17.535,15.9605"/>
+            <dia:point val="17.535,15.2245"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -1311,7 +1312,7 @@ pending DB#</dia:string>
         </dia:composite>
       </dia:attribute>
       <dia:attribute name="valign">
-        <dia:enum val="3"/>
+        <dia:enum val="2"/>
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O6" connection="2"/>
@@ -1822,14 +1823,14 @@ pending DB#</dia:string>
         <dia:point val="6.5445,17.5676"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="6.4945,12.8094;16.485,18.1254"/>
+        <dia:rectangle val="6.4945,13.2539;16.485,18.1254"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="6.5445,17.5676"/>
         <dia:point val="6.5445,18.0754"/>
         <dia:point val="12.0027,18.0754"/>
-        <dia:point val="12.0027,12.8594"/>
-        <dia:point val="15.985,12.8594"/>
+        <dia:point val="12.0027,13.3039"/>
+        <dia:point val="15.985,13.3039"/>
         <dia:point val="15.985,14.3534"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -1865,44 +1866,9 @@ pending DB#</dia:string>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="8.26447,7.35835"/>
-        <dia:point val="8.26447,8.33724"/>
-        <dia:point val="6.5445,8.33724"/>
+        <dia:point val="8.26447,8.33991"/>
+        <dia:point val="6.5445,8.33991"/>
         <dia:point val="6.5445,9.31613"/>
-      </dia:attribute>
-      <dia:attribute name="orth_orient">
-        <dia:enum val="1"/>
-        <dia:enum val="0"/>
-        <dia:enum val="1"/>
-      </dia:attribute>
-      <dia:attribute name="autorouting">
-        <dia:boolean val="true"/>
-      </dia:attribute>
-      <dia:attribute name="end_arrow">
-        <dia:enum val="12"/>
-      </dia:attribute>
-      <dia:attribute name="end_arrow_length">
-        <dia:real val="0.5"/>
-      </dia:attribute>
-      <dia:attribute name="end_arrow_width">
-        <dia:real val="0.5"/>
-      </dia:attribute>
-      <dia:connections>
-        <dia:connection handle="0" to="O1" connection="1"/>
-        <dia:connection handle="1" to="O5" connection="0"/>
-      </dia:connections>
-    </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O45">
-      <dia:attribute name="obj_pos">
-        <dia:point val="8.26447,7.35835"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="8.21447,7.30835;16.485,14.4034"/>
-      </dia:attribute>
-      <dia:attribute name="orth_points">
-        <dia:point val="8.26447,7.35835"/>
-        <dia:point val="8.26447,8.33939"/>
-        <dia:point val="15.985,8.33939"/>
-        <dia:point val="15.985,14.3534"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -1923,20 +1889,55 @@ pending DB#</dia:string>
       </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O1" connection="1"/>
-        <dia:connection handle="1" to="O6" connection="0"/>
+        <dia:connection handle="1" to="O5" connection="0"/>
       </dia:connections>
     </dia:object>
-    <dia:object type="Standard - ZigZagLine" version="1" id="O46">
+    <dia:object type="Standard - ZigZagLine" version="1" id="O45">
       <dia:attribute name="obj_pos">
         <dia:point val="8.26447,7.35835"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="8.21447,7.30835;20.9986,9.34411"/>
+        <dia:rectangle val="8.21447,7.30835;15.3046,9.34411"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="8.26447,7.35835"/>
-        <dia:point val="8.26447,8.32623"/>
-        <dia:point val="20.4986,8.32623"/>
+        <dia:point val="8.26447,8.33939"/>
+        <dia:point val="14.8046,8.33939"/>
+        <dia:point val="14.8046,9.29411"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+      </dia:attribute>
+      <dia:attribute name="autorouting">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="end_arrow">
+        <dia:enum val="12"/>
+      </dia:attribute>
+      <dia:attribute name="end_arrow_length">
+        <dia:real val="0.5"/>
+      </dia:attribute>
+      <dia:attribute name="end_arrow_width">
+        <dia:real val="0.5"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O1" connection="1"/>
+        <dia:connection handle="1" to="O47" connection="0"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="Standard - ZigZagLine" version="1" id="O46">
+      <dia:attribute name="obj_pos">
+        <dia:point val="8.26447,7.35834"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="8.21447,7.30834;20.9986,9.34411"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="8.26447,7.35834"/>
+        <dia:point val="8.26447,8.33991"/>
+        <dia:point val="20.4986,8.33991"/>
         <dia:point val="20.4986,9.29411"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
@@ -1945,7 +1946,7 @@ pending DB#</dia:string>
         <dia:enum val="1"/>
       </dia:attribute>
       <dia:attribute name="autorouting">
-        <dia:boolean val="true"/>
+        <dia:boolean val="false"/>
       </dia:attribute>
       <dia:attribute name="end_arrow">
         <dia:enum val="12"/>
@@ -1959,6 +1960,105 @@ pending DB#</dia:string>
       <dia:connections>
         <dia:connection handle="0" to="O1" connection="1"/>
         <dia:connection handle="1" to="O20" connection="0"/>
+      </dia:connections>
+    </dia:object>
+    <dia:object type="SDL - Task" version="0" id="O47">
+      <dia:attribute name="obj_pos">
+        <dia:point val="12.6674,9.29411"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="12.6174,9.24411;16.9919,11.7512"/>
+      </dia:attribute>
+      <dia:attribute name="elem_corner">
+        <dia:point val="12.6674,9.29411"/>
+      </dia:attribute>
+      <dia:attribute name="elem_width">
+        <dia:real val="4.274508476483188"/>
+      </dia:attribute>
+      <dia:attribute name="elem_height">
+        <dia:real val="2.4071067811865472"/>
+      </dia:attribute>
+      <dia:attribute name="line_width">
+        <dia:real val="0.10000000000000001"/>
+      </dia:attribute>
+      <dia:attribute name="line_colour">
+        <dia:color val="#000000"/>
+      </dia:attribute>
+      <dia:attribute name="fill_colour">
+        <dia:color val="#ffffff"/>
+      </dia:attribute>
+      <dia:attribute name="show_background">
+        <dia:boolean val="true"/>
+      </dia:attribute>
+      <dia:attribute name="line_style">
+        <dia:enum val="0"/>
+        <dia:real val="1"/>
+      </dia:attribute>
+      <dia:attribute name="text">
+        <dia:composite type="text">
+          <dia:attribute name="string">
+            <dia:string>#Save
+the state#</dia:string>
+          </dia:attribute>
+          <dia:attribute name="font">
+            <dia:font family="sans" style="0" name="Helvetica"/>
+          </dia:attribute>
+          <dia:attribute name="height">
+            <dia:real val="0.80000000000000004"/>
+          </dia:attribute>
+          <dia:attribute name="pos">
+            <dia:point val="14.8046,10.2402"/>
+          </dia:attribute>
+          <dia:attribute name="color">
+            <dia:color val="#000000"/>
+          </dia:attribute>
+          <dia:attribute name="alignment">
+            <dia:enum val="1"/>
+          </dia:attribute>
+        </dia:composite>
+      </dia:attribute>
+      <dia:attribute name="flip_horizontal">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="flip_vertical">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+    </dia:object>
+    <dia:object type="Standard - ZigZagLine" version="1" id="O48">
+      <dia:attribute name="obj_pos">
+        <dia:point val="14.8046,11.7012"/>
+      </dia:attribute>
+      <dia:attribute name="obj_bb">
+        <dia:rectangle val="14.7546,11.6512;19.3078,14.5699"/>
+      </dia:attribute>
+      <dia:attribute name="orth_points">
+        <dia:point val="14.8046,11.7012"/>
+        <dia:point val="14.8046,12.9039"/>
+        <dia:point val="18.8078,12.9039"/>
+        <dia:point val="18.8078,14.5199"/>
+      </dia:attribute>
+      <dia:attribute name="orth_orient">
+        <dia:enum val="1"/>
+        <dia:enum val="0"/>
+        <dia:enum val="1"/>
+      </dia:attribute>
+      <dia:attribute name="autorouting">
+        <dia:boolean val="false"/>
+      </dia:attribute>
+      <dia:attribute name="line_style">
+        <dia:enum val="4"/>
+      </dia:attribute>
+      <dia:attribute name="end_arrow">
+        <dia:enum val="12"/>
+      </dia:attribute>
+      <dia:attribute name="end_arrow_length">
+        <dia:real val="0.5"/>
+      </dia:attribute>
+      <dia:attribute name="end_arrow_width">
+        <dia:real val="0.5"/>
+      </dia:attribute>
+      <dia:connections>
+        <dia:connection handle="0" to="O47" connection="1"/>
       </dia:connections>
     </dia:object>
   </dia:layer>

@@ -15,7 +15,7 @@ Una vegada creada la malla l'aplicació ja pot enrutar directament a cada node e
 \subsection{Seguretat}
 L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els túnels garantint els serveis criptogràfics del xifrat, l'autenticació i el no repudi. De manera que cada node té la certesa d'estar entregant la informació directament al destí indicat, sabent que cap altre pot estar ni llegint ni manipulant. També els altres nodes tenen la mateixa certesa de rebre la informació de l'origen indicat.
 
-Per assolir aquest objectiu juntament amb el de la baixa latència s'han de realitzar connexions directes entre tots els nodes, i no es poden realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar la direcció IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
+Per assolir aquest objectiu juntament amb el de la baixa latència s'han de realitzar connexions directes entre tots els nodes, i no es poden realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar l'adreça IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
 
 Per tant el primer que cal establir és el funcionament de l'adreçament IP. Per a fer-ho es contemplen dues possibilitats: l'utilització d'un adreçament que es calculi a partir dels certificats o la incrustació de l'adreçament dins d'algun camp dels certificats.
 La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority}.
@@ -227,12 +227,23 @@ El diagrama d'aquesta part de l'aplicació està en la figura \ref{F:dia-tunsrv}
 \caption{Diagrama de flux del thread TUN}
 \label{F:dia-tunsrv}
 \end{figure}
-El primer que fa el node en rebre un paquet de la interfície TUN és comprovar que el paquet provingui d'una direcció IP que els altres nodes reconeguin com a pròpia d'ell, desprès busca el node a qui va destinat i li envia pel canal xifrat.
+El primer que fa el node en rebre un paquet de la interfície TUN és comprovar que el paquet provingui d'una adreça IP que els altres nodes reconeguin com a pròpia d'ell, desprès busca el node a qui va destinat i li envia pel canal xifrat. En el cas de no complir algun dels requisits es descarta el paquet sense notificar-ho.
+
 \subsection{Servidor UDP/DTLS}
-Tal com s'ha definit anteriorment el servidor UDP utilitza el protocol DTLS. %La figura \ref{F:dia-udpsrv} mostra 
+Tal com s'ha definit anteriorment el servidor UDP utilitza el protocol DTLS. La figura \ref{F:dia-udpsrv} mostra el diagrama d'aquesta part de l'aplicació un cop desxifrat el paquet.
 \begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{images/dia-udpsrv}
 \caption{Diagrama de flux del thread UDP}
 \label{F:dia-udpsrv}
 \end{figure}
+En arribar un paquet es separa entre paquets IP o paquets interns, després els paquets interns s'identifiquen pel seu identificador de paquet intern separant així entre ID, ID Ack i KA.
+
+Els paquets \textbf{IP} es comproven que vaguin destinats a una adreça IP de les que s'han anunciat inicialment amb els paquets ID, es comprova també que vinguin d'una IP validada de les anunciades pel node de procedència. 
+
+Els paquets \textbf{ID} es comproven que no siguin d'un node ja conegut i que publiquin xarxes d'acord al seu certificat, tot seguit se li retorna un paquet ID Ack. En cas de que no hagi rebut un paquet ID amb anterioritat, se li enviarà també un paquet ID. Finalment s'afegeix el node a la base de dades excepte en el cas de no complir les condicions inicials que es tancaria la connexió DTLS.
+
+Els paquets \textbf{ID Ack} anoten conforme l'altre node ha rebut satisfactòriament el paquet ID, per poder ser consultat en rebre un paquet ID.
+
+Els paquets \textbf{KA} afegeixen tota la informació dels nodes rebuda a la base de dades de nodes pendents de connectar. Cada cert temps el temporitzador del programa comprovarà aquestes dades i intentarà connectar-se a ells. Pel que fa al temporitzador dels routers NAT, aquest s'actualitza cada cop que es rep un paquet vàlid.
+
