@@ -50,17 +50,17 @@ Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UD
 Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Si coincidissin múltiples factors el xifratge resultant podria esdevenir menys segur, però no hi ha cap implementació que ho tingui en compte ja que la probabilitat de que coincidissin es molt baixa, així que tampoc no es tindrà en compte en aquest programari.
 
 \subsection{Definició de paquets}
-Per el disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
+Pel disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
 \begin{itemize}
 \item La IP i port del node
 \item La IP pública i port del node
 \item Agrupació de IPs i ports (locals i públics)
 \item Xarxes que publica el node
 \end{itemize}
-L'utilització de la IP i el port no és informació suficient degut a l'existència de xarxes privades i publiques.%, també els NAT simètrics no donen el mateix port per a tots els hosts remots on es connecti un mateix node.
-L'utilització de la IP publica per aquesta tasca no és valida ja que deixa de ser única si hi ha dos nodes al costat privat abans de un NAT. Aquest dos en trobar-se es pensaran que són nodes diferents dels que coneixen amb IP pública.
-L'utilització de l'agrupació de IPs i ports tant locals com públics sembla prou vàlid, però de vegades s'utilitza un NAT per ajuntar diferents subxarxes de mateix identificador de xarxa.
-Les xarxes que publica o ofereix un node és una informació validada per la CA i no pot ser repetida per cap altre node de la VPN. És per això que aquesta última opció serà la utilitzada alhora de identificar els nodes.
+La utilització de la IP i el port no és informació suficient degut a l'existència de xarxes privades i públiques. %també els NAT simètrics no donen el mateix port per a tots els hosts remots on es connecti un mateix node.
+La utilització de la IP pública per aquesta tasca no és valida ja que deixa de ser única si hi ha dos nodes al costat privat abans d'un NAT. Aquests dos en trobar-se es pensaran que són nodes diferents dels que coneixen amb IP pública.
+La utilització de l'agrupació de IPs i ports tant locals com públics sembla prou vàlida, però de vegades s'utilitza un NAT per ajuntar diferents subxarxes de mateix identificador de xarxa.
+Les xarxes que publica o ofereix un node és una informació validada per la CA i no pot ser repetida per cap altre node de la VPN. És per això que aquesta última opció serà la utilitzada alhora d'identificar els nodes.
 
 %Fragmentació a quin nivell.
 Les VPN encapsulen tràfic IP dins del protocol IP, de manera que la màxima informació que poden contenir els paquets IP encapsulats és menor. El protocol definit per donar seguretat permet tant el xifratge com la compressió, això complica el càlcul de la màxima informació que poden contenir els paquets; és per aquest motiu que en primera instància es forçarà que la fragmentació dels paquets la faci el sistema operatiu i els \emph{routers} d'entremig, per tant no s'implementarà cap fragmentació dinàmica dins del programa. En el futur la implementació de la fragmentació dinàmica dins del programa es faria seguint l'estàndard de IP, d'aquesta manera seria transparent al protocol del programa.
@@ -102,7 +102,7 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:inpkt}
 \end{center}
 \end{table}
-Tal com es veu en la taula \ref{T:inpkt}, aquests tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). El camp equivalent al que en IP està destinat a \keyword{ToS}{Type of Service} en els paquets de senyalització servirà per definir el tipus de paquet intern.
+Tal com es veu en la taula \ref{T:inpkt}, aquests tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar per el primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). El tercer byte, que en IP està destinat a \keyword{ToS}{Type of Service}, en els paquets de senyalització servirà per definir el tipus de paquet intern.
 Els tipus de paquets són: paquets \emph{identification} (ID), paquets \emph{identification acknowledgment} (ID ACK) i paquets \emph{keep alive} (KA). El seu ús dins de la comunicació es mostra en la figura \ref{F:dia-pktflow}.
 \begin{figure}[htb]
 \centering
@@ -110,14 +110,14 @@ Els tipus de paquets són: paquets \emph{identification} (ID), paquets \emph{ide
 \caption{Diagrama de flux de la comunicació}
 \label{F:dia-pktflow}
 \end{figure}
-
 \subsubsection{Paquet Identification}
-Els paquets \emph{Identification} (ID) descriuen al node que l'envia. Per descriure'l s'envia la següent informació:
+Els paquets \emph{Identification} (ID) descriuen al node que l'envia. Per descriure'l s'envien els següents blocs d'informació:
 \begin{itemize}
-\item Xarxes que publica el node, també fa d'identificador del node.
-\item Agrupacions de IP i port, altres vies per comunicar-se amb el node.
+\item Xarxes que publica el node: fa d'identificador del node.
+\item Agrupacions de IP i port: altres vies per comunicar-se amb el node.
 \end{itemize}
-En el paquet (taula \ref{T:pktid}) primer s'envien les quantitats de la informació que s'envia, tot seguit s'envien totes les xarxes que el node publica i desprès les agrupacions de IP i port.
+En el paquet (taula \ref{T:pktid}) primer s'envien les quantitats dels dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
+Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x00$.
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -141,9 +141,9 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:pktid}
 \end{center}
 \end{table}
-
 \subsubsection{Paquet Identification Acknowledgment}
-El paquet \emph{Identification Acknowledgment} (ID ACK) confirma haver rebut el paquet ID (taula \ref{T:pktidack}).
+Els paquets \emph{Identification Acknowledgment} (ID ACK) confirmen haver rebut el paquet ID, en la taula \ref{T:pktidack} es pot veure la seva estructura.
+Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x01$.
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -158,10 +158,11 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:pktidack}
 \end{center}
 \end{table}
-
 \subsubsection{Paquet Keep Alive}
-El paquet \emph{Keep Alive} (KA) manté el canal obert i envia informació d'altres nodes (veure taula \ref{T:pktka}).
-%Hole punching.
+Els routers NAT s'utilitzen generalment per compartir una mateixa IP entre màquines diferents. El router guarda cada connexió en memòria per tal de reutilitzar els mateixos paràmetres en travessar més dades de la connexió. Tots els routers NAT assignen un temps de vida a la informació guardada en memòria i el renoven a mesura que circulen dades de la connexió. En el moment que caduca el temps de vida, la connexió es perd sense que cap dels participants s'en adonin, és per això que es important assegurar-se de que el router no arribi a esgotar aquest temps de vida.
+
+El paquet \emph{Keep Alive} (KA) té dos objectius: mantenir el canal obert i ajudar a mallar la VPN.
+El primer objectiu fa que enviar aquest paquet només sigui necessari quan no s'ha enviat cap altre informació al canal, en canvi el segon objectiu fa que sigui necessari enviar-lo cada cert temps. D'aquesta manera es defineixen dos temps configurables que s'anomenaran $t_{min}$ i $t_{max}$. La política d'enviament resultant consisteix en enviar un paquet KA cada $t_{min}$ des de l'últim paquet transmès pel canal i en cas de no haver-se enviat cap paquet d'aquests durant $t_{max}$ es forçaria l'enviament malgrat no fos necessari pel primer objectiu.
 
 \begin{table}[htb]
 \begin{center}
@@ -192,40 +193,43 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:pktka}
 \end{center}
 \end{table}
+Per tal de complir el segon objectiu fa falta afegir informació dels altres nodes de la VPN dins del paquet, la informació necessària és la mateixa que la continguda al paquet ID.
+En el paquet (taula \ref{T:pktka}) primer s'envia la quantitat de nodes que es descriuran. Tot seguit s'enviara el mateix contingut dels paquets ID un darrera l'altre.
+Per tant aquest paquet, porta la informació suficient per a poder establir una connexió amb cada un dels nodes que descriu tot mantenint el canal obert pels routers NAT, fent així la funció de \emph{hole punching}, aquest concepte es troba definit en un \emph{paper} a l'annex \refannexpapers.
+Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x02$.
 
-\clearpage%Optional
 \section{Arquitectura del programa}
-%Llenguatge C.
-%Threads.
-La arquitectura del programa com es veu en la figura \ref{F:dia-app} es separa entre l'adaptador virtual i el servidor UDP. Els paquets que les aplicacions envien a traves de l'adaptador virtual son enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí.
-Pel que fa al adaptador virtual s'utilitza el controlador universal TUN/TAP.
+La arquitectura del programa com es veu en la figura \ref{F:dia-app} es separa entre l'adaptador virtual i el servidor UDP.
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.5\textwidth]{images/dia-app}
 \caption{Diagrama de la aplicació}
 \label{F:dia-app}
 \end{figure}
-\clearpage%Optional
+Per altre banda hi ha un temporitzador que s'encarrega de llançar els esdeveniments que depenguin del temps, com l'enviament de paquets \emph{Keep Alive} o reenviament de paquets \emph{Identification}.
+Els paquets que les aplicacions envien a través de l'adaptador virtual són enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí. Aquest dos s'han implementat mitjançant threads i són capaços d'enrutar i xifrar o desxifrar múltiples paquets simultàniament.
+
+Per el desenvolupament d'aquesta aplicació s'ha escollit el llenguatge C per tal de poder treballar de forma el més proper possible als bits i poder optimitzar-la per aconseguir baixes latències. També s'ha decidit utilitzar la llibreria de threads de \keyword{POSIX}{Portable Operating System Interface} per la seva potència i la facilitat per una futura adaptació de l'aplicació a altres sistemes operatius. L'elecció d'aquest llenguatge juntament amb la utilització de threads ha comportat múltiples dificultats en la gestió dels recursos compartits entre els diferents threads, però el resultat hauria d'aprofitar millor els recursos de les màquines node.
 \subsection{Interfície TUN}
 L'aplicació fa ús del \emph{driver} genèric TUN/TAP. S'ha escollit aquest \emph{driver} ja que està disponible per la majoria de sistemes operatius i facilitarà la possible futura adaptació de l'aplicació.
-
-%\subsubsection{Driver TUN/TAP}
-El \emph{driver} TUN/TAP es un \emph{driver} de \emph{kernel} d'una targeta de xarxa virtual, i per tant no depèn del cap targeta real física. El driver es separa en dos \emph{sub-drivers}:
+El \emph{driver} TUN/TAP és un \emph{driver} de \emph{kernel} d'una targeta de xarxa virtual, i per tant no depèn del cap targeta real física. Aquest \emph{driver} es separa en dos \emph{sub-drivers}:
 \begin{itemize}
 \item \emph{Driver} \textbf{TAP} simula una interfície de xarxa Ethernet i treballa amb trames de capa 2 del model OSI.
 \item \emph{Driver} \textbf{TUN} simula una interfície de xarxa punt-a-punt i treballa amb trames de capa 3 del model OSI.
 \end{itemize}
 
-En aquestes targetes els paquets enviats per el sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats per el \emph{stack} de protocols del \emph{kernel}.
+En aquestes targetes els paquets enviats pel sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats pel \emph{stack} de protocols del \emph{kernel}.
 
+El diagrama d'aquesta part de l'aplicació està en la figura \ref{F:dia-tunsrv}.
 \begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{images/dia-tunsrv}
 \caption{Diagrama de flux del thread TUN}
 \label{F:dia-tunsrv}
 \end{figure}
-\clearpage%Optional
+El primer que fa el node en rebre un paquet de la interfície TUN és comprovar que el paquet provingui d'una direcció IP que els altres nodes reconeguin com a pròpia d'ell, desprès busca el node a qui va destinat i li envia pel canal xifrat.
 \subsection{Servidor UDP/DTLS}
+Tal com s'ha definit anteriorment el servidor UDP utilitza el protocol DTLS. %La figura \ref{F:dia-udpsrv} mostra 
 \begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{images/dia-udpsrv}
