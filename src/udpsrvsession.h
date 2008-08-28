@@ -35,8 +35,10 @@ struct udpsrvsession_s
 {
   timeout_t timeout;
   SSL *dtls;
+  BIO *bioread;
   pthread_mutex_t dtls_mutex;
-  pthread_mutex_t dtls_mutex_write;
+  pthread_mutex_t bioread_mutex;
+  int dtls_reading;
   struct sockaddr_in *addr;
   struct peer_s *peer;
 };

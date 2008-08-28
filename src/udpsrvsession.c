@@ -49,8 +49,9 @@ struct udpsrvsession_s *udpsrvsession_create(const struct sockaddr_in
   addr->sin_port = source->sin_port;
   newsession->addr = addr;
   newsession->peer = NULL;
+  newsession->dtls_reading = 0;
   pthread_mutex_init(&newsession->dtls_mutex, NULL);
-  pthread_mutex_init(&newsession->dtls_mutex_write, NULL);
+  pthread_mutex_init(&newsession->bioread_mutex, NULL);
   newsession->dtls = NULL;
   timeout_update(&newsession->timeout);
   return newsession;

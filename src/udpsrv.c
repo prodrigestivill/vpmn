@@ -96,7 +96,7 @@ void udpsrv_thread()
         {
           if (pthread_mutex_trylock(&udpsrv_buffer[i].buffer_mutex) == 0)
             {
-              if (udpsrv_buffer[i].free)
+              if (udpsrv_buffer[i].free != 0)
                 pthread_mutex_unlock(&udpsrv_buffer[i].buffer_mutex);
               else
                 {
@@ -159,7 +159,7 @@ void udpsrv()
         {
           if (pthread_mutex_trylock(&udpsrv_buffer[i].buffer_mutex) == 0)
             {
-              if (udpsrv_buffer[i].free)
+              if (udpsrv_buffer[i].free != 0)
                 {
                   udpsrv_buffer[i].free = 0;
                   udpsrv_buffer[i].addr_len =

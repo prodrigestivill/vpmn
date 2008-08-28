@@ -109,6 +109,12 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
   if (buffer_len < 4)
     return;
   len = ntohs(ip->tot_len);
+  log_info("UDP: sizes %d = %d.\n", len, buffer_len);
+  if (buffer_len > 27)
+    {
+      uint16_t *ping = &buffer[26];
+      log_info("Ping%d id: %d\n", ip->version, ntohs(*ping));
+    }
   if (ip->version == 4)         //IPv4 packet
     {
       if (session->peer == NULL
@@ -130,13 +136,13 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
         }
       if (len > buffer_len)
         {
-          log_error("Invalid size %d > %d.\n", len, buffer_len);
+          log_error("UDP: Invalid size %d > %d.\n", len, buffer_len);
           return;
         }
       tundev_write(buffer, len);
     }
 //else if (ip->version == 6) //IPv6 Packet
-  else if (ip->version == PROTOCOL1_V)  //Internal packets v1
+  else if (ip->version == PROTOCOL1_V && ip->ihl == 1)  //Internal packets v1
     {
       if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_IDA)
         {
@@ -148,6 +154,8 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
               session->peer->stat |= PEER_STAT_IDK;
               pthread_mutex_unlock(&session->peer->modify_mutex);
             }
+          if ((session->peer->stat & PEER_STAT_ID) != 0)
+            log_info("New peer authenticated.\n");
         }
       else if (((struct protocol_1_s *) ip)->pid == PROTOCOL1_ID)
         {
@@ -184,6 +192,8 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
                 }
               peer->stat |= PEER_STAT_ID;
               timeout_update(&peer->timeout);
+              if ((session->peer->stat & PEER_STAT_IDK) != 0)
+                log_info("New peer authenticated.\n");
               pthread_mutex_unlock(&peer->modify_mutex);
               if (peer_add(peer, session) < 1)
                 {
@@ -230,10 +240,16 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
             }
         }
       else
-        return;
+        {
+          log_error("Unknown paquet\n");
+          return;
+        }
     }
   else
-    return;
+    {
+      log_error("Unknown paquet\n");
+      return;
+    }
   if (len + 4 <= buffer_len)
     protocol_recvpacket(buffer + len, buffer_len - len, session);
 }
@@ -252,7 +268,7 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
       len = ntohs(ip->tot_len);
       if (len > buffer_len)
         {
-          log_error("Invalid size %d > %d.\n", len, buffer_len);
+          log_error("TUN: Invalid size %d > %d.\n", len, buffer_len);
           return -1;
         }
       if (router_checksrc((struct in_addr *) &ip->saddr, &tun_selfpeer) ==
@@ -267,7 +283,8 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
               ret = 0;
             }
           else
-            log_error("Invalid destination.\n");
+            log_error("Invalid destination: %s\n",
+                      inet_ntoa(*(struct in_addr *) &ip->daddr));
         }
       else
         log_error("Invalid source.\n");

@@ -37,7 +37,7 @@ int daemonize;
 #define MAXPEERS 512
 
 //TUNSRV
-#define TUNBUFFERSIZE 1502
+#define TUNBUFFERSIZE 65535
 char *tunname;
 int tunmtu;
 struct in_network tunaddr_ip;

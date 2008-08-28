@@ -58,7 +58,7 @@ void tunsrv_thread()
         {
           if (pthread_mutex_trylock(&tunsrv_buffer[i].buffer_mutex) == 0)
             {
-              if (tunsrv_buffer[i].free)
+              if (tunsrv_buffer[i].free != 0)
                 pthread_mutex_unlock(&tunsrv_buffer[i].buffer_mutex);
               else
                 {
@@ -114,7 +114,7 @@ void tunsrv()
         {
           if (pthread_mutex_trylock(&tunsrv_buffer[i].buffer_mutex) == 0)
             {
-              if (tunsrv_buffer[i].free)
+              if (tunsrv_buffer[i].free != 0)
                 {
                   tunsrv_buffer[i].free = 0;
                   tunsrv_buffer[i].buffer_len =

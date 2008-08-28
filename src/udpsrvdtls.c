@@ -34,7 +34,6 @@
 #include "srv.h"
 
 SSL_CTX *udpsrvdtls_clictx, *udpsrvdtls_srvctx;
-BIO *udpsrvdtls_mbio;
 
 void udpsrvdtls_init()
 {
@@ -51,13 +50,16 @@ void udpsrvdtls_init()
   SSL_CTX_set_verify(udpsrvdtls_clictx, verifymode, NULL);
   SSL_CTX_set_verify_depth(udpsrvdtls_clictx, ssl_verifydepth);
   SSL_CTX_set_options(udpsrvdtls_clictx, SSL_OP_NO_QUERY_MTU);
+  SSL_CTX_set_mode(udpsrvdtls_clictx, SSL_MODE_AUTO_RETRY);
+  //SSL_CTX_set_read_ahead(udpsrvdtls_clictx, 1);
   udpsrvdtls_srvctx = SSL_CTX_new(DTLSv1_server_method());
   if (SSL_CTX_set_cipher_list(udpsrvdtls_srvctx, ssl_cipherlist) != 1)
     log_error("Error setting cipher list.\n");
   SSL_CTX_set_verify(udpsrvdtls_srvctx, verifymode, NULL);
   SSL_CTX_set_verify_depth(udpsrvdtls_srvctx, ssl_verifydepth);
   SSL_CTX_set_options(udpsrvdtls_srvctx, SSL_OP_NO_QUERY_MTU);
-  udpsrvdtls_mbio = BIO_new(BIO_s_mem());
+  SSL_CTX_set_mode(udpsrvdtls_srvctx, SSL_MODE_AUTO_RETRY);
+  //SSL_CTX_set_read_ahead(udpsrvdtls_srvctx, 1);
 }
 
 int
@@ -89,16 +91,38 @@ udpsrvdtls_loadcerts(const char *cafile, const char *certfile,
 
 void udpsrvdtls_destroy(struct udpsrvsession_s *session)
 {
-  pthread_mutex_lock(&session->dtls_mutex_write);
+  pthread_mutex_lock(&session->bioread_mutex);
   pthread_mutex_lock(&session->dtls_mutex);
-  //CRYPTO_add(&udpsrvdtls_mbio->references, 1, CRYPTO_LOCK_BIO);
-  session->dtls->rbio = NULL;
   SSL_free(session->dtls);
+  BIO_free(session->bioread);
   session->dtls = NULL;
   if (session->peer != NULL)
     peer_destroy(session->peer);        //-TODO: Check
   pthread_mutex_unlock(&session->dtls_mutex);
-  pthread_mutex_unlock(&session->dtls_mutex_write);
+  pthread_mutex_unlock(&session->bioread_mutex);
+}
+
+void udpsrvdtls_create(struct udpsrvsession_s *session, int isserver)
+{
+  BIO *wbio, *rbio;
+  if (isserver)
+    {
+      session->dtls = SSL_new(udpsrvdtls_srvctx);
+      SSL_set_accept_state(session->dtls);
+    }
+  else
+    {
+      session->dtls = SSL_new(udpsrvdtls_clictx);
+      SSL_set_connect_state(session->dtls);
+    }
+  wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
+  BIO_dgram_set_peer(wbio, session->addr);
+  pthread_mutex_lock(&session->bioread_mutex);
+  BIO_new_bio_pair(&session->bioread, UDPBUFFERSIZE, &rbio, 1);
+  pthread_mutex_unlock(&session->bioread_mutex);
+  SSL_set_bio(session->dtls, rbio, wbio);
+  //SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
+  SSL_set_mtu(session->dtls, SSL3_RT_MAX_PLAIN_LENGTH);
 }
 
 int udpsrvdtls_write(const char *buffer, const int buffer_len,
@@ -106,34 +130,22 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
 {
   int len, retry = 0;
   unsigned long err;
-  BIO *wbio;
+
   if (session == NULL)
     return -1;
-  pthread_mutex_lock(&session->dtls_mutex_write);
+  pthread_mutex_lock(&session->dtls_mutex);
   if (session->dtls == NULL)
-    {
-      pthread_mutex_lock(&session->dtls_mutex);
-      if (session->dtls == NULL)
-        {
-          session->dtls = SSL_new(udpsrvdtls_clictx);
-          SSL_set_connect_state(session->dtls);
-          wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
-          BIO_dgram_set_peer(wbio, session->addr);
-          SSL_set_bio(session->dtls, udpsrvdtls_mbio, wbio);
-          //SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
-          SSL_set_mtu(session->dtls, SSL3_RT_MAX_PLAIN_LENGTH);
-        }
-      pthread_mutex_unlock(&session->dtls_mutex);
-    }
+    udpsrvdtls_create(session, 0);
   do
     {
       if (retry > 0)
-        pthread_mutex_lock(&session->dtls_mutex_write);
+        pthread_mutex_lock(&session->dtls_mutex);
       len = SSL_write(session->dtls, buffer, buffer_len);
-      err = SSL_get_error(session->dtls, len);
-      log_debug("Write %d:%d\n", len, buffer_len);
-      pthread_mutex_unlock(&session->dtls_mutex_write);
-      if (len < 0
+      if (len <= 0)
+        err = SSL_get_error(session->dtls, len);
+      BIO_flush(SSL_get_wbio(session->dtls));
+      pthread_mutex_unlock(&session->dtls_mutex);
+      if (len <= 0
           && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
         {
           sleep(1);             //-TODO: Improve DTLS1_get_timeout()
@@ -141,11 +153,13 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
         }
       else
         retry = 0;
+      if (len != buffer_len)
+        log_error("Write %d != %d\n", len, buffer_len);
     }
-  while (retry > 0 && retry < 10 && session->dtls != NULL);
+  while (retry > 0 && retry < 5 && session->dtls != NULL);
   if (len <= 0)
     {
-      log_debug("err write\n");
+      log_error("err write\n");
       udpsrvdtls_sessionerr(err, session);
     }
   return len;
@@ -156,50 +170,32 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
                     char *bufferout, const int bufferout_len,
                     struct udpsrvsession_s *session)
 {
-  int len, retry = 0;
-  unsigned long err;
-  BIO *wbio, *rbio;
+  int len;
   if (session == NULL)
     return -1;
-  pthread_mutex_lock(&session->dtls_mutex);
   if (session->dtls == NULL)
     {
-      session->dtls = SSL_new(udpsrvdtls_srvctx);
-      SSL_set_accept_state(session->dtls);
-      wbio = BIO_new_dgram(udpsrv_fd, BIO_NOCLOSE);
-      BIO_dgram_set_peer(wbio, session->addr);
-      SSL_set_bio(session->dtls, NULL, wbio);
-      //SSL_set_options(session->dtls, SSL_OP_NO_QUERY_MTU);
-      SSL_set_mtu(session->dtls, SSL3_RT_MAX_PLAIN_LENGTH);
-    }
-  rbio = BIO_new_mem_buf((void *) buffer, buffer_len);
-  BIO_set_mem_eof_return(rbio, -1);
-  do
-    {
-      if (retry > 0)
-        pthread_mutex_lock(&session->dtls_mutex);
-      session->dtls->rbio = rbio;
-      len = SSL_read(session->dtls, bufferout, bufferout_len);
-      err = SSL_get_error(session->dtls, len);
-      session->dtls->rbio = udpsrvdtls_mbio;
+      pthread_mutex_lock(&session->dtls_mutex);
+      if (session->dtls == NULL)
+        udpsrvdtls_create(session, 1);
       pthread_mutex_unlock(&session->dtls_mutex);
-      if (len < 0
-          && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
-        {
-          sleep(1);             //-TODO: Improve DTLS1_get_timeout()
-          retry++;
-        }
-      else
-        retry = 0;
     }
-  while (retry > 0 && retry < 10 && session->dtls != NULL);
-  BIO_free(rbio);
-  if (len > 0 && retry == 0)
-    timeout_update(&session->timeout);
-  if (len <= 0)
+
+  pthread_mutex_lock(&session->bioread_mutex);
+  len = BIO_write(session->bioread, (void *) buffer, buffer_len);
+  if (len != buffer_len)
+    log_error("BIO_write error %d\n", len);     //TODO-retry?
+  BIO_flush(session->bioread);
+  log_debug("BIOPending %d\n", BIO_pending(session->dtls->rbio));
+  pthread_mutex_unlock(&session->bioread_mutex);
+
+  if (session->dtls_reading == 0)
     {
-      log_debug("err read\n");
-      udpsrvdtls_sessionerr(err, session);
+      pthread_mutex_lock(&session->dtls_mutex);
+      session->dtls_reading = 1;
+      len = SSL_read(session->dtls, bufferout, bufferout_len);
+      session->dtls_reading = 0;
+      pthread_mutex_unlock(&session->dtls_mutex);
     }
   return len;
 }
