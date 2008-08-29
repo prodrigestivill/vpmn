@@ -282,11 +282,11 @@ int protocol_sendframe(const char *buffer, const int buffer_len)
               udpsrvdtls_write(buffer, len, dstpeer->udpsrvsession);
               ret = 0;
             }
-          else
+          else //TODO: ICMP
             log_error("Invalid destination: %s\n",
                       inet_ntoa(*(struct in_addr *) &ip->daddr));
         }
-      else
+      else //TODO: ICMP
         log_error("Invalid source.\n");
       if (len + 20 <= buffer_len)
         return protocol_sendframe(buffer + len, buffer_len - len);

@@ -143,7 +143,6 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
       len = SSL_write(session->dtls, buffer, buffer_len);
       if (len <= 0)
         err = SSL_get_error(session->dtls, len);
-      BIO_flush(SSL_get_wbio(session->dtls));
       pthread_mutex_unlock(&session->dtls_mutex);
       if (len <= 0
           && (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE))
@@ -186,17 +185,20 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
   if (len != buffer_len)
     log_error("BIO_write error %d\n", len);     //TODO-retry?
   BIO_flush(session->bioread);
-  log_debug("BIOPending %d\n", BIO_pending(session->dtls->rbio));
+  //log_debug("BIOPending %d\n", BIO_pending(session->dtls->rbio));
   pthread_mutex_unlock(&session->bioread_mutex);
 
-  if (session->dtls_reading == 0)
+  /*len = pthread_mutex_trylock(&session->dtls_mutex);
+  pthread_mutex_trylock(&session->dtls_mutex);
+  if (len == 0 || session->dtls_reading == 0)
     {
+      if (len != 0)*/
       pthread_mutex_lock(&session->dtls_mutex);
-      session->dtls_reading = 1;
+      //session->dtls_reading = 1;
       len = SSL_read(session->dtls, bufferout, bufferout_len);
-      session->dtls_reading = 0;
+      //session->dtls_reading = 0;
       pthread_mutex_unlock(&session->dtls_mutex);
-    }
+    //}
   return len;
 }
 
