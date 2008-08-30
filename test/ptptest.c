@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
   inet_aton(argv[4], &tun_selfpeer.shared_networks[1].addr);
   inet_aton(argv[5], &tun_selfpeer.shared_networks[1].netmask);
   tun_selfpeer.shared_networks[1].addr.s_addr =
-    tun_selfpeer.shared_networks[1].addr.s_addr & tun_selfpeer.
-    shared_networks[1].netmask.s_addr;
+    tun_selfpeer.shared_networks[1].addr.
+    s_addr & tun_selfpeer.shared_networks[1].netmask.s_addr;
   tun_selfpeer.shared_networks_len = 1 + 1;
 
   //UDPSRV

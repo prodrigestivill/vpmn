@@ -169,7 +169,7 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
                     char *bufferout, const int bufferout_len,
                     struct udpsrvsession_s *session)
 {
-  int len;
+  int len, tlen = 0;
   if (session == NULL)
     return -1;
   if (session->dtls == NULL)
@@ -188,18 +188,21 @@ int udpsrvdtls_read(const char *buffer, const int buffer_len,
   //log_debug("BIOPending %d\n", BIO_pending(session->dtls->rbio));
   pthread_mutex_unlock(&session->bioread_mutex);
 
-  /*len = pthread_mutex_trylock(&session->dtls_mutex);
-  pthread_mutex_trylock(&session->dtls_mutex);
-  if (len == 0 || session->dtls_reading == 0)
+  pthread_mutex_lock(&session->dtls_mutex);
+  do
     {
-      if (len != 0)*/
-      pthread_mutex_lock(&session->dtls_mutex);
-      //session->dtls_reading = 1;
-      len = SSL_read(session->dtls, bufferout, bufferout_len);
-      //session->dtls_reading = 0;
-      pthread_mutex_unlock(&session->dtls_mutex);
-    //}
-  return len;
+      len =
+        SSL_read(session->dtls, bufferout + tlen, bufferout_len - tlen);
+      log_debug("Read: %d\n", len);
+      if (len > 0)
+        tlen += len;
+      /*else
+         udpsrvdtls_sessionerr(SSL_get_error(session->dtls, len), session); */
+    }
+  while (len > 0 && tlen + tunmtu < bufferout_len
+         && SSL_pending(session->dtls) > 0);
+  pthread_mutex_unlock(&session->dtls_mutex);
+  return tlen;
 }
 
 void udpsrvdtls_sessionerr(const unsigned long err,
