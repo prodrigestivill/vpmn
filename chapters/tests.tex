@@ -1,11 +1,77 @@
 \chapter{Tests i resultats}
 \section{Tests}
+En aquest capítol s'exposen els resultats dels tests realitzats per comparar l'aplicació creada amb el programari existent.
+En tots els programes s'han utilitzat certificats de 1024 bits i s'ha activat la compressió que permetés l'aplicació; el motiu d'activar la compressió és que la llibreria OpenSSL utilitzada per la creació d'aquest programa no permet desactivar la compressió en temps d'execució.
+L'escenari dels tests consta de una xarxa Gigabit Ethernet on hi estan connectats dos ordenadors:
+\begin{enumerate}
+\item Debian GNU/Linux (PC amd64)
+\begin{itemize}
+\item AMD Athlon 64 X2 Dual Core Processor BE-2400 (2.3GHz, 1024KB cache)
+\item nForce Gigabit Ethernet CK804
+\end{itemize}
+\item Debian GNU/Linux (PC i686)
+\begin{itemize}
+\item Intel Pentium M Centrino Processor (1.70GHz, 2048KB cache)
+\item Realtek Gigabit Ethernet RTL-8169
+\end{itemize}
+\end{enumerate}
 %TODO:
 %Afegir retards als tests
 %Tests de Compressio
 \subsection{Eficiència}
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\multicolumn{1}{c}{} & \multicolumn{2}{|c|}{Mida (bytes)} \\ \hline
+Aplicació & Inicialització & Ping \\ \hline \hline
+\tt directe & ARP? & 84 \\ \hline
+OpenVPN & 0 & 0 \\ \hline
+TincVPN & 0 & 0 \\ \hline
+\bf VPMN & 0 & 0 \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Eficiència}
+\label{T:efi}
+\end{center}
+\end{table}
+
 \subsection{Latència}
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\multicolumn{2}{c}{} & \multicolumn{4}{|c|}{RTT (ms)} \\ \hline
+Aplicació & Pèrdues & Mínim & Mitjana & Màxim & D.Estàndard \\ \hline \hline
+\tt directe & 0\% & 0 & 0 & 0 & 0 \\ \hline
+OpenVPN & 0\% & 0 & 0 & 0 & 0 \\ \hline
+TincVPN & 0\% & 0 & 0 & 0 & 0 \\ \hline
+\bf VPMN & 0\% & 0 & 0 & 0 & 0 \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Latència}
+\label{T:lat}
+\end{center}
+\end{table}
+
 \subsection{Taxa màxima de tranferencia}
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Aplicació & Màxim (Mbps) \\ \hline \hline
+\tt directe & 0 \\ \hline
+OpenVPN & 0 \\ \hline
+TincVPN & 0 \\ \hline
+%\bf VPMN & 0 \\ \hline
+\end{tabular}
+\end{center}
+\begin{center}
+\caption{Taxa màxima de transferencia}
+\label{T:tax}
+\end{center}
+\end{table}
+
 %Proves amb varios nodes
 %\subsection{Capacitat}
 %\subsection{Càrrega}
