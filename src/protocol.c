@@ -442,6 +442,7 @@ int protocol_checknameconstraints(const struct peer_s *peer)
   STACK_OF(GENERAL_SUBTREE) * trees;
   GENERAL_SUBTREE *tree;
 
+  pthread_mutex_lock(&peer->udpsrvsession->dtls_mutex);
   cert = SSL_get_peer_certificate(peer->udpsrvsession->dtls);
   exts = cert->cert_info->extensions;
   for (r = 0; r < peer->shared_networks_len; r++)
@@ -486,10 +487,13 @@ int protocol_checknameconstraints(const struct peer_s *peer)
                 }
             }
         }
-      if (valid == 0)
-        return -1;
+      if (valid == 0){
+        ret = -1;
+        break;
+      }
       ret += valid;
       valid = 0;
     }
+  pthread_mutex_unlock(&peer->udpsrvsession->dtls_mutex);
   return ret;
 }
