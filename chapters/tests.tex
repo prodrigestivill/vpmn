@@ -21,13 +21,13 @@ L'escenari dels tests consta de una xarxa Gigabit Ethernet on hi estan connectat
 \subsection{Eficiència}
 \begin{table}[htb]
 \begin{center}
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c|r|r|}
 \multicolumn{1}{c}{} & \multicolumn{2}{|c|}{Mida (bytes)} \\ \hline
 Aplicació & Inicialització & Ping \\ \hline \hline
-\tt directe & ARP? & 84 \\ \hline
-OpenVPN & 0 & 0 \\ \hline
-TincVPN & 0 & 0 \\ \hline
-\bf VPMN & 0 & 0 \\ \hline
+\tt directe & 112 & 84 \\ \hline
+OpenVPN & 11876 & 153 \\ \hline
+TincVPN & 2569 & 136 \\ \hline
+\bf VPMN & 4641 & 169 \\ \hline
 \end{tabular}
 \end{center}
 \begin{center}
@@ -35,6 +35,9 @@ TincVPN & 0 & 0 \\ \hline
 \label{T:efi}
 \end{center}
 \end{table}
+%Es a nivell IP i per tant s'ha restat 14bytes per paquet ethernet.
+%TincVPN no intercanvia els certificats pq ja ho tenen fet.
+%El directe s'ha contat el ARP com a inicialtizació i a la resta de programes no.
 
 \subsection{Latència}
 \begin{table}[htb]
