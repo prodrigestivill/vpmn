@@ -36,7 +36,7 @@ TincVPN & 2569 & 136 \\ \hline
 \end{center}
 \end{table}
 %Es a nivell IP i per tant s'ha restat 14bytes per paquet ethernet.
-%TincVPN no intercanvia els certificats pq ja ho tenen fet.
+%TincVPN no intercanvia els certificats pq ja ho tenen fet. 830*2=1660
 %El directe s'ha contat el ARP com a inicialtizació i a la resta de programes no.
 
 \subsection{Latència}
@@ -45,10 +45,10 @@ TincVPN & 2569 & 136 \\ \hline
 \begin{tabular}{|c|c|c|c|c|c|}
 \multicolumn{2}{c}{} & \multicolumn{4}{|c|}{RTT (ms)} \\ \hline
 Aplicació & Pèrdues & Mínim & Mitjana & Màxim & D.Estàndard \\ \hline \hline
-\tt directe & 0\% & 0 & 0 & 0 & 0 \\ \hline
-OpenVPN & 0\% & 0 & 0 & 0 & 0 \\ \hline
-TincVPN & 0\% & 0 & 0 & 0 & 0 \\ \hline
-\bf VPMN & 0\% & 0 & 0 & 0 & 0 \\ \hline
+\tt directe & 0\% & 0.047 & 0.050 & 0.074 & 0.006 \\ \hline
+OpenVPN & 0\% & 0.199 & 0.479 & 5.333 & 1.080 \\ \hline
+TincVPN & 0\% & 0.136 & 0.185 & 0.911 & 0.092 \\ \hline
+\bf VPMN & 0\% & 0.228 & 0.310 & 0.415 & 0.034 \\ \hline
 \end{tabular}
 \end{center}
 \begin{center}
@@ -56,24 +56,52 @@ TincVPN & 0\% & 0 & 0 & 0 & 0 \\ \hline
 \label{T:lat}
 \end{center}
 \end{table}
+%ping -i 2 -c 100
 
-\subsection{Taxa màxima de tranferencia}
+\subsection{Taxa màxima de transferència}
 \begin{table}[htb]
 \begin{center}
-\begin{tabular}{|c|c|}
-\hline
-Aplicació & Màxim (Mbps) \\ \hline \hline
-\tt directe & 0 \\ \hline
-OpenVPN & 0 \\ \hline
-TincVPN & 0 \\ \hline
-%\bf VPMN & 0 \\ \hline
+\begin{tabular}{|c|c|c|r|}
+\multicolumn{1}{c}{} & \multicolumn{3}{|c|}{Màxim (Mbps)} \\ \hline
+Aplicació & TCP & UDP & MGEN \\ \hline \hline
+\tt directe & 690.49 & 960.63 & 116.03 \\ \hline
+OpenVPN & 185.01 & 613.67 & 78.52 \\ \hline
+TincVPN & 133.26 & 286.29 & 78.29 \\ \hline
+\bf VPMN & 188.09 & --- & 96.17 \\ \hline
 \end{tabular}
 \end{center}
 \begin{center}
-\caption{Taxa màxima de transferencia}
+\caption{Taxa màxima de transferència}
 \label{T:tax}
 \end{center}
 \end{table}
+%netperf per TCP
+\begin{table}[htb]
+\begin{center}
+\begin{minipage}[htb]{0.6\linewidth}
+\footnotesize
+\begin{verbatim}
+TXBUFFER 1000
+0.0 ON  1 UDP DST 10.0.0.1/5000 PERIODIC [90000.0 996]
+10.0 OFF 1
+\end{verbatim}
+\end{minipage}
+\caption{Configuració MGEN}
+\label{T:mgencfg}
+\end{center}
+\end{table}
+
+\begin{minipage}[htb]{\linewidth}
+\begin{equation}\label{E:mgen}
+r=P\cdot\frac{(996+28)\cdot8}{10}
+\end{equation}
+\centering
+{\scriptsize
+r: Tassa de transmissió. 
+P: Número de paquets rebuts. 
+}\\
+Equació \ref{E:mgen}: Càlcul de la tassa de transmissió del MGEN.
+\end{minipage}
 
 %Proves amb varios nodes
 %\subsection{Capacitat}
