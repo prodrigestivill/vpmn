@@ -36,8 +36,9 @@ TincVPN & 2569 & 136 \\ \hline
 \end{center}
 \end{table}
 %Es a nivell IP i per tant s'ha restat 14bytes per paquet ethernet.
-%TincVPN no intercanvia els certificats pq ja ho tenen fet. 830*2=1660
+%TincVPN no intercanvia els certificats pq ja ho tenen fet. $830\cdot2=1660$
 %El directe s'ha contat el ARP com a inicialtizació i a la resta de programes no.
+%Comentar compressió
 
 \subsection{Latència}
 \begin{table}[htb]
@@ -75,7 +76,10 @@ TincVPN & 133.26 & 270.77 & 78.29 \\ \hline
 \label{T:tax}
 \end{center}
 \end{table}
-%netperf per TCP
+%netperf per TCP i UDP
+%Comentar compressio
+%Comentar que OpenSSL nomes pot treballar amb un thread per connexio a la vegada
+%Comentar els fallos a la hora de fer els tests
 \begin{table}[htb]
 \begin{center}
 \begin{minipage}[htb]{0.6\linewidth}
