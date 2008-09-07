@@ -1,8 +1,8 @@
 \chapter{Tests i resultats}
-\section{Tests}
-En aquest capítol s'exposen els resultats dels tests realitzats per comparar l'aplicació creada amb el programari existent.
+\section{Metodologia}
+En aquest capítol s'exposaran els resultats dels tests realitzats per comparar l'aplicació creada amb el programari existent.
 En tots els programes s'han utilitzat certificats de 1024 bits i s'ha activat la compressió que permetés l'aplicació; el motiu d'activar la compressió és que la llibreria OpenSSL utilitzada per la creació del VPMN (el programa creat en aquest projecte) no permet desactivar la compressió en temps d'execució.
-L'escenari dels tests consta de una xarxa Gigabit Ethernet on hi estan connectats dos ordenadors:
+L'escenari dels tests consta d'una xarxa Gigabit Ethernet on hi estan connectats dos ordenadors:
 \begin{enumerate}
 \item Debian GNU/Linux (PC amd64)
 \begin{itemize}
@@ -21,7 +21,64 @@ L'escenari dels tests consta de una xarxa Gigabit Ethernet on hi estan connectat
 \subsection{Eficiència}
 Per analitzar l'eficiència dels programes s'analitzen els bytes transmesos durant la inicialització, en el cas de la connexió directe es conten els bytes de les peticions \keyword{ARP}{Address Resolution Protocol} i en la resta de casos s'exclouen.
 També s'analitzen els bytes transmesos durant l'enviament de paquets de \emph{ping} de 56 bytes (contant la capa IP són 84 bytes/paquet).
-En la taula \ref{T:efi} es mostren els resultats en bytes sense comptar la capa Ethernet (14 bytes/trama).
+Els resultats es contaran en bytes sense comptar la capa Ethernet (14 bytes/trama).
+
+En el moment d'analitzar els resultats s'ha de tenir en compte que TincVPN no intercanvia certificats durant la inicialització, en el seu lloc les claus públiques dels altres nodes s'han d'instal·lar al configurar el programari (per tenir una idea del que ocupen 2 certificats de 1024 bits: $830\cdot2=1660$ bytes).
+També s'ha de tenir en compte que els diferents programes utilitzen diferents algoritmes de compressió. 
+
+\subsection{Latència}
+Per analitzar la latència dels diferentes programes es realitzen les mesures amb el programa \emph{ping}. S'han realitzat 100 mesures en intervals de 2 segons per donar temps als algoritmes del programari VPN.
+
+\subsection{Taxa màxima de transferència}
+Per analitzar la taxa màxima de transferència s'han realitzat els tests amb 2 programes diferents: netperf i MGEN.
+El netperf s'ha utilitzat per realitzar tests en TCP i UDP.
+El MGEN s'ha utilitzat amb la configuració de la taula \ref{T:mgencfg} per tal d'enviar paquets a 737.28 Mbps durant 10 segons, i mesurant el nombre de paquets rebuts s'ha calculat la taxa rebuda.
+\begin{table}[htb]
+\begin{center}
+\begin{minipage}[htb]{0.6\linewidth}
+\footnotesize
+\begin{verbatim}
+TXBUFFER 1000
+0.0 ON  1 UDP DST 10.0.0.1/5000 PERIODIC [90000.0 996]
+10.0 OFF 1
+\end{verbatim}
+\end{minipage}
+\caption{Configuració MGEN}
+\label{T:mgencfg}
+\end{center}
+\end{table}
+
+En la taula \ref{T:mgencfg}, la configuració del MGEN utilitzada, encomana enviar 90000 paquets UDP per segon amb un \emph{payload} UDP de 996 bytes, resultant així paquets IP de 1024 bytes. Per a calcular la taxa de recepció s'utilitza l'equació \ref{E:mgen}, tenint en compte que l'activitat del MGEN es realitza només durant 10 segons.
+
+\begin{minipage}[htb]{\linewidth}
+\begin{equation}\label{E:mgen}
+r=P\cdot\frac{(996+28)\cdot8}{10}
+\end{equation}
+\centering
+{\scriptsize
+r: Taxa de recepció. 
+P: Número de paquets rebuts. 
+}\\
+%Equació \ref{E:mgen}: Càlcul de la tassa de recepció del MGEN.
+\vspace{1em}
+\end{minipage}
+
+En interpretar els resultats obtinguts s'ha de tenir en compte la presència de la compressió durant els tests del programari VPN. Aquesta pot afectar a la comparativa de la taxa de recepció si el tràfic generat té diferents ratis de compressió depenent dels algoritmes utilitzats en cada programari.
+
+La llibreria OpenSSL només pot treballar amb un sol \emph{thread} per connexió, per tant la utilització de \emph{threads} en l'aplicació creada en aquest projecte (VPMN) només es veuria beneficiada en un context de vàries connexions.
+
+%Proves amb varios nodes
+%\subsection{Capacitat}
+%\subsection{Càrrega}
+%\subsection{Escalabilitat}
+
+\section{Anàlisi de resultats}
+Abans d'analitzar els resultats cal comentar els problemes trobats durant les proves del programa creat. 
+Ja durant els primers tests d'aquesta aplicació es van notar comportaments estranys amb la recepció de tràfic xifrat i s'ha invertit molt de temps en intentar trobar l'arrel d'aquest problema. Per mirar de sol·lucionar el problema es va intentar canviar la part que treballa amb el xifratge amb diferents algoritmes i estructures. Finalment després de depurar molt el programa s'ha pogut trobar que el comportament anòmal ve donat per la llibreria OpenSSL, que sembla que falla al cap d'un temps aleatori malgrat aparentment l'aplicació fa un bon ús d'ella. Per tant sembla que la recent implementació de DTLS d'aquesta llibreria conté errors que afecten a l'ús que s'en fa en aquesta aplicació.
+El poc ús que rep aquest protocol, i per tant la seva implementació en la OpenSSL, fa que sigui més difícil trobar documentat aquest possible error, però s'ha començat a buscar l'error dins del codi font de la llibreria.
+
+Com a conseqüència dels problemes esmentats els tests d'aquesta aplicació, aquests s'han hagut de realitzat nombroses vegades abans de poder obtenir un resultat.
+
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|r|r|}
@@ -39,11 +96,6 @@ TincVPN & 2569 & 136 \\ \hline
 \end{center}
 \end{table}
 
-En el moment de analitzar els resultats s'ha de tenir en compte que TincVPN no intercanvia certificats durant la inicialització, en el seu lloc les claus públiques dels altres nodes s'han d'instal·lar al configurar el programari; per tenir idea del que ocupen 2 certificats de 1024 bits: $830\cdot2=1660$ bytes.
-També s'ha de tenir en compte que els diferents programes utilitzen diferents algoritmes de compressió. 
-
-\subsection{Latència}
-Per analitzar la latència dels diferentes programes es realitzen les mesures amb el programa \emph{ping}. S'han realitzat 100 mesures en intervals de 2 segons per donar temps al programari VPN.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -61,10 +113,6 @@ TincVPN & 0\% & 0.136 & 0.185 & 0.911 & 0.092 \\ \hline
 \end{center}
 \end{table}
 
-\subsection{Taxa màxima de transferència}
-Per analitzar la taxa màxima de transferència s'han realitzat els tests amb 2 programes diferents: netperf i MGEN.
-El netperf s'ha utilitzat per realitzar tests en TCP i UDP.
-El MGEN s'ha utilitzat amb la configuració de la taula \ref{T:mgencfg} per tal de enviar paquets a 737.28 Mbps durant 10 segons i mesurant el nombre de paquets rebuts s'ha calculat la velocitat rebuda.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|c|c|r|}
@@ -81,46 +129,4 @@ TincVPN & 133.26 & 270.77 & 78.29 \\ \hline
 \label{T:tax}
 \end{center}
 \end{table}
-En la taula \ref{T:mgencfg}, la configuració del MGEN utilitzada, encomana enviar 90000 paquets UDP per segon amb un \emph{payload} UDP de 996 bytes, resultan així paquets IP de 1024 bytes. Per a calcular la taxa de recepció s'utilitza l'equació \ref{E:mgen}, tenint en compte que l'activitat del MGEN es realitza només durant 10 segons.
-\begin{table}[htb]
-\begin{center}
-\begin{minipage}[htb]{0.6\linewidth}
-\footnotesize
-\begin{verbatim}
-TXBUFFER 1000
-0.0 ON  1 UDP DST 10.0.0.1/5000 PERIODIC [90000.0 996]
-10.0 OFF 1
-\end{verbatim}
-\end{minipage}
-\caption{Configuració MGEN}
-\label{T:mgencfg}
-\end{center}
-\end{table}
-\begin{minipage}[htb]{\linewidth}
-\begin{equation}\label{E:mgen}
-r=P\cdot\frac{(996+28)\cdot8}{10}
-\end{equation}
-\centering
-{\scriptsize
-r: Taxa de recepció. 
-P: Número de paquets rebuts. 
-}\\
-Equació \ref{E:mgen}: Càlcul de la tassa de recepció del MGEN.
-\end{minipage}
-
-En interpretar els resultats obtinguts s'ha de tenir en compte la presencia de la compressió durant els tests del programari VPN. Aquesta pot afectar a la comparativa de la taxa de recepció si el trafic generat té diferents ratis de compressió depenent dels algoritmes utilitzats en cada programari.
-
-La llibreria OpenSSL només pot treballar amb un sol \emph{thread} per connexió fet que afectaria que la utilització de \emph{threads} en l'aplicació creada en aquest projecte (VPMN) només veuria benefici d'aquesta tecnologia en un context de vàries connexions.
-
-%Proves amb varios nodes
-%\subsection{Capacitat}
-%\subsection{Càrrega}
-%\subsection{Escalabilitat}
-
-\section{Anàlisi de resultats}
-Abans d'analitzar els resultats cal comentar els problemes trobats durant les proves del programa creat. 
-Ja durant els primers tests de l'aplicació creada es van notar comportaments estranys amb la recepció de tràfic xifrat i s'ha invertit molt de temps en intentar trobar l'arrel d'aquest problema. Es va intentar canviar la part que treballa amb el xifratge amb diferents algoritmes i estructures per mirar de sol·lucionar el problema desconegut. Finalment després de depurar molt el programa s'ha pogut trobar que el comportament anòmal ve donat per la llibreria OpenSSL que sembla que falla al cap de un temps aleatori malgrat aparentment l'aplicació fa un bon ús d'ella. Per tant sembla que la recent implementació de DTLS d'aquesta llibreria conté errors que afecten al ús que s'en fa en aquesta aplicació.
-El poc ús que rep aquest protocol, i per tant la implementació també, fa que sigui més difícil trobar documentat aquest possible error, però s'ha començat a buscar l'error dins del codi font de la llibreria.
-
-Com a conseqüència dels problemes esmentats els tests d'aquesta aplicació, aquests s'han hagut de realitzat nombroses vegades abans de poder obtenir un resultat.
 
