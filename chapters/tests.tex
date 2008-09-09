@@ -1,7 +1,7 @@
 \chapter{Tests i resultats}
 \section{Metodologia}
 En aquest capítol s'exposaran els resultats dels tests realitzats per comparar l'aplicació creada amb el programari existent.
-En tots els programes s'han utilitzat certificats de 1024 bits i s'ha activat la compressió que permetés l'aplicació; el motiu d'activar la compressió és que la llibreria OpenSSL utilitzada per la creació del VPMN (el programa creat en aquest projecte) no permet desactivar la compressió en temps d'execució.
+En tots els programes s'han utilitzat certificats de 1024 bits i s'ha activat la compressió que permetés l'aplicació; el motiu d'activar la compressió és que la llibreria OpenSSL utilitzada per la creació del \keyword{VPMN}{Virtual Private Mesh Network} (el programa creat en aquest projecte) no permet desactivar la compressió en temps d'execució.
 L'escenari dels tests consta d'una xarxa Gigabit Ethernet on hi estan connectats dos ordenadors:
 \begin{enumerate}
 \item Debian GNU/Linux (PC amd64)
@@ -20,7 +20,7 @@ L'escenari dels tests consta d'una xarxa Gigabit Ethernet on hi estan connectats
 %Tests de Compressio
 \subsection{Eficiència}
 Per analitzar l'eficiència dels programes s'analitzen els bytes transmesos durant la inicialització, en el cas de la connexió directe es conten els bytes de les peticions \keyword{ARP}{Address Resolution Protocol} i en la resta de casos s'exclouen.
-També s'analitzen els bytes transmesos durant l'enviament de paquets de \emph{ping} de 56 bytes (contant la capa IP són 84 bytes/paquet).
+També s'analitzen els bytes transmesos durant l'enviament de paquets \keyword{ICMP}{Internet Control Message Protocol} de \emph{echo} (\emph{ping}) de 56 bytes (contant la capa IP són 84 bytes/paquet).
 Els resultats es contaran en bytes sense comptar la capa Ethernet (14 bytes/trama).
 
 En el moment d'analitzar els resultats s'ha de tenir en compte que TincVPN no intercanvia certificats durant la inicialització, en el seu lloc les claus públiques dels altres nodes s'han d'instal·lar al configurar el programari (per tenir una idea del que ocupen 2 certificats de 1024 bits: $830\cdot2=1660$ bytes).
@@ -67,7 +67,7 @@ En interpretar els resultats obtinguts s'ha de tenir en compte la presència de 
 
 La llibreria OpenSSL només pot treballar amb un sol \emph{thread} per connexió, per tant la utilització de \emph{threads} en l'aplicació creada en aquest projecte (VPMN) només es veuria beneficiada en un context de vàries connexions.
 
-%Proves amb varios nodes
+%Proves amb varis nodes
 %\subsection{Capacitat}
 %\subsection{Càrrega}
 %\subsection{Escalabilitat}
@@ -79,6 +79,7 @@ El poc ús que rep aquest protocol, i per tant la seva implementació en la Open
 
 Com a conseqüència dels problemes esmentats els tests d'aquesta aplicació, aquests s'han hagut de realitzat nombroses vegades abans de poder obtenir un resultat.
 
+En la taula \ref{T:efi} es compara la eficiència en el tràfic.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|r|r|}
@@ -95,7 +96,13 @@ TincVPN & 2569 & 136 \\ \hline
 \label{T:efi}
 \end{center}
 \end{table}
+Es pot veure com el OpenVPN intercanvia notablement més informació durant la inicialització, més del doble del trafic generat pel VPMN.
+El TincVPN es manté per sota de les altres aplicacions, però aquest no intercanvia certificats durant la inicialització: afegint un intercanvi de 2 certificats serien 4229 bytes i estaria a prop del VPMN però encara mantenint-se per sota; afegint els 2 certificats més, el de la CA de cada un, aquest hauria d'enviar 5889 bytes i es quedaria entre el OpenVPN i el VPMN. Per tant es pot dir que TincVPN envia poca informació d'inicialització gràcies a l'absència d'aquest intercanvi.
+La negociació ARP de la connexió directe esta molt per sota de totes les aplicacions, per tant com ja es podia predir el contingut que necessiten transportar els paquets ARP es molt menor al de qualssevol negociació de les aplicacions VPN.
 
+També es el TincVPN el que aconseguix la millor eficiència en la transferència dels paquets \emph{ping}. Les altres aplicacions resulten estar molt a prop d'aquest resultat però aquesta vegada OpenVPN millora l'eficiència al VPMN. En aquest test la mida original, mesurat en la connexió directe, no s'allunya molt dels resultats dels paquets xifrats.
+
+En la taula \ref{T:lat} es compara la latència mesurant el \keyword{RTT}{Round-Trip Time}.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -112,7 +119,9 @@ TincVPN & 0\% & 0.136 & 0.185 & 0.911 & 0.092 \\ \hline
 \label{T:lat}
 \end{center}
 \end{table}
+La mínima latència és la del TincVPN.
 
+En la taula \ref{T:tax} es compara la taxa màxima de transferència.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|c|c|r|}
@@ -129,4 +138,4 @@ TincVPN & 133.26 & 270.77 & 78.29 \\ \hline
 \label{T:tax}
 \end{center}
 \end{table}
-
+L'aplicació que arriba a la màxima taxa és la OpenVPN amb tràfic UDP.
