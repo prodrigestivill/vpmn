@@ -31,7 +31,7 @@ Per analitzar la latència dels diferentes programes es realitzen les mesures am
 
 \subsection{Taxa màxima de transferència}
 Per analitzar la taxa màxima de transferència s'han realitzat els tests amb 2 programes diferents: netperf i MGEN.
-El netperf s'ha utilitzat per realitzar tests en TCP i UDP.
+El netperf s'ha utilitzat per realitzar tests en TCP i UDP, aquests tests es realitzen enviant grans blocs d'informació a traves dels protocols esmentats.
 El MGEN s'ha utilitzat amb la configuració de la taula \ref{T:mgencfg} per tal d'enviar paquets a 737.28 Mbps durant 10 segons, i mesurant el nombre de paquets rebuts s'ha calculat la taxa rebuda.
 \begin{table}[htb]
 \begin{center}
@@ -79,7 +79,14 @@ El poc ús que rep aquest protocol, i per tant la seva implementació en la Open
 
 Com a conseqüència dels problemes esmentats els tests d'aquesta aplicació, aquests s'han hagut de realitzat nombroses vegades abans de poder obtenir un resultat.
 
-En la taula \ref{T:efi} es compara la eficiència en el tràfic.
+Per analitzar els resultats cal tenir en compte que tal com s'ha descrit l'escenari algunes aplicacions tenen un comportament diferent:
+\begin{itemize}
+\item Les aplicacions utilitzen algoritmes de compressió i xifratge diferents.
+\item El OpenVPN no realitza tasques d'enrutament intern en el node client al haver-hi una instància servidor i una client, tant el TincVPN com el VPMN realitzen aquestes tasques en ambdós nodes.
+\item El TincVPN no intercanvia certificats ni claus públiques; el seu protocol, tal com esta descrit en el capítol \ref{TincVPN-Sec}, no compleix tots els requisits per a ser un protocol segur.
+\end{itemize}
+
+En la taula \ref{T:efi} es compara la \textbf{eficiència} en el tràfic.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|r|r|}
@@ -102,7 +109,7 @@ La negociació ARP de la connexió directe esta molt per sota de totes les aplic
 
 També es el TincVPN el que aconseguix la millor eficiència en la transferència dels paquets \emph{ping}. Les altres aplicacions resulten estar molt a prop d'aquest resultat però aquesta vegada OpenVPN millora l'eficiència al VPMN. En aquest test la mida original, mesurat en la connexió directe, no s'allunya molt dels resultats dels paquets xifrats.
 
-En la taula \ref{T:lat} es compara la latència mesurant el \keyword{RTT}{Round-Trip Time}.
+En la taula \ref{T:lat} es compara la \textbf{latència} mesurant el \keyword{RTT}{Round-Trip Time}.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -119,9 +126,9 @@ TincVPN & 0\% & 0.136 & 0.185 & 0.911 & 0.092 \\ \hline
 \label{T:lat}
 \end{center}
 \end{table}
-La mínima latència és la del TincVPN.
+La mínima latència és la del TincVPN i la màxima és la del OpenVPN. TincVPN es manté entremig però amb una desviació estàndard molt inferior a la dels altres dos programaris. La desviació estàndard major es la de OpenVPN, aquest també enregistra valors màxims molt elevats per estar en una xarxa local. Els resultats de la latència en connexió directe només donen una referencia de que l'escenari utilitza una xarxa local.
 
-En la taula \ref{T:tax} es compara la taxa màxima de transferència.
+En la taula \ref{T:tax} es compara la \textbf{taxa màxima de transferència}.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|c|c|c|r|}
@@ -138,4 +145,15 @@ TincVPN & 133.26 & 270.77 & 78.29 \\ \hline
 \label{T:tax}
 \end{center}
 \end{table}
-L'aplicació que arriba a la màxima taxa és la OpenVPN amb tràfic UDP.
+L'aplicació que arriba a la màxima taxa és la OpenVPN amb tràfic UDP, és el valor més proper a la connexió directe només superant lleugerament la meitat d'aquest últim valor.
+L'aplicació TincVPN té valors molt baixos en TCP.
+El programa creat en aquest projecte (VPMN), malgrat tenir un bon resultat en TCP i MGEN, es manté en velocitats semblants tant en TCP com en UDP.
+
+Per tant es pot observar com en treballar amb paquets grans els resultats són molt diferents dels d'eficiència. En aquest test però també s'hi veu representat l'eficiència dels algoritmes interns, de xifratge i d'enrutament (OpenVPN només enruta en un node).
+
+El test del MGEN al utilitzar UDP hauria de donar resultats semblants als del test de UDP però en canvi dona resultats ben diferents. Primerament no arriba a enviar els aproximadament 740 Mbps, sinó uns 116 Mbps. Per tant el programari està treballant en condicions més normals de les de taxa màxima. Concloent, el resultat del test amb MGEN dona uns resultats estranys possiblement per la manera de mesurar la velocitat.
+
+A continuació com es fa un \textbf{resum} de la secció.
+El OpenVPN realitza una inicialització extensa, te una latència gran juntament amb una desviació estàndard alta i permet taxes de transferència grans.
+El TincVPN realitza una inicialització molt breu, te una latència molt baixa i permet taxes de transferència baixes.
+L'aplicació creada realitza una inicialització breu, te una latència baixa juntament amb una desviació estàndard molt baixa i permet taxes de transferència altes en TCP i baixes en UDP (en comparació amb la de les altres aplicacions).

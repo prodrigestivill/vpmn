@@ -80,6 +80,7 @@ TincVPN és un programa de VPNs a nivell d'aplicació, que fa ús del \emph{driv
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega del \emph{bridging} (en mode pont Ethernet) o de l'enrutat (en mode túnel IP) de la VPN a nivell d'aplicació.
 
+\label{TincVPN-Sec}
 A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Pot treballar només amb TCP, o utilitzar el TCP només com a canal de control i el UDP per les dades. Peter Gutmann va trobar nombroses errades de disseny en la seguretat del protocol de la versió 1 d'aquest programa que encara no s'han resolt (a l'annex \refannexmail{} es troba l'e-mail on exposa el seu anàlisi).
 
 \subsection{Wippien}
