@@ -2,6 +2,7 @@
 \usepackage{report/a4}
 \usepackage{latexsym}
 \usepackage[catalan,spanish,english]{babel}
+\usepackage[catalan]{babelbib}
 \usepackage[utf8]{inputenc}
 \usepackage{fancyhdr}
 \usepackage{makeidx}
@@ -150,5 +151,18 @@
 \input{report/chapters}
 
 \clearemptydoublepage
+
+%%%  BIBLIOGRAFIA
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% BibTeX
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliografia}
+\nocite{*}
+\selectbiblanguage{catalan}
+\setbtxfallbacklanguage{catalan}
+%%% a)  Estil de bibliografia
+\bibliographystyle{babunsrt-fl}
+%%% b) Indicar els fitxers que contenen la bibliografia
+\bibliography{report/bibliography,report/rfc}
 \clearemptydoublepage
 \end{document}

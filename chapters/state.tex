@@ -1,6 +1,6 @@
 \chapter{Estudi de la situació actual}
 \section{Protocols i programaris existents}
-Els protocols de seguretat poden proveir alguns dels serveis de seguretat aquí explicats:
+Els protocols de seguretat poden proveir part o la totalitat dels serveis de seguretat aquí esmentats:
 \begin{itemize}
 \item \textbf{Xifrar el tràfic} de manera que no pugi ser llegit per ningú més que pels destinataris originals.
 \item \textbf{Validar la integritat} per assegurar que el tràfic no ha estat modificat durant el seu recorregut.
@@ -15,7 +15,7 @@ A continuació s'analitzaran alguns protocols i programaris existents que permet
 
 IPsec va ser introduït per proporcionar serveis de seguretat tals com: xifrar el tràfic, validar la integritat, autenticar als extrems i l'anti-repetició. L'ús principal d'IPsec és el de crear VPNs en qualsevol dels dos modes, però les implicacions de seguretat són bastant diferents entre els dos modes d'operació.
 
-La majoria d'implementacions d'aquest protocol tenen problemes de compatibilitat amb les altres implementacions del mateix protocol, degut a que cada fabricant interpreta el \rfckeyword{} i s'adapta el protocol a la seva mida.
+La majoria d'implementacions d'aquest protocol tenen problemes de compatibilitat amb les altres implementacions del mateix protocol, degut a que cada fabricant interpreta el \rfckeyword{}s i s'adapta el protocol a la seva mida.
 
 L'intercanvi de claus a escala Internet és va desenvolupar més tard i utilitza la infraestructura de clau pública universal \keyword{DNSSEC}{Domain Name System Security Extensions}, però l'utilització d'aquesta tecnologia no es troba en gaires implementacions d'IPsec.
 
@@ -95,11 +95,11 @@ Per tant podem dir que Wippien crea VPNs mallades i completament connectades per
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs que utilitzin el seu servidor \emph{mediator} pertanyen a la xarxa 5.0.0.0/8.
 
-A nivell de seguretat utilitza un protocol propi amb AES128, mitjançant un component privatiu anomenat \emph{wodVPN ActiveX}; aquest component és \emph{NAT friendly} (està preparat per travessar els routers NAT) i suporta tant TCP com UDP.
+A nivell de seguretat utilitza un protocol propi amb l'algoritme de xifratge AES128, mitjançant un component privatiu anomenat \emph{wodVPN ActiveX}; aquest component és \emph{NAT friendly} (està preparat per travessar els routers NAT) i suporta tant TCP com UDP.
 
 \subsection{Hamachi}
 Hamachi és un programa privatiu de VPNs a nivell d'aplicació que suporta tant túnels IP com túnels \keyword{IPX}{Internetwork Packet Exchange}.
-El programa utilitza una connexió a un servidor central com a canal de control. En arrancar efectua el procés d'autenticació amb aquest servidor i efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT (per tant és una aplicació \emph{NAT friendly}). Finalment el servidor entrega al client la seva llista de VPNs juntament amb la llista dels membres que s'actualitza constantment cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda: en el procés de superar els routers NAT, en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
+El programa utilitza una connexió a un servidor central com a canal de control. En arrancar efectua el procés d'autenticació amb aquest servidor i efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT (per tant és una aplicació \emph{NAT friendly}). Finalment el servidor entrega al client la seva llista de VPNs juntament amb la llista dels membres, aquesta llista s'actualitza constantment cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda: en el procés de superar els routers NAT, en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs pertanyen a la xarxa 5.0.0.0/8.
 

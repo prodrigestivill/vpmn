@@ -2,7 +2,7 @@
 \section{Funcionament de l'aplicació}
 L'objectiu de l'aplicació és ser capaç de crear xarxes privades virtuals que no depenguin de cap servidor central, superar els routers NAT i proporcionar una baixa latència.
 
-L'aplicació d'aquest projecte, en arrancar, es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvia la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets. Per tal que el NAT no tanqui el port d'entrada, cal que l'aplicació no pari d'enviar paquets a tots el nodes. La idea és aprofitar aquests paquets per informar dels altres nodes coneguts, per així garantir una malla completament connectada (veure figura \ref{F:vpn-fullymeshed}).
+L'aplicació d'aquest projecte, en arrancar, es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvia la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets. Per tal que el NAT no tanqui el port d'entrada, cal que l'aplicació no pari d'enviar paquets a tots el nodes. Aquests paquets es poden aprofitar per informar dels altres nodes coneguts, per així garantir una malla completament connectada (veure figura \ref{F:vpn-fullymeshed}).
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.5\textwidth]{images/vpn-fullymeshed}
@@ -45,7 +45,7 @@ El protocol IP permet enviar paquets sense control de pèrdues mitjançant UDP, 
 El programari de VPNs es complica ja que malgrat sembli que UDP sigui la solució no hi ha implementacions conegudes de capes de seguretat sobre UDP. És per això que la majoria d'elles opten per implementar els seus protocols propis de seguretat.
 Peter Gutmann va analitzar nombroses aplicacions VPN i en va descriure les nombroses errades de disseny dels protocols de seguretat. L'error que remarcava era que la majoria d'elles volien simplificar els estàndards segurs ja que són complicats, però conclou que un protocol segur en la seva totalitat és complexe (veure \cite{latm-metzdowd}: a l'annex \refannexmail{} es troba l'e-mail on s'exposa el seu anàlisi).
 
-Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UDP, es decideix no utilitzar el TCP i buscar intensament alguna implementació el més segura possible o fins hi tot a poder ser estàndard. Finalment es va trobar un protocol del 2004 basat en TLS, que van dissenyar N. Modadugu i E. Rescorla de la universitat d'Stanford, anomenat \keyword{DTLS}{Datagram Transport Layer Security} i més tard el 2006 va esdevenir el RFC~4347~\cite{rfc4347} del IETF. A l'annex \refannexpapers{} es troba el \emph{paper} inicial que descriu el protocol. El mateix equip va treballar en una variant del DTLS \cite{rfc-dtls-short}(el borrador RFC ha caducat i es diu \emph{Extensions for Datagram Transport Layer Security (TLS) in Low Bandwidth Environments}) per estalviar bits les capçeleres DTLS per a entorns amb poc ample de banda. Proposaven treure els camps repetits a cada \emph{record} de TLS i DTLS que segons ells no són necessaris. Degut a que aquesta variant no va tenir massa èxit i no va esdevenir RFC, en aquest projecte es farà ús del DTLS que descriu el RFC~4347~\cite{rfc4347}, aquest protocol està implementat en les versions més recents de la llibreria OpenSSL i és la implementació que s'ha decidit utilitzar.
+Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UDP, es decideix no utilitzar el TCP i buscar intensament alguna implementació el més segura possible o fins hi tot a poder ser estàndard. Finalment es va trobar un protocol del 2004 basat en TLS, que van dissenyar N. Modadugu i E. Rescorla de la universitat d'Stanford, anomenat \keyword{DTLS}{Datagram Transport Layer Security} i més tard el 2006 va esdevenir el RFC~4347~\cite{rfc4347} del IETF. A l'annex \refannexpapers{} es troba el \emph{paper} inicial que descriu el protocol. El mateix equip va treballar en una variant del DTLS \cite{rfc-dtls-short}(el esborrany RFC ha caducat i es diu \emph{Extensions for Datagram Transport Layer Security (TLS) in Low Bandwidth Environments}) per estalviar bits les capçeleres DTLS per a entorns amb poc ample de banda. Proposaven treure els camps repetits a cada \emph{record} de TLS i DTLS que segons ells no són necessaris. Degut a que aquesta variant no va tenir massa èxit i no va esdevenir RFC, en aquest projecte es farà ús del DTLS que descriu el RFC~4347~\cite{rfc4347}, aquest protocol està implementat en les versions més recents de la llibreria OpenSSL i és la implementació que s'ha decidit utilitzar.
 
 Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} (veure \cite{deq-metzdowd}) hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Si coincidissin múltiples factors el xifratge resultant podria esdevenir menys segur, però no hi ha cap implementació que ho tingui en compte ja que la probabilitat de que coincidissin es molt baixa, així que tampoc no es tindrà en compte en aquest programari.
 
@@ -116,7 +116,7 @@ Els paquets \emph{Identification} (ID) descriuen al node que l'envia. Per descri
 \item Xarxes que publica el node: fa d'identificador del node.
 \item Agrupacions de IP i port: altres vies per comunicar-se amb el node.
 \end{itemize}
-En el paquet (taula \ref{T:pktid}) primer s'envien les quantitats dels dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
+En el paquet (taula \ref{T:pktid}) primer s'envien el numero d'entrades que contenen els dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
 Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x00$.
 \begin{table}[htb]
 \begin{center}
@@ -159,7 +159,7 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \end{center}
 \end{table}
 \subsubsection{Paquet Keep Alive}
-Els routers NAT s'utilitzen generalment per compartir una mateixa IP entre màquines diferents. El router guarda cada connexió en memòria per tal de reutilitzar els mateixos paràmetres en travessar més dades de la connexió. Tots els routers NAT assignen un temps de vida a la informació guardada en memòria i el renoven a mesura que circulen dades de la connexió. En el moment que caduca el temps de vida, la connexió es perd sense que cap dels participants s'en adonin, és per això que es important assegurar-se de que el router no arribi a esgotar aquest temps de vida.
+Els routers NAT s'utilitzen generalment per compartir una mateixa IP entre màquines diferents. El router guarda cada connexió en memòria per tal de reutilitzar els mateixos paràmetres en travessar més dades per la connexió. Tots els routers NAT assignen un temps de vida a la informació guardada en memòria i el renoven a mesura que circulen dades de la connexió. En el moment que caduca el temps de vida, la connexió es perd sense que cap dels participants s'en adonin, és per això que es important assegurar-se de que el router no arribi a esgotar aquest temps de vida.
 
 El paquet \emph{Keep Alive} (KA) té dos objectius: mantenir el canal obert i ajudar a mallar la VPN.
 El primer objectiu fa que enviar aquest paquet només sigui necessari quan no s'ha enviat cap altre informació al canal, en canvi el segon objectiu fa que sigui necessari enviar-lo cada cert temps. D'aquesta manera es defineixen dos temps configurables que s'anomenaran $t_{min}$ i $t_{max}$. La política d'enviament resultant consisteix en enviar un paquet KA cada $t_{min}$ des de l'últim paquet transmès pel canal i en cas de no haver-se enviat cap paquet d'aquests durant $t_{max}$ es forçaria l'enviament malgrat no fos necessari pel primer objectiu.
@@ -203,13 +203,17 @@ La arquitectura del programa com es veu en la figura \ref{F:dia-app} es separa e
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.5\textwidth]{images/dia-app}
-\caption{Diagrama de la aplicació}
+\caption{Diagrama de processos de la aplicació}
 \label{F:dia-app}
 \end{figure}
 Per altre banda hi ha un temporitzador que s'encarrega de llançar els esdeveniments que depenguin del temps, com l'enviament de paquets \emph{Keep Alive} o reenviament de paquets \emph{Identification}.
+
 Els paquets que les aplicacions envien a través de l'adaptador virtual són enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí. Aquest dos s'han implementat mitjançant threads i són capaços d'enrutar i xifrar o desxifrar múltiples paquets simultàniament.
 
-Per el desenvolupament d'aquesta aplicació s'ha escollit el llenguatge C per tal de poder treballar de forma el més proper possible als bits i poder optimitzar-la per aconseguir baixes latències. També s'ha decidit utilitzar la llibreria de threads de \keyword{POSIX}{Portable Operating System Interface} per la seva potència i la facilitat per una futura adaptació de l'aplicació a altres sistemes operatius. L'elecció d'aquest llenguatge juntament amb la utilització de threads ha comportat múltiples dificultats en la gestió dels recursos compartits entre els diferents threads, però el resultat hauria d'aprofitar millor els recursos de les màquines node.
+Per el desenvolupament d'aquesta aplicació s'ha escollit el llenguatge C per ser un lleguatge de baix nivell (permetent treballar el més proper possible als bits) i poder optimitzar-la per aconseguir baixes latències. També s'ha decidit utilitzar la llibreria de threads de \keyword{POSIX}{Portable Operating System Interface} per la seva potència i la compatibilitat amb altres sistemes operatius.
+
+L'elecció d'aquest llenguatge juntament amb la utilització de threads ha comportat múltiples dificultats en la gestió dels recursos compartits entre els diferents threads, però el resultat hauria d'aprofitar millor els recursos de les màquines node.
+
 \subsection{Interfície TUN}
 L'aplicació fa ús del \emph{driver} genèric TUN/TAP. S'ha escollit aquest \emph{driver} ja que està disponible per la majoria de sistemes operatius i facilitarà la possible futura adaptació de l'aplicació.
 El \emph{driver} TUN/TAP és un \emph{driver} de \emph{kernel} d'una targeta de xarxa virtual, i per tant no depèn del cap targeta real física. Aquest \emph{driver} es separa en dos \emph{sub-drivers}:
@@ -218,7 +222,7 @@ El \emph{driver} TUN/TAP és un \emph{driver} de \emph{kernel} d'una targeta de 
 \item \emph{Driver} \textbf{TUN} simula una interfície de xarxa punt-a-punt i treballa amb trames de capa 3 del model OSI.
 \end{itemize}
 
-En aquestes targetes els paquets enviats pel sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats pel \emph{stack} de protocols del \emph{kernel}.
+En aquestes targetes virtuals els paquets enviats pel sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats pel \emph{stack} de protocols del \emph{kernel}.
 
 El diagrama d'aquesta part de l'aplicació està en la figura \ref{F:dia-tunsrv}.
 \begin{figure}[htb]
@@ -227,6 +231,7 @@ El diagrama d'aquesta part de l'aplicació està en la figura \ref{F:dia-tunsrv}
 \caption{Diagrama de flux del thread TUN}
 \label{F:dia-tunsrv}
 \end{figure}
+
 El primer que fa el node en rebre un paquet de la interfície TUN és comprovar que el paquet provingui d'una adreça IP que els altres nodes reconeguin com a pròpia d'ell, desprès busca el node a qui va destinat i li envia pel canal xifrat. En el cas de no complir algun dels requisits es descarta el paquet sense notificar-ho.
 
 \subsection{Servidor UDP/DTLS}
