@@ -23,7 +23,7 @@ Així doncs depenent del nivell en el que actuï l'IPsec, aquest estarà treball
 \subsubsection{Mode transport}
 En mode transport, només es xifra i/o autentica el \emph{payload} (la carga útil) del paquet IP. Per tant al no tocar les capçaleres IP no afecta a l'enrutament, però si s'utilitza l'\keyword{AH}{Authentication Header} les direccions IP no poden ser traduïdes (com fa per exemple un NAT) ja que això faria que el valor del \emph{hash} (resum) no coincidís. Aquest mode s'utilitza en comunicacions ordinador a ordinador.
 
-Per tal de travessar els NATs s'ha definit en un RFC com a mecanisme d'encapsulació de missatges IPsec anomanat \keyword{NAT-T}{NAT Traversal in the IKE}.
+Per tal de travessar els NATs s'ha definit en un RFC com a mecanisme d'encapsulació de missatges IPsec anomanat \keyword{NAT-T}{NAT Traversal in the IKE} (veure \cite{rfc3715} i \cite{rfc3947}).
 \subsubsection{Mode túnel}
 En el mode túnel, es xifra i/o autentica tot el paquet IP sencer (capçalera inclusiva). Aquesta informació s'encapsula dins del \emph{payload} d'un nou paquet IP per tal de que pugui ser enrutat. Aquest mode s'utilitza en comunicacions xarxa a xarxa, per exemple per crear VPNs a través d'Internet.
 
@@ -81,7 +81,7 @@ TincVPN és un programa de VPNs a nivell d'aplicació, que fa ús del \emph{driv
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega del \emph{bridging} (en mode pont Ethernet) o de l'enrutat (en mode túnel IP) de la VPN a nivell d'aplicació.
 
 \label{TincVPN-Sec}
-A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Pot treballar només amb TCP, o utilitzar el TCP només com a canal de control i el UDP per les dades. Peter Gutmann va trobar nombroses errades de disseny en la seguretat del protocol de la versió 1 d'aquest programa que encara no s'han resolt (a l'annex \refannexmail{} es troba l'e-mail on exposa el seu anàlisi).
+A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Pot treballar només amb TCP, o utilitzar el TCP només com a canal de control i el UDP per les dades. Peter Gutmann va trobar nombroses errades de disseny en la seguretat del protocol de la versió 1 d'aquest programa que encara no s'han resolt (veure \cite{latm-metzdowd} i \cite{tinc-sec}: a l'annex \refannexmail{} es troba l'e-mail on exposa el seu anàlisi).
 
 \subsection{Wippien}
 Wippien és un programa de missatgeria instantània amb funcionalitats de creació de VPNs a nivell d'aplicació. Utilitza \keyword{XMPP}{Extensible Messaging and Presence Protocol} com a missatgeria instantània. Una vegada connectat al servidor XMPP, l'aplicació mostra a l'usuari la seva llista de contactes per tal que esculli amb quins contactes vol crear la VPN. Per crear-la negocia els paràmetres de la VPN (com la IP pública, el port i el protocol) a través d'XMPP. També utilitza HTTP cap a un servidor anomenat \emph{mediator}, que fa la funció de \keyword{DHCP}{Dynamic Host Configuration Protocol} assignant una IP única per sessió a cada \emph{peer} de la VPN; d'aquesta manera es garanteix que no hi hagi conflictes d'IPs.
@@ -108,7 +108,7 @@ A nivell de seguretat la VPN utilitza un protocol propi sobre UDP.
 \subsection{ELA VPN}
 \keyword{ELA}{Everywhere Local Area network} és un programa de VPN a nivell d'aplicació.
 Utilitza una topologia de nodes mallada (veure la figura \ref{F:vpn-meshed}) connectada amb un protocol propi tant amb TCP com amb UDP.
-D'aquesta tecnologia no s'ha trobat cap implementació, el \emph{paper} descriptiu es troba adjunt a l'annex \refannexpapers.
+D'aquesta tecnologia no s'ha trobat cap implementació, el \emph{paper} descriptiu~\cite{ela} es troba adjunt a l'annex \refannexpapers.
 
 \section{Comparativa}
 \begin{table}[htb]

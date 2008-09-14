@@ -1,7 +1,7 @@
 .PHONY: all pdf paper report epsc %extra %images clean distclean cleanupload upload 
 
 all: pdf
-pdf: cleanpdf allextra allimages epsc
+pdf: clean cleanpdf allextra allimages epsc
 
 #Default Output PDFs
 paper = paper
@@ -20,16 +20,17 @@ epsc: $(epsc).pdf $(epsc)$(annex).pdf $(epsc)$(withannex).pdf
 %.pdf: %.tex
 	pdflatex --draftmode $<
 	makeindex $(basename $<).glo -s $(basename $<).ist -o $(basename $<).gls
+	bibtex $(basename $<) || true
 	pdflatex --draftmode $<
 	pdflatex $<
 
 #Clean
 cmdcleanpdf = rm -vf *.pdf
-cmdclean = rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.idx *.log *.lot *.lof *.prv *.toc *~ *.out *.ilg *.ind *.glo *.ist *.gls
+cmdclean = rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.idx *.log *.lot *.lof *.prv *.toc *~ *.out *.ilg *.ind *.glo *.ist *.gls *.bbl
 cleanpdf:
 	$(cmdcleanpdf)
 
-clean: cleanimages
+clean:
 	$(cmdclean)
 	cd annex && $(cmdclean)
 	cd chapters && $(cmdclean)
@@ -37,7 +38,7 @@ clean: cleanimages
 	cd paper && $(cmdclean)
 	cd epsc && $(cmdclean)
 
-distclean: clean cleanpdf cleanextra
+distclean: clean cleanimages cleanpdf cleanextra
 
 #Extra
 %extra:
