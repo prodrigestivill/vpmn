@@ -19,7 +19,7 @@ L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els tú
 Per assolir aquest objectiu juntament amb el de la baixa latència s'han de realitzar connexions directes entre tots els nodes, i no es poden realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar l'adreça IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
 
 Per tant el primer que cal establir és el funcionament de l'adreçament IP. Per a fer-ho es contemplen dues possibilitats: l'utilització d'un adreçament que es calculi a partir dels certificats o la incrustació de l'adreçament dins d'algun camp dels certificats.
-La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority}.
+La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority (per més informació consultar l'annex \refannexdesc{})}.
 
 Després d'examinar els camps de les extensions x509v3 per a certificats, es va trobar una entrada anomenada \emph{nameConstraints}. Aquesta entrada permet definir múltiples tipus de permisos (tant de permetre com d'excloure, veure exemple a la taula \ref{T:nameconstraints} o \cite{nameconstraints}).
 \begin{table}[htb]
@@ -50,8 +50,7 @@ La utilització de la IP pública per aquesta tasca no és valida ja que deixa d
 La utilització de l'agrupació de IPs i ports tant locals com públics sembla prou vàlida, però de vegades s'utilitza un NAT per ajuntar diferents subxarxes de mateix identificador de xarxa.
 Les xarxes que publica o ofereix un node és una informació validada per la CA i no pot ser repetida per cap altre node de la VPN. És per això que aquesta última opció serà la utilitzada alhora d'identificar els nodes.
 
-\subsection{Transport segur}
-%UDP+DTLS
+\subsection{Transport segur} %UDP+DTLS
 Pel que fa la informació a transportar, el protocol IP està dissenyat per un medi hostil on els paquets es desordenen o es perden, però l'ús de TCP permet oblidar-se d'aquest medi ja que s'encarrega de l'ordenació i de la recuperació de les pèrdues. Degut a que la majoria de comunicacions utilitzen TCP, una VPN transmetrà majoritàriament paquets TCP encapulats dins del protocol que utilitzin pel transport.
 En el cas d'utilitzar una VPN sobre TCP i haver-hi congestió a la xarxa, aquesta provocaria la pèrdua dels paquets de la connexió de la VPN i per tant també dels paquets TCP que hi són encapsulats. Com a conseqüència, les dos piles (\emph{stacks}) de TCP reenviarien els paquets perduts de forma que la xarxa encara es saturaria més, tenint cada cop més paquets iguals retransmetent-se.
 El protocol IP permet enviar paquets sense control de pèrdues mitjançant UDP, aquest protocol és el que la majoria de VPNs intenten utilitzar per millorar l'eficiència en el cas explicat anteriorment. A més a més no  perjudica en cap mesura, ja que com s'ha dit el protocol IP que va dins de la VPN està dissenyat per un medi amb pèrdues.
@@ -227,17 +226,15 @@ El \emph{driver} TUN/TAP és un \emph{driver} de \emph{kernel} d'una targeta de 
 \item \emph{Driver} \textbf{TAP} simula una interfície de xarxa Ethernet i treballa amb trames de capa 2 del model OSI.
 \item \emph{Driver} \textbf{TUN} simula una interfície de xarxa punt-a-punt i treballa amb trames de capa 3 del model OSI.
 \end{itemize}
-
-En aquestes targetes virtuals els paquets enviats pel sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats pel \emph{stack} de protocols del \emph{kernel}.
-
-El diagrama d'aquesta part de l'aplicació està en la figura \ref{F:dia-tunsrv}.
 \begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{images/dia-tunsrv}
 \caption{Diagrama de flux del thread TUN}
 \label{F:dia-tunsrv}
 \end{figure}
+En aquestes targetes virtuals els paquets enviats pel sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats pel \emph{stack} de protocols del \emph{kernel}.
 
+El diagrama d'aquesta part de l'aplicació està en la figura \ref{F:dia-tunsrv}.
 El primer que fa el node en rebre un paquet de la interfície TUN és comprovar que el paquet provingui d'una adreça IP que els altres nodes reconeguin com a pròpia d'ell, desprès busca el node a qui va destinat i li envia pel canal xifrat. En el cas de no complir algun dels requisits es descarta el paquet sense notificar-ho.
 
 \subsection{Servidor UDP/DTLS}

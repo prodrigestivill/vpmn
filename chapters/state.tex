@@ -21,7 +21,7 @@ L'intercanvi de claus a escala Internet és va desenvolupar més tard i utilitza
 
 Així doncs depenent del nivell en el que actuï l'IPsec, aquest estarà treballant en mode transport o mode túnel.
 \subsubsection{Mode transport}
-En mode transport, només es xifra i/o autentica el \emph{payload} (la carga útil) del paquet IP. Per tant al no tocar les capçaleres IP no afecta a l'enrutament, però si s'utilitza l'\keyword{AH}{Authentication Header (per més informació consultar l'annex \refannexdesc{})} les direccions IP no poden ser traduïdes (com fa per exemple un NAT) ja que això faria que el valor del \emph{hash} (resum) no coincidís. Aquest mode s'utilitza en comunicacions ordinador a ordinador.
+En mode transport, només es xifra i/o autentica el \emph{payload} (la carga útil) del paquet IP. Per tant al no tocar les capçaleres IP no afecta a l'enrutament (o encaminament), però si s'utilitza l'\keyword{AH}{Authentication Header (per més informació consultar l'annex \refannexdesc{})} les direccions IP no poden ser traduïdes (com fa per exemple un NAT) ja que això faria que el valor del \emph{hash} (resum) no coincidís. Aquest mode s'utilitza en comunicacions ordinador a ordinador.
 
 Per tal de travessar els NATs s'ha definit en un RFC com a mecanisme d'encapsulació de missatges IPsec anomanat \keyword{NAT-T}{NAT Traversal in the IKE} (veure \cite{rfc3715} i \cite{rfc3947}).
 \subsubsection{Mode túnel}
@@ -70,7 +70,7 @@ Per tant podem dir que és tracta d'una aplicació pensada per VPNs centralitzad
 A nivell de seguretat utilitza la llibreria Open\keyword{SSL}{Secure Socket Layer (la versió 3 en convertir-se en estàndard es va anomenar TLS)} tant per \keyword{TCP}{Transmission Control Protocol} com per \keyword{UDP}{User Datagram Protocol}: en TCP utilitza l'estàndard \keyword{TLS}{Transport Layer Security (per més informació consultar l'annex \refannexdesc{})} i en UDP utilitza un protocol propi basat en TLS. Permet l'autenticació per claus secretes compartides prèviament, per certificats x509 i per usuari-contrasenya.
 
 \subsection{TincVPN}
-TincVPN és un programa de VPNs a nivell d'aplicació, que fa ús del \emph{driver} genèric i multiplataforma TUN/TAP. Mitjançant aquest \emph{driver} l'aplicació pot crear VPNs en \textbf{mode pont Ethernet} o en \textbf{mode túnel IP}, ja explicats anteriorment. L'aplicació crea una VPN mallada (figura \ref{F:vpn-meshed}) connectant-se a una llista de \emph{peers}, i la resta de \emph{peers} de la VPN hauran de ser enrutats a través d'altres \emph{peers} per arribar als nodes que no tinguin connexió directe.
+TincVPN és un programa de VPNs a nivell d'aplicació, que fa ús del \emph{driver} genèric i multiplataforma TUN/TAP. Mitjançant aquest \emph{driver} l'aplicació pot crear VPNs en \textbf{mode pont Ethernet} o en \textbf{mode túnel IP}, ja explicats anteriorment. L'aplicació crea una VPN mallada (figura \ref{F:vpn-meshed}) connectant-se a una llista de \emph{peers} (nodes client i servidor), i la resta de \emph{peers} de la VPN hauran de ser enrutats a través d'altres \emph{peers} per arribar als nodes que no tinguin connexió directe.
 \begin{figure}[htb]
 \centering
 \includegraphics[height=0.5\textwidth]{images/vpn-meshed}
@@ -78,7 +78,7 @@ TincVPN és un programa de VPNs a nivell d'aplicació, que fa ús del \emph{driv
 \label{F:vpn-meshed}
 \end{figure}
 
-Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega del \emph{bridging} (en mode pont Ethernet) o de l'enrutat (en mode túnel IP) de la VPN a nivell d'aplicació.
+Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} de la VPN qui s'encarrega a nivell d'aplicació del \emph{bridging} (adreçar les trames Ethernet al destí correcte) en mode pont Ethernet o del \emph{routing} (enrutament: adreçar els paquets IP cap al camí correcte) en mode túnel IP.
 
 \label{TincVPN-Sec}
 A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Pot treballar només amb TCP, o utilitzar el TCP només com a canal de control i el UDP per les dades. Peter Gutmann va trobar nombroses errades de disseny en la seguretat del protocol de la versió 1 d'aquest programa que encara no s'han resolt (veure \cite{latm-metzdowd} i \cite{tinc-sec}: a l'annex \refannexmail{} es troba l'e-mail on exposa el seu anàlisi).
@@ -95,7 +95,7 @@ Per tant podem dir que Wippien crea VPNs mallades i completament connectades per
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs que utilitzin el seu servidor \emph{mediator} pertanyen a la xarxa 5.0.0.0/8.
 
-A nivell de seguretat utilitza un protocol propi amb l'algoritme de xifratge AES128, mitjançant un component privatiu\footnote{component privatiu: programari privatiu (per més informació consultar el concepte \emph{proprietary software} a l'annex \refannexdesc{})} anomenat \emph{wodVPN ActiveX}; aquest component és \emph{NAT friendly} (està preparat per travessar els routers NAT) i suporta tant TCP com UDP.
+A nivell de seguretat utilitza un protocol propi amb l'algoritme de xifratge AES128, mitjançant un component privatiu\footnote{component privatiu: part d'un programa privatiu (per més informació consultar el concepte \emph{proprietary software} a l'annex \refannexdesc{})} anomenat \emph{wodVPN ActiveX}; aquest component és \emph{NAT friendly} (està preparat per travessar els routers NAT) i suporta tant TCP com UDP.
 
 \subsection{Hamachi}
 Hamachi és un programa privatiu de VPNs a nivell d'aplicació que suporta tant túnels IP com túnels \keyword{IPX}{Internetwork Packet Exchange}.
@@ -106,7 +106,7 @@ Utilitza una única interfície de xarxa en cada màquina per tota la VPN. Per t
 A nivell de seguretat la VPN utilitza un protocol propi sobre UDP.
 
 \subsection{ELA VPN}
-\keyword{ELA}{Everywhere Local Area network} és un programa de VPN a nivell d'aplicació.
+\keyword{ELA}{Everywhere Local Area network \cite{ela}} és un programa de VPN a nivell d'aplicació.
 Utilitza una topologia de nodes mallada (veure la figura \ref{F:vpn-meshed}) connectada amb un protocol propi tant amb TCP com amb UDP.
 D'aquesta tecnologia no s'ha trobat cap implementació, el \emph{paper} descriptiu~\cite{ela} es troba adjunt a l'annex \refannexpapers.
 
