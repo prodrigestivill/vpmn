@@ -8,10 +8,20 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % NOTA: la longitud passada com a parametre d'entrada 
 %       s'ha d'ajustar ``a ull'' fins que el requadre del resum ocupi tota la pagina 
-\begin{resum}{17cm}
+\begin{resum}{7.8cm}
 % El resum ha de tenir una extensió mínima de 1500 caràcters sense
 % espais i una extensió màxima de 3000.
-Disseny i programació d'una xarxa privada virtual sense servidors centrals. La idea és fer el disseny i programar tot el sistema a excepció de la capa d'autenticació i encriptació.
+En aquest projecte s'apropa als conceptes com les xarxes privades virtuals, els serveis de seguretat (xifrar el tràfic, validar la integritat, autenticar els extrems, evitar el repudi i evitar la repetició) i les aplicacions distribuïdes (\emph{peer to peer}).
+
+Avui en dia, la funció de permetre la unió de diferents ordenadors o xarxes locals en una nova xarxa virtual, pot ser aprofitada per poder abstraure's de les barreres imposades per IPv4 com la limitació d'adreçament públic. El fet de afegir la component de privacitat permet forçar un entorn segur, de confiança i independent del que puguin aportar les aplicacions. El conjunt de la creació de xarxes virtuals amb la component de privacitat permet la creació de xarxes privades virtuals també anomenades VPNs.
+
+L'objectiu d'aquest projecte és dissenyar i implementar una aplicació capaç de crear xarxes privades virtuals que no depenguin de cap servidor central, sense que això comprometi la privacitat ni l'autenticació dels integrants de la xarxa. L'aplicació ha de ser capaç de superar els routers NAT (que tradueixen les adreces IP permetent compartir una adreça pública entre diferents ordenadors) per tal d'establir connexions bidireccionals directament amb els veïns de la xarxa virtual, proporcionant així una baixa latència.
+
+Aquest document comença amb una introducció a les xarxes privades virtuals i al projecte.
+Seguidament, en el primer capítol s'exposa la descripció i la comparativa de les tecnologies de xarxes privades virtuals existents.
+En el segon s'explica el funcionament, el disseny i l'arquitectura de l'aplicació creada.
+En el tercer es presenten els resultats de les proves realitzades amb l'aplicació creada.
+I finalment hi ha les conclusions, la bibliografia i el glossari.
 \end{resum}
 
 %% OVERVIEW
@@ -19,10 +29,19 @@ Disseny i programació d'una xarxa privada virtual sense servidors centrals. La 
 % NOTA: la longitud passada com a parametre d'entrada 
 %       s'ha d'ajustar ``a ull'' fins que el requadre del resum ocupi tota la pagina 
 \selectlanguage{english}
-\begin{overview}{17cm}
-% El resum ha de tenir una extensió mínima de 1500 caràcters sense
-% espais i una extensió màxima de 3000.
-Design and develop a virtual private network without central servers. The idea is to design and develop all the system with the exception of authentication and encryption layer.
+\begin{overview}{8.3cm}
+This project are close to the concepts like the virtual private networks, the security services (encrypt the traffic, validate the integration, authenticate both ends, avoid the repudiation and avoid repetitions) and the distributed applications (like peer to peer).
+
+Nowadays, allow to join different computers or local networks into a new virtual network could be used to escape from the current barriers imposed by IPv4 limitations, like the availability of public addresses. It also could be added an additional component to this like the privacy of the communications, it could provide a safe and confident environment independent from each one the user applications could supply. Both components as a whole allow to create virtual private networks abbreviated as VPNs.
+
+The main target of this project is to design and implement an application that permits to create virtual private networks which did not need to any central server without any compromise in the privacy nor the confidence in the authentication of the virtual network members.
+The application needs to be able to reach directly the other members of the virtual private network across NAT routers (network address translator routers, to share a single IP with various computers) allowing a low latency.
+
+This document starts with an introduction to the virtual private networks and to this work.
+The first chapter describes and compares the existing virtual private network technologies.
+The second one explains how the created application works, how is designed and its internal architecture.
+The third one present the results of the test done with the created application.
+Finally there are the conclusions, the bibliography and a glossary.
 \end{overview}
 \selectlanguage{catalan}
 
