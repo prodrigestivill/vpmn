@@ -45,9 +45,9 @@ El protocol IP permet enviar paquets sense control de pèrdues mitjançant UDP, 
 El programari de VPNs es complica ja que malgrat sembli que UDP sigui la solució no hi ha implementacions conegudes de capes de seguretat sobre UDP. És per això que la majoria d'elles opten per implementar els seus protocols propis de seguretat.
 Peter Gutmann va analitzar nombroses aplicacions VPN i en va descriure les nombroses errades de disseny dels protocols de seguretat. L'error que remarcava era que la majoria d'elles volien simplificar els estàndards segurs ja que són complicats, però conclou que un protocol segur en la seva totalitat és complexe (veure \cite{latm-metzdowd}: a l'annex \refannexmail{} es troba l'e-mail on s'exposa el seu anàlisi).
 
-Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UDP, es decideix no utilitzar el TCP i buscar intensament alguna implementació el més segura possible o fins hi tot a poder ser estàndard. Finalment es va trobar un protocol del 2004 basat en TLS, que van dissenyar N. Modadugu i E. Rescorla de la universitat d'Stanford, anomenat \keyword{DTLS}{Datagram Transport Layer Security} i més tard el 2006 va esdevenir el RFC~4347~\cite{rfc4347} del IETF. A l'annex \refannexpapers{} es troba el \emph{paper} inicial que descriu el protocol. El mateix equip va treballar en una variant del DTLS \cite{rfc-dtls-short}(el esborrany RFC ha caducat i es diu \emph{Extensions for Datagram Transport Layer Security (TLS) in Low Bandwidth Environments}) per estalviar bits les capçeleres DTLS per a entorns amb poc ample de banda. Proposaven treure els camps repetits a cada \emph{record} de TLS i DTLS que segons ells no són necessaris. Degut a que aquesta variant no va tenir massa èxit i no va esdevenir RFC, en aquest projecte es farà ús del DTLS que descriu el RFC~4347~\cite{rfc4347}, aquest protocol està implementat en les versions més recents de la llibreria OpenSSL i és la implementació que s'ha decidit utilitzar.
+Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UDP, es decideix no utilitzar el TCP i buscar intensament alguna implementació el més segura possible o fins hi tot a poder ser estàndard. Finalment es va trobar un protocol del 2004 basat en TLS, que van dissenyar N. Modadugu i E. Rescorla de la universitat d'Stanford, anomenat \keyword{DTLS}{Datagram Transport Layer Security} i més tard el 2006 va esdevenir el RFC~4347~\cite{rfc4347} del IETF. A l'annex \refannexpapers{} es troba el \emph{paper} inicial que descriu el protocol. El mateix equip va treballar en una variant del DTLS \cite{rfc-dtls-short} (l'esborrany RFC ha caducat i es diu \emph{Extensions for Datagram Transport Layer Security (TLS) in Low Bandwidth Environments}) per estalviar bits les capçeleres DTLS per a entorns amb poc ample de banda. Proposaven treure els camps repetits a cada \emph{record} de TLS i DTLS que segons ells no són necessaris. Degut a que aquesta variant no va tenir massa èxit i no va esdevenir RFC, en aquest projecte es farà ús del DTLS que descriu el RFC~4347~\cite{rfc4347}, aquest protocol està implementat en les versions més recents de la llibreria OpenSSL i és la implementació que s'ha decidit utilitzar.
 
-Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} (veure \cite{deq-metzdowd}) hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Si coincidissin múltiples factors el xifratge resultant podria esdevenir menys segur, però no hi ha cap implementació que ho tingui en compte ja que la probabilitat de que coincidissin es molt baixa, així que tampoc no es tindrà en compte en aquest programari.
+Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} (veure \cite{deq-metzdowd}) hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN hi traspassen dades xifrades externament, com per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. En aquest escenari la informació seria xifrada 2 cops. Si coincidissin múltiples factors, el xifratge resultant podria esdevenir menys segur, però no hi ha cap implementació que ho tingui en compte ja que la probabilitat de que coincidissin es molt baixa, així que tampoc no es tindrà en compte en aquest programari.
 
 \subsection{Disseny dels paquets}
 Pel disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
@@ -116,7 +116,7 @@ Els paquets \emph{Identification} (ID) descriuen al node que l'envia. Per descri
 \item Xarxes que publica el node: fa d'identificador del node.
 \item Agrupacions de IP i port: altres vies per comunicar-se amb el node.
 \end{itemize}
-En el paquet (taula \ref{T:pktid}) primer s'envien el numero d'entrades que contenen els dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
+En el paquet (taula \ref{T:pktid}), primer s'envien el numero d'entrades que contenen els dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
 Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x00$.
 \begin{table}[htb]
 \begin{center}
@@ -142,7 +142,7 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \end{center}
 \end{table}
 \subsubsection{Paquet Identification Acknowledgment}
-Els paquets \emph{Identification Acknowledgment} (ID ACK) confirmen haver rebut el paquet ID, en la taula \ref{T:pktidack} es pot veure la seva estructura.
+Els paquets \emph{Identification Acknowledgment} (ID ACK) confirmen haver rebut el paquet ID. El paquet(taula \ref{T:pktidack}) no conté cap més informació addicional tal com es pot veure la seva estructura.
 Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x01$.
 \begin{table}[htb]
 \begin{center}
@@ -159,10 +159,7 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \end{center}
 \end{table}
 \subsubsection{Paquet Keep Alive}
-Els routers NAT s'utilitzen generalment per compartir una mateixa IP entre màquines diferents. El router guarda cada connexió en memòria per tal de reutilitzar els mateixos paràmetres en travessar més dades per la connexió. Tots els routers NAT assignen un temps de vida a la informació guardada en memòria i el renoven a mesura que circulen dades de la connexió. En el moment que caduca el temps de vida, la connexió es perd sense que cap dels participants s'en adonin, és per això que es important assegurar-se de que el router no arribi a esgotar aquest temps de vida.
-
-El paquet \emph{Keep Alive} (KA) té dos objectius: mantenir el canal obert i ajudar a mallar la VPN.
-El primer objectiu fa que enviar aquest paquet només sigui necessari quan no s'ha enviat cap altre informació al canal, en canvi el segon objectiu fa que sigui necessari enviar-lo cada cert temps. D'aquesta manera es defineixen dos temps configurables que s'anomenaran $t_{min}$ i $t_{max}$. La política d'enviament resultant consisteix en enviar un paquet KA cada $t_{min}$ des de l'últim paquet transmès pel canal i en cas de no haver-se enviat cap paquet d'aquests durant $t_{max}$ es forçaria l'enviament malgrat no fos necessari pel primer objectiu.
+Els routers NAT s'utilitzen generalment per compartir una mateixa IP entre màquines diferents. El router desa cada connexió en memòria per tal de reutilitzar els mateixos paràmetres en travessar més dades per la connexió. Tots els routers NAT assignen un temps de vida a la informació guardada en memòria i el renoven a mesura que circulen dades de la connexió. En el moment que caduca el temps de vida, la connexió es perd sense que cap dels participants s'en adonin, és per això que es important assegurar-se de que el router no arribi a esgotar aquest temps de vida.
 
 \begin{table}[htb]
 \begin{center}
@@ -193,8 +190,12 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:pktka}
 \end{center}
 \end{table}
+
+El paquet \emph{Keep Alive} (KA) té dos objectius: mantenir el canal obert i ajudar a mallar la VPN.
+El primer objectiu fa que enviar aquest paquet només sigui necessari quan no s'ha enviat cap altre informació al canal, en canvi el segon objectiu fa que sigui necessari enviar-lo cada cert temps. D'aquesta manera es defineixen dos temps configurables que s'anomenaran $t_{min}$ i $t_{max}$. La política d'enviament resultant consisteix en enviar un paquet KA cada $t_{min}$ des de l'últim paquet transmès pel canal i en cas de no haver-se enviat cap paquet d'aquests durant $t_{max}$ es forçaria l'enviament malgrat no fos necessari pel primer objectiu.
+
 Per tal de complir el segon objectiu fa falta afegir informació dels altres nodes de la VPN dins del paquet, la informació necessària és la mateixa que la continguda al paquet ID.
-En el paquet (taula \ref{T:pktka}) primer s'envia la quantitat de nodes que es descriuran. Tot seguit s'enviara el mateix contingut dels paquets ID un darrera l'altre.
+En el paquet (taula \ref{T:pktka}), primer s'envia el nombre de nodes que es descriuran. Tot seguit s'enviara el mateix contingut dels paquets ID un darrera l'altre.
 Per tant aquest paquet, porta la informació suficient per a poder establir una connexió amb cada un dels nodes que descriu tot mantenint el canal obert pels routers NAT, fent així la funció de \emph{hole punching}, aquest concepte es troba definit en un \emph{paper} a l'annex \refannexpapers.
 Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x02$.
 
