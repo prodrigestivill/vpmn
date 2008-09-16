@@ -1,0 +1,110 @@
+\chapter{Conceptes B\`asics}
+Aquest capítol s'expliquen conceptes bàsics de telemàtica a nivell general. Està destinat a les persones que no han cursat l'especialitat de telemàtica. En cas de voler adquirir un coneixement més profund es recomana llegir fonts més tècniques com els RFCs de IETF.
+ 
+\selectlanguage{english}
+\section{Transport Layer Security}
+\emph{Extracted from:} \url{http://en.wikipedia.org/wiki/Transport_Layer_Security}\\
+\emph{More information:} \url{http://tools.ietf.org/html/rfc5246}
+
+Transport Layer Security (TLS) and its predecessor, Secure Sockets Layer (SSL), are cryptographic protocols that provide secure communications on the Internet for such things as web browsing, e-mail, Internet faxing, instant messaging and other data transfers. There are slight differences between SSL and TLS, but they are essentially the same.
+
+The TLS protocol allows applications to communicate across a network in a way designed to prevent eavesdropping, tampering, and message forgery. TLS provides endpoint authentication and communications privacy over the Internet using cryptography. Typically, only the server is authenticated (i.e., its identity is ensured) while the client remains unauthenticated; this means that the end user (whether an individual or an application, such as a Web browser) can be sure with whom it is communicating. The next level of security --- in which both ends of the "conversation" are sure with whom they are communicating --- is known as mutual authentication. Mutual authentication requires public key infrastructure (PKI) deployment to clients unless TLS-PSK or the Secure Remote Password (SRP) protocol are used, which provide strong mutual authentication without needing to deploy a PKI.
+
+TLS involves three basic phases:
+\begin{enumerate}
+\item Peer negotiation for algorithm support
+\item Key exchange and authentication
+\item Symmetric cipher encryption and message authentication
+\end{enumerate}
+
+During the first phase, the client and server negotiate cipher suites, which determine the ciphers to be used, the key exchange and authentication algorithms, as well as the message authentication codes (MACs). The key exchange and authentication algorithms are typically public key algorithms, or as in TLS-PSK preshared keys could be used. The message authentication codes are made up from cryptographic hash functions using the HMAC construction for TLS, and a non-standard pseudorandom function for SSL.
+
+Typical algorithms could be:
+\begin{itemize}
+\item For key exchange: RSA, Diffie-Hellman, ECDH, SRP, PSK
+\item For authentication: RSA, DSA, ECDSA
+\item Symmetric ciphers: RC4, Triple DES, AES, IDEA, DES, or Camellia. In older versions of SSL, RC2 was also used.
+\item For cryptographic hash function: HMAC-MD5 or HMAC-SHA are used for TLS, MD5 and SHA for SSL, while older versions of SSL also used MD2 and MD4.
+\end{itemize}
+
+\section{Authentication Header}
+\emph{Extracted from:} \url{http://en.wikipedia.org/wiki/Authentication_Header}\\
+\emph{More information:} \url{http://tools.ietf.org/html/rfc4835}
+
+Two protocols have been developed to provide packet-level security for both IPv4 and IPv6:
+\begin{itemize}
+\item The IP \textbf{Authentication Header} provides integrity, authentication, and non-repudiation if the appropriate choice of cryptographic algorithms is made.
+\item The IP Encapsulating Security Payload provides confidentiality, along with optional (but strongly recommended) authentication and integrity protection.
+\end{itemize}
+Cryptographic algorithms defined for use with IPsec include HMAC-SHA1 for integrity protection, and TripleDES-CBC and AES-CBC for confidentiality. Refer to RFC 4835 for details.
+
+The \textbf{AH} is intended to guarantee connectionless integrity and data origin authentication of IP datagrams. Further, it can optionally protect against replay attacks by using the sliding window technique and discarding old packets. AH protects the IP payload and all header fields of an IP datagram except for mutable fields, i.e. those that might be altered in transit. In IPv4, mutable (and therefore unauthenticated) IP header fields include TOS, Flags, Fragment Offset, TTL and Header Checksum. AH operates directly on top of IP, using IP protocol number 51.
+An AH packet diagram:
+\begin{table}[htb]
+\centering
+\begin{tabular}{|c|p{0.18\linewidth}|p{0.18\linewidth}|p{0.18\linewidth}|c|}
+\hline
+bits & \centering 0--7 & \centering 8--15 & \centering 16-23 & \multicolumn{1}{|p{0.18\linewidth}|}{\centering 24--31} \\ \hline \hline
+0 & \centering Next header & \centering Payload lenght & \multicolumn{2}{|c|}{RESERVED} \\ \hline
+32 & \multicolumn{4}{|c|}{Security parameters index (SPI)} \\ \hline
+64 & \multicolumn{4}{|c|}{Sequence number} \\ \hline
+96 & \multicolumn{4}{|c|}{Authentication data (variable)} \\ \hline
+\end{tabular}
+\end{table}
+
+Field meanings:
+\begin{itemize}
+\item\textbf{Next header}:
+Identifies the protocol of the transferred data.
+\item\textbf{Payload length}:
+Size of AH packet.
+\item\textbf{RESERVED}:
+Reserved for future use (all zero until then).
+\item\textbf{Security parameters index (SPI)}:
+Identifies the security parameters, which, in combination with the IP address, then identify the security association implemented with this packet.
+\item\textbf{Sequence number}:
+A monotonically increasing number, used to prevent replay attacks.
+\item\textbf{Authentication data}:
+Contains the integrity check value (ICV) necessary to authenticate the packet; it may contain padding.
+\end{itemize}
+
+\section{Certificate authority}
+\emph{Extracted from:} \url{http://en.wikipedia.org/wiki/Certificate_authority}
+
+A CA issues digital certificates which contain a public key and the identity of the owner. The CA also attests that the public key contained in the certificate belongs to the person, organization, server or other entity noted in the certificate. A CA's obligation in such schemes is to verify an applicant's credentials, so that users and relying parties can trust the information in the CA's certificates.
+
+If the user trusts the CA and can verify the CA's signature, then they can also verify that a certain public key does indeed belong to whoever is identified in the certificate. If the CA can be subverted, then the security of the entire system is lost.
+
+Suppose an attacker, Mallory (to use the Alice and Bob convention), manages to get a CA to issue a false certificate tying Alice to the wrong public key; the corresponding private key is known to Mallory. If Bob subsequently obtains and uses Alice's public key in this (bogus) certificate, the security of his communications to her could be compromised by Mallory - since Bob's messages could be decrypted by Mallory, or Bob could be tricked into accepting signatures which are forged to appear to be from Alice.
+
+The problem of assuring correctness of match between data and entity when the data are presented to the CA (perhaps over an electronic network), and when the credentials of the person/company/program asking for a certificate are likewise presented, is difficult. This is why commercial CAs often use a combination of authentication techniques including leveraging government bureaus, the payment infrastructure, third parties' databases and services, and custom heuristics. In some enterprise systems, local forms of authentication such as Kerberos can be used to obtain a certificate which can in turn be used by external relying parties. Notaries are required in some cases to personally know the party whose signature is being notarized; this is a higher standard than can be reached for many CAs. According to the American Bar Association outline on Online Transaction Management the primary points of federal and state statutes that have been enacted regarding digital signatures in the United States has been to "prevent conflicting and overly burdensome local regulation and to establish that electronic writings satisfy the traditional requirements associated with paper documents." Further the E-Sign and UETA code help ensure that:
+\begin{enumerate}
+\item a signature, contract or other record relating to such transaction may not be denied legal effect, validity, or enforceability solely because it is in electronic form; and
+\item a contract relating to such transaction may not be denied legal effect, validity or enforceability solely because an electronic signature or electronic record was used in its formation.
+\end{enumerate}
+In large-scale deployments, Alice may not be familiar with Bob's certificate authority (perhaps they each have a different CA), so Bob's certificate may also include his CA's public key signed by a different CA$_{2}$, which is presumably recognizable by Alice. This process typically leads to a hierarchy or mesh of CAs and CA certificates.
+
+\section{Proprietary Software}
+\emph{Extracted from:} \url{http://www.fsf.org/about/what-is-free-software}
+\begin{quote}
+Free software is software that gives you the user the freedom to share, study and modify it. We call this free software because the user is free.
+
+To use free software is to make a political and ethical choice asserting the right to learn, and share what we learn with others.  Free software has become the foundation of a learning society where we share our knowledge in a way that others can build upon and enjoy.
+
+Currently, many people use \textbf{proprietary software} that denies users these freedoms and benefits.  If we make a copy and give it to a friend, if we try to figure out how the program works, if we put a copy on more than one of our own computers in our own home, we could be caught and fined or put in jail. That’s what’s in the fine print of the license agreement you accept when using \textbf{proprietary software}.
+
+The corporations behind \textbf{proprietary software} will often spy on your activities and restrict you from sharing with others. And because our computers control much of our personal information and daily activities, \textbf{proprietary software} represents an unacceptable danger to a free society.
+\end{quote}
+
+\emph{Extracted from:} \url{http://en.wikipedia.org/wiki/Proprietary_software}
+\begin{quote}
+\textbf{Proprietary software} is computer software on which the producer has set restrictions on use, private modification, copying, or republishing. Similar terms include "closed-source software" and "non-free software".
+
+Proprietors may enforce restrictions by technical means, such as by restricting source code access, or by legal means, such as through copyright and patents.
+
+Exclusive legal rights to software by a proprietor are not required for software to be proprietary, since public domain software and software under a permissive licence can become \textbf{proprietary software} by distributing compiled (binary) versions of the program without making the source code available. \textbf{Proprietary software} includes freeware and shareware.
+
+Software distributions considered as proprietary may in fact incorporate a "mixed source" model including both free and non-free software in the same distribution. Most if not all so-called proprietary UNIX distributions are mixed source software, bundling open source components and others along with a purely proprietary kernel and system utilities.
+
+For some free software, the same laws used by \textbf{proprietary software} are used to preserve the freedoms to use, copy and modify the software. This technique is called copyleft.
+\end{quote}

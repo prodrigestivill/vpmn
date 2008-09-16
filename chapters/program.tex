@@ -49,7 +49,7 @@ Malgrat no haver-hi implementacions de protocols de seguretat conegudes sobre UD
 
 Per acabar la subsecció, i com a curiositat, a l'annex \refannexmail{} (veure \cite{deq-metzdowd}) hi ha una conversa d'e-mails explicant què passa quan dins d'una VPN s'encapsula una connexió ja encriptada externament, per exemple una connexió \keyword{HTTPS}{Hypertext Transfer Protocol over SSL}. Si coincidissin múltiples factors el xifratge resultant podria esdevenir menys segur, però no hi ha cap implementació que ho tingui en compte ja que la probabilitat de que coincidissin es molt baixa, així que tampoc no es tindrà en compte en aquest programari.
 
-\subsection{Definició de paquets}
+\subsection{Disseny dels paquets}
 Pel disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
 \begin{itemize}
 \item La IP i port del node
@@ -85,7 +85,7 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16-18 &
 \label{T:ippkt}
 \end{center}
 \end{table}
-Per evitar afegir més capçaleres (\emph{overhead}) en aquests paquets, ja que són els més importants i freqüents, l'aplicació els enviarà directament els paquets IP sense afegir cap capçalera ni identificador (veure taula \ref{T:ippkt}).
+Per evitar afegir més capçaleres (\emph{overhead}) en aquests paquets, ja que són els més importants i freqüents, l'aplicació enviarà directament els paquets IP sense afegir cap capçalera ni identificador (veure taula \ref{T:ippkt}).
 
 Els altres paquets, considerats d'ús exclusivament intern, fan la funció de senyalització de la VPN.
 \begin{table}[hbt]
