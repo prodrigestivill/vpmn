@@ -206,6 +206,7 @@ La arquitectura del programa com es veu en la figura \ref{F:dia-app} es separa e
 \caption{Diagrama de processos de la aplicació}
 \label{F:dia-app}
 \end{figure}
+\label{arch-temp}
 Per altre banda hi ha un temporitzador que s'encarrega de llançar els esdeveniments que depenguin del temps, com l'enviament de paquets \emph{Keep Alive} o reenviament de paquets \emph{Identification}.
 
 Els paquets que les aplicacions envien a través de l'adaptador virtual són enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual a la màquina de destí. Aquest dos s'han implementat mitjançant threads i són capaços d'enrutar i xifrar o desxifrar múltiples paquets simultàniament.
