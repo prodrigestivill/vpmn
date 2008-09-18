@@ -19,7 +19,7 @@ L'objectiu d'aquest projecte és dissenyar i implementar una aplicació capaç d
 
 En fer els tests inicials es va trobar un problema relacionat amb la implementació de la llibreria OpenSSL del protocol segur utilitzat. Aquest error es presenta malgrat que aparentment l'aplicació fa un bon ús d'aquesta llibreria. Aquest problema ha consumit molt temps de dedicació del projecte sense poder ser solucionat.
 
-Com a resultats dels tests de l'aplicació creada en comparació amb les de les altres aplicacions existents: aquesta realitza inicialització breu, te una latència baixa juntament amb una desviació estàndard molt baixa i permet taxes de transferència altes en TCP i baixes en UDP.
+Com a resultats dels tests de l'aplicació creada en comparació amb les de les altres aplicacions existents: aquesta realitza una inicialització breu, te una latència baixa juntament amb una desviació estàndard molt baixa i permet taxes de transferència altes en TCP i baixes en UDP.
 
 Aquest document comença amb una introducció a les xarxes privades virtuals i al projecte.
 Seguidament, en el primer capítol s'exposa la descripció i la comparativa de les tecnologies de xarxes privades virtuals existents.
@@ -34,16 +34,16 @@ I finalment hi ha les conclusions, la bibliografia i el glossari.
 %       s'ha d'ajustar ``a ull'' fins que el requadre del resum ocupi tota la pagina 
 \selectlanguage{english}
 \begin{overview}{4.7cm}
-This project are close to the concepts like the virtual private networks, the security services (encrypt the traffic, validate the integration, authenticate both ends, avoid the repudiation and avoid repetitions) and the distributed applications (like peer to peer).
+This project is close to the concepts like the virtual private networks, the security services (encrypt the traffic, validate the integration, authenticate both ends, avoid the repudiation and avoid repetitions) and the distributed applications (like peer to peer).
 
-Nowadays, allow to join different computers or local networks into a new virtual network could be used to escape from the current barriers imposed by IPv4 limitations, like the availability of public addresses. It also could be added an additional component to this like the privacy of the communications, it could provide a safe and confident environment independent from each one the user applications could supply. Both components as a whole allow to create virtual private networks abbreviated as VPNs.
+Nowadays, to allow to join different computers or local networks into a new virtual network could be used to escape from the current barriers imposed by IPv4 limitations, like the availability of public addresses. It also could be added an additional component to this like the privacy of the communications, it could provide a safe and confident environment independent from each one the user applications could supply. Both components as a whole allow to create virtual private networks abbreviated as VPNs.
 
 The main target of this project is to design and implement an application that permits to create virtual private networks which did not need to any central server without any compromise in the privacy nor the confidence in the authentication of the virtual network members.
 The application needs to be able to reach directly the other members of the virtual private network across NAT routers (network address translator routers, to share a single IP with various computers) allowing a low latency.
 
-During the initial tests a problem had appeared related with the implementation of the security protocol used provided by OpenSSL library. This error appears even the usage of this library seams correct. A lot of time had been expended with this problem without solving it.
+During the initial tests a problem had appeared related to the implementation of the security protocol used provided by OpenSSL library. This error appears even the usage of this library seams correct. A lot of time had been expended with this problem without solving it.
 
-The results of the tests of the created application compared with the other existing applications are: small initialization, low latency together with a few standard deviation, it allows high data rates with TCP and low ones in UDP.
+The results of the tests of the created application compared with the other existing applications are: small initialization, low latency together with a few standard deviation, high data rates with TCP and low ones in UDP.
 
 This document starts with an introduction to the virtual private networks and to this work.
 The first chapter describes and compares the existing virtual private network technologies.

@@ -17,32 +17,32 @@ IPsec va ser introduït per proporcionar serveis de seguretat tals com: xifrar e
 
 La majoria d'implementacions d'aquest protocol tenen problemes de compatibilitat amb les altres implementacions del mateix protocol, degut a que cada fabricant interpreta el \rfckeyword{}s i s'adapta el protocol a la seva mida.
 
-L'intercanvi de claus a escala Internet és va desenvolupar més tard i utilitza la infraestructura de clau pública universal \keyword{DNSSEC}{Domain Name System Security Extensions}, però l'utilització d'aquesta tecnologia no es troba en gaires implementacions d'IPsec.
+L'intercanvi de claus a escala Internet és va desenvolupar més tard i utilitza la infraestructura de clau pública universal \keyword{DNSSEC}{Domain Name System Security Extensions}, però la utilització d'aquesta tecnologia no es troba en gaires implementacions d'IPsec.
 
 Així doncs depenent del nivell en el que actuï l'IPsec, aquest estarà treballant en mode transport o mode túnel.
 \subsubsection{Mode transport}
 En mode transport, només es xifra i/o autentica el \emph{payload} (la carga útil) del paquet IP. Per tant al no tocar les capçaleres IP no afecta a l'enrutament (o encaminament), però si s'utilitza l'\keyword{AH}{Authentication Header (per més informació consultar l'annex \refannexdesc{})} les direccions IP no poden ser traduïdes (com fa per exemple un NAT) ja que això faria que el valor del \emph{hash} (resum) no coincidís. Aquest mode s'utilitza en comunicacions ordinador a ordinador.
 
-Per tal de travessar els NATs s'ha definit en un RFC com a mecanisme d'encapsulació de missatges IPsec anomanat \keyword{NAT-T}{NAT Traversal in the IKE} (veure \cite{rfc3715} i \cite{rfc3947}).
+Per tal de travessar els NATs existeix un mecanisme d'encapsulació de missatges IPsec anomanat \keyword{NAT-T}{NAT Traversal in the IKE} en un RFC (veure \cite{rfc3715} i \cite{rfc3947}).
 \subsubsection{Mode túnel}
 En el mode túnel, es xifra i/o autentica tot el paquet IP sencer (capçalera inclusiva). Aquesta informació s'encapsula dins del \emph{payload} d'un nou paquet IP per tal de que pugui ser enrutat. Aquest mode s'utilitza en comunicacions xarxa a xarxa, per exemple per crear VPNs a través d'Internet.
 
 \subsection{OpenVPN}
 OpenVPN és un programa de VPN a nivell d'aplicació molt configurable. Per explicar les seves possibilitats s'explicaran els tres grups de configuració principals.
 \begin{itemize}
-\item \textbf{Modes de la VPN}
+\item \textbf{Modes de la VPN}:
 Especifica el contingut que ha de circular dins de la VPN.
-\item \textbf{Topologies internes}
-Especifica com veuen els sistemes operatius l'interfície a la VPN.
-\item \textbf{Modes de funcionament}
+\item \textbf{Topologies internes}:
+Especifica com veuen els sistemes operatius la interfície de la VPN.
+\item \textbf{Modes de funcionament}:
 Especifica el comportament de la aplicació.
 \end{itemize}
 
 Mijançant el \emph{driver} genèric i multiplataforma TUN/TAP l'aplicació pot crear dos modes de VPN:
 \begin{itemize}
-\item \textbf{Mode pont Ethernet}
+\item \textbf{Mode pont Ethernet}:
 Simula una interfície de xarxa Ethernet i crea una VPN que treballa amb trames de capa 2 del \keywords{OSI}{model OSI}{Open Systems Interconnection - Basic Reference Model}.
-\item \textbf{Mode túnel IP}
+\item \textbf{Mode túnel IP}:
 Simula una interfície de xarxa punt-a-punt i crea una VPN que treballa amb paquets de capa 3 del model OSI.
 \end{itemize}
 
@@ -99,7 +99,7 @@ A nivell de seguretat utilitza un protocol propi amb l'algoritme de xifratge AES
 
 \subsection{Hamachi}
 Hamachi és un programa privatiu de VPNs a nivell d'aplicació que suporta tant túnels IP com túnels \keyword{IPX}{Internetwork Packet Exchange}.
-El programa utilitza una connexió a un servidor central com a canal de control. En arrancar efectua el procés d'autenticació amb aquest servidor i efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT (per tant és una aplicació \emph{NAT friendly}). Finalment el servidor entrega al client la seva llista de VPNs juntament amb la llista dels membres connectats. Aquesta llista es actualitzada cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda: en el procés de superar els routers NAT, en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
+El programa utilitza una connexió a un servidor central com a canal de control. En arrancar efectua el procés d'autenticació amb aquest servidor i efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT (per tant és una aplicació \emph{NAT friendly}). Finalment el servidor entrega al client la seva llista de VPNs juntament amb la llista dels membres connectats. Aquesta llista és actualitzada cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda: en el procés de superar els routers NAT, en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs pertanyen a la xarxa 5.0.0.0/8.
 
@@ -111,6 +111,7 @@ Utilitza una topologia de nodes mallada (veure la figura \ref{F:vpn-meshed}) con
 D'aquesta tecnologia no s'ha trobat cap implementació, el \emph{paper} descriptiu~\cite{ela} es troba adjunt a l'annex \refannexpapers.
 
 \section{Comparativa}
+Per acabar, la taula \ref{T:statecomp} fa un resum de les tecnologies analitzades en aquest capítol.
 \begin{table}[htb]
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
@@ -129,5 +130,6 @@ Nom & Lliure & Topologia & Protocol & Seguretat \\ \hline \hline
 \label{T:statecomp}
 \end{center}
 \end{table}
-Per acabar, la taula \ref{T:statecomp} fa un resum de les tecnologies analitzades en aquest capítol. De les tecnologies de nivell d'aplicació disponibles esmentades, només TincVPN permet la creació de VPNs sense necessitar un servidor central. ELA VPN, tal com s'ha exposat, no està disponible i per tant també quedaria descartada. Tot i així, cap d'aquestes tecnologies permet l'utilització d'adreçament autenticat que ha estat definit com a objectiu; per tant aquestes opcions es descarten per no complir la majoria d'objectius.
-Per altre banda, IPsec permetria la majoria dels objectius, però degut a que l'implementació necessita estar integrada al nucli dels sistemes operatius i que les diferents implementacions tenen problemes de compatibilitat entre elles, aquesta opció també es descarta.
+
+De les tecnologies de nivell d'aplicació disponibles esmentades, només TincVPN permet la creació de VPNs sense necessitar un servidor central. ELA VPN, tal com s'ha exposat, no està disponible i per tant també quedaria descartada. Tot i així, cap d'aquestes tecnologies permet la utilització d'adreçament autenticat que ha estat definit com a objectiu; per tant aquestes opcions es descarten per no complir la majoria d'objectius.
+Per altre banda, IPsec permetria la majoria dels objectius, però degut a que la implementació necessita estar integrada al nucli dels sistemes operatius i que les diferents implementacions tenen problemes de compatibilitat entre elles, aquesta opció també es descarta.

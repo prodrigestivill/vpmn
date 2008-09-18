@@ -2,13 +2,13 @@
 En el projecte s'ha dedicat molt de temps en trobar un protocol de seguretat tolerant a pèrdues, i per tant un protocol que permeti esquivar el problema ja esmentat de TCP dins de TCP. En trobar DTLS i la seva implementació en OpenSSL es va procedir a dissenyar i implementar l'aplicació.
 
 Més endavant el projecte es va veure endarrerit pel problema de la recent implementació de DTLS d'aquesta llibreria.
-Tal com s'ha comentat, el poc ús que rep aquest protocol i l'implementació de OpenSSL, va fer que fos més difícil trobar documentat l'error. Això també ha fet que la dedicació del projecte es centres més a solucionar aquest error, tant dins de la aplicació com en la llibreria, que en implementar totes les altres funcionalitats.
+Tal com s'ha comentat, el poc ús que rep aquest protocol i la implementació de OpenSSL, va fer que fos més difícil trobar documentat l'error. Això també ha fet que la dedicació del projecte es centres més a solucionar aquest error, tant dins de la aplicació com en la llibreria, que en implementar totes les altres funcionalitats.
 
 Per tant funcionalitats com la del temporitzador (explicat en la secció \ref{arch-temp}) o un interpret pel fitxer de configuració no han estat implementades, tot i que tota la estructura està dissenyada i preparada per que hi acabin existint.
 
-De les diferents eleccions que s'han pres durant el disseny del projecte es pot dir que l'elecció del protocol DTLS no ha estat un error, tal com s'ha vist amb els resultats dels tests en l'anterior capítol. Tampoc és una mala decisió utilitzar el OpenSSL al ser la única implementació de DTLS trobada. En canvi la elecció de realitzar el projecte amb \emph{threads} ha comportat una dedicació molt més gran de la que s'hagi pogut apreciar en els resultats; però tal com s'ha comentat, faltaria fer tests amb més nodes per veure el possible benefici d'aquesta decisió.
+De les diferents eleccions que s'han pres durant el disseny del projecte es pot dir que l'elecció del protocol DTLS no ha estat un error, tal com s'ha vist amb els resultats dels tests en l'anterior capítol. Tampoc és una mala decisió utilitzar el OpenSSL al ser la única implementació de DTLS trobada. En canvi l'elecció de realitzar el projecte amb \emph{threads} ha comportat una dedicació molt més gran de la que s'hagi pogut apreciar en els resultats; però tal com s'ha comentat, faltaria fer tests amb més nodes per veure el possible benefici d'aquesta decisió.
 
 En un futur es pretén deixar l'aplicació operativa i oberta a la comunitat de programari lliure.
-Per tant arreglar l'error del codi font de la llibreria OpenSSL és una prioritat a curt termini, així com també fer més usable l'aplicació per l'usuari final.
+Per tant, arreglar l'error del codi font de la llibreria OpenSSL és una prioritat a curt termini, així com també fer més usable l'aplicació per l'usuari final.
 
-Com a curiositat aquest projecte va ser presentat \emph{Summer Camp Garrotxa 2008} el dia 5 de Juliol del 2008 a la població de Sant Jaume de Llierca, la presentació va atraure al públic present deixant els interessats a les expectatives d'una aplicació totalment funcional.
+Com a curiositat aquest projecte va ser presentat \emph{Summer Camp Garrotxa 2008} el dia 5 de Juliol del 2008 a la població de Sant Jaume de Llierca, la presentació va atraure al públic present deixant als interessats a les expectatives d'una aplicació totalment funcional.
