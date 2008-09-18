@@ -1,0 +1,318 @@
+\documentclass{beamer}
+\mode<presentation>
+{
+  %\usetheme{Warsaw}
+  %\setbeamercovered{transparent}
+  % or ...
+  \usetheme{Darmstadt}
+  \usefonttheme[onlylarge]{structurebold}
+  \setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
+  %\setbeamertemplate{navigation symbols}{}
+}
+
+\usepackage[english]{babel}
+% or whatever
+
+\usepackage[utf8]{inputenc}
+% or whatever
+
+\usepackage{times}
+\usepackage[T1]{fontenc}
+% Or whatever. Note that the encoding and the font should match. If T1
+% does not look nice, try deleting the line with the fontenc.
+
+
+\title[VPMN]{Virtual Private Mesh Network} % (optional, use only with long paper titles)
+
+\subtitle{Decentralized VPN Application} % (optional)
+
+\author[Pau]{Pau~Rodriguez-Estivill}
+
+\institute[EPSC UPC] % (optional, but mostly needed)
+{
+  Escola Polit\`ecnica Superior de Castelldefels\\
+  Universitat Polit\`ecnica de Catalunya
+}
+% - Use the \inst command only if there are several affiliations.
+% - Keep it simple, no one is interested in your street address.
+
+\date[date] % (optional)
+{\today}
+
+\subject{Projecte de Fi de Carrera}
+% This is only inserted into the PDF information catalog. Can be left
+% out. 
+
+% If you have a file called "university-logo-filename.xxx", where xxx
+% is a graphic format that can be processed by latex or pdflatex,
+% resp., then you can add a logo as follows:
+
+% \pgfdeclareimage[height=0.5cm]{university-logo}{university-logo-filename}
+% \logo{\pgfuseimage{university-logo}}
+
+\pgfdeclareimage[height=0.5cm]{epsc-logo}{../epsc/logo_epsc}
+\logo{\pgfuseimage{epsc-logo}}
+
+
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\AtBeginSubsection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+% If you wish to uncover everything in a step-wise fashion, uncomment
+% the following command: 
+
+%\beamerdefaultoverlayspecification{<+->}
+
+\newcommand*{\comparativeframe}[5]{
+\begin{frame}{#1}
+	#2
+	\begin{exampleblock}{Pros}
+		\begin{itemize}
+		#3
+		\end{itemize}
+	\end{exampleblock}
+	\begin{alertblock}{Cons}
+		\begin{itemize}
+		#4
+		\end{itemize}
+	\end{alertblock}
+	#5
+\end{frame}
+}
+
+\begin{document}
+\pdfbookmark[2]{Welcome}{welcome}
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+  % You might wish to add the option [pausesections]
+\end{frame}
+
+% However, the talk length of between 15min and 45min and
+% the theme suggest that you stick to the following rules:
+
+% - Exactly two or three sections (other than the summary).
+% - At *most* three subsections per section.
+% - Talk about 30s to 2min per frame. So there should be between about
+%   15 and 30 frames, all told.
+
+\section{Introduction}
+\subsection*{Status}
+\begin{frame}{Internet}
+	\begin{itemize}
+	\item \textbf{Insecure}
+		\begin{itemize}
+		\item Traffic can be read by other parties
+		\item Traffic can be modified by other parties
+		\item Content can be faked (\textbf{phishing})
+		\end{itemize}
+	\item \textbf{Untrusted}
+		\begin{itemize}
+		\item IPs can be spoofed
+		\end{itemize}
+	\item \textbf{Divided}
+		\begin{itemize}
+		\item NATs separate it in multiple private networks
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{VPN}
+	\begin{center}
+	\includegraphics[height=7em]{images/vpn}
+	\end{center}
+	\begin{itemize}
+	\item \textbf{Virtual Network}
+		\begin{itemize}
+		\item a tunnel with no routing hops
+		\item own IP addressing
+		\end{itemize}
+	\item \textbf{Private}
+		\begin{itemize}
+		\item exclusive for trusted parties
+		\item traffic cannot be read by other parties
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{Security}
+	\begin{itemize}
+	\item \textbf{Encrypting} it cannot be read by other parties
+	\item \textbf{Integrity validation} ensure it has not been modified
+	\item \textbf{Authenticating} ensure that it is from a trusted party
+	\item \textbf{No repudiation} other parties cannot lie
+	\item \textbf{Anti-replay} protect against malicious replay
+	\end{itemize}
+\end{frame}
+\subsection*{Objectives}
+\begin{frame}{Project Aims}
+	\begin{center}
+	\includegraphics[height=10em]{images/vpn-fullymeshed}
+	\end{center}
+	\begin{itemize}
+	\item Add dynamically nodes to the fully connected mesh
+	\item Authenticate nodes and IP addressing together
+	\item Low latency and low overhead
+	\item NAT friendly
+	\end{itemize}
+\end{frame}
+
+\section{State of Art}
+\subsection{IPsec}
+\comparativeframe{IPsec vs VPMN}{}
+{% Pros
+\item Standard
+\item Mandatory in IPv6 implementations
+\item DNSSEC enable possible dynamic tunneling
+}{% Cons
+\item Different implementations are \alert{not compatible}
+\item Must be supported in kernel
+\item Only one mode supported through NAT
+\item IP addressing authentication not centralized
+}{}
+\subsection{OpenVPN}
+\comparativeframe{OpenVPN vs VPMN}
+{\begin{center}
+\includegraphics[height=6em]{images/vpn-centralized}
+\end{center}}
+{% Pros
+\item IP configurations can be pushed
+\item Standard encryption channel
+}{% Cons
+\item Centralized, mesh alternative not easy
+\item IP addressing not authenticated
+}{}
+\subsection{Tinc VPN}
+\comparativeframe{Tinc VPN vs VPMN}
+{\begin{center}
+\includegraphics[height=6em]{images/vpn-meshed}
+\end{center}}
+{% Pros
+\item Meshed Network
+}{% Cons
+\item Not fully connected
+\item IP addressing not authenticated
+}{}
+
+\section{Internals}
+\subsection{Overview}
+\begin{frame}{Application}
+	\begin{center}
+	\includegraphics[height=10em]{images/dia-app}
+	\end{center}
+	\begin{itemize}
+	\item Multi-thread application 
+	\item Entirely written in C
+	\end{itemize}
+\end{frame}
+\subsection{Security}
+\begin{frame}{Security summary}
+	\begin{itemize}
+	\item Datagram TLS (DTLS)
+	\item Uses CA for trusting nodes from the same network
+	\item Certificates contain ACLs for IP addressing
+	\begin{block}{NameConstraints (x509v3)}
+	nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
+	\end{block}
+	\end{itemize}
+\end{frame}
+\begin{frame}{DTLS: Datagram TLS}
+	\begin{itemize}
+	\item\begin{thebibliography}\beamertemplatearticlebibitems
+	\item RFC 4347
+	\end{thebibliography}
+	\item All operations in UDP
+		\begin{itemize}
+		\item Exchange of certificates
+		\item Negotiation of cryptography algorithms
+		\item Transport of ciphered data
+		\end{itemize}
+	\item Based on TLSv1
+	\item Cryptography mechanisms as TLS 
+		\begin{itemize}
+		\item Encryption
+		\item Integrity validation
+		\item Authentication
+		\item Anti-replay mechanism
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+\begin{frame}{Type of packets}
+	\begin{enumerate}
+	\item Raw IP packets
+	\vspace{1em}
+	\item Identification packets
+		\begin{itemize}
+		\item IP-port pairs
+		\item Shared networks
+		\end{itemize}
+	\item Identification acknowledgment packets
+	\item Keep alive packets
+		\begin{itemize}
+		\item Information of other known peers
+			\begin{itemize}
+			\item All IP-port pairs
+			\item Shared networks
+			\end{itemize}
+		\end{itemize}
+	\end{enumerate}
+\end{frame}
+\subsection{Architecture}
+\begin{frame}{UDP Server Part}
+	\begin{center}
+	\includegraphics[height=18em]{images/dia-udpsrv}
+	\end{center}
+\end{frame}
+\begin{frame}{TUN Server Part}
+	\begin{center}
+	\includegraphics[height=18em]{images/dia-tunsrv}
+	\end{center}
+\end{frame}
+\subsection{Conclusions}
+\comparativeframe{Conclusions}{}
+{% Pros
+\item Dynamic Fully Connected Mesh Network
+\item Authenticated IP addressing with certificates
+\item Standard encryption channel (\textbf{DTLS})
+}{% Cons
+\item No relay mode possible
+\item Fragmentation needed
+}{
+\begin{block}{Future tasks}\begin{itemize}
+\item Heterogeneous MTU support
+\item Let fragmentation be optional
+\item User-space NAT
+\end{itemize}\end{block}
+}
+%\section{Tests}
+
+\section*{Summary}
+%\subsection*{Summary}
+\begin{frame}{Summary}
+	\begin{itemize}
+	\item Internet is \alert{insecure} and \textbf{VPN} is needed
+	\item \textbf{Server-less} architecture
+	\item \textbf{Dynamic} Fully Connected Mesh Network
+	\item \textbf{Authenticated IP} addressing with certificates
+	\item Standard encryption channel (\textbf{DTLS})
+	\end{itemize}
+\end{frame}
+
+% Questions
+\begin{frame}
+\begin{center}
+\usebeamerfont{title}Questions?
+\end{center}
+\end{frame}
+\end{document}

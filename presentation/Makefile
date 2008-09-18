@@ -1,8 +1,8 @@
 .PHONY: pdf presentations %images clean distclean 
 
-pdf: cleanpdf cleanimages allimages presentations
+pdf: cleanpdf allimages presentations
 
-presentations: allimages scg08_vpmn.pdf
+presentations: allimages epsc_vpmn_slides.pdf #scg08_vpmn.pdf
 
 #PDF Output files
 %.pdf: %.tex
