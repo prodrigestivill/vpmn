@@ -15,10 +15,10 @@ cmdclean = rm -vf .*swp *.autosave *.pws *.bak *.aux *.def *.drv *.dvi *.glo *.i
 cleanpdf:
 	$(cmdcleanpdf)
 
-clean: cleanimages
+clean:
 	$(cmdclean)
 
-distclean: clean cleanpdf
+distclean: clean cleanimages cleanpdf
 
 #Images
 %images:

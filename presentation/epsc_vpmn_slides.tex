@@ -1,13 +1,30 @@
 \documentclass{beamer}
 \mode<presentation>
 {
-  %\usetheme{Warsaw}
-  %\setbeamercovered{transparent}
-  % or ...
-  \usetheme{Darmstadt}
+  %\usetheme{Madrid}
+  \setbeamercovered{transparent}
   \usefonttheme[onlylarge]{structurebold}
   \setbeamerfont*{frametitle}{size=\normalsize,series=\bfseries}
-  %\setbeamertemplate{navigation symbols}{}
+  \useinnertheme{rounded}
+  \useoutertheme{infolines}
+  \usecolortheme{dolphin}
+  \usecolortheme{orchid}
+  \setbeamertemplate{sidebar right}{
+    \vfill
+    \llap{
+      \usebeamertemplate***{navigation symbols}
+      \hskip0.1cm
+      \insertlogo
+      \hskip0.1cm
+    }
+    \vskip2pt
+  }
+  \setbeamertemplate{navigation symbols}{\hbox{
+    \hbox{\insertframenavigationsymbol}
+    \hbox{\insertsubsectionnavigationsymbol}
+    \hbox{\insertsectionnavigationsymbol}
+  }}
+
 }
 
 \usepackage[english]{babel}
@@ -21,22 +38,26 @@
 % Or whatever. Note that the encoding and the font should match. If T1
 % does not look nice, try deleting the line with the fontenc.
 
-
 \title[VPMN]{Virtual Private Mesh Network} % (optional, use only with long paper titles)
 
 \subtitle{Decentralized VPN Application} % (optional)
 
-\author[Pau]{Pau~Rodriguez-Estivill}
+\author{Pau~Rodriguez-Estivill}
 
-\institute[EPSC UPC] % (optional, but mostly needed)
+\institute[UPC EPSC] % (optional, but mostly needed)
 {
+  \it
+  Director: Jos\'e Manuel Y\'ufera-G\'omez\\
+  ~\\ \tiny
+  Enginyeria de Telecomunicaci\'o (segon cicle)\\
+  ~\\ \normalfont
   Escola Polit\`ecnica Superior de Castelldefels\\
   Universitat Polit\`ecnica de Catalunya
 }
 % - Use the \inst command only if there are several affiliations.
 % - Keep it simple, no one is interested in your street address.
 
-\date[date] % (optional)
+\date % (optional)
 {\today}
 
 \subject{Projecte de Fi de Carrera}
@@ -91,6 +112,7 @@
 }
 
 \begin{document}
+%\selectlanguage{catalan}
 \pdfbookmark[2]{Welcome}{welcome}
 \begin{frame}
   \titlepage
