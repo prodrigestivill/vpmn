@@ -109,12 +109,15 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
   if (buffer_len < 4)
     return;
   len = ntohs(ip->tot_len);
+#if DEBUG > 2
   log_info("UDP: sizes %d = %d.\n", len, buffer_len);
-  if (buffer_len > 27)
+
+    if (buffer_len > 27)
     {
       uint16_t *ping = &buffer[26];
-      log_info("Ping%d id: %d\n", ip->version, ntohs(*ping));
+      log_debug("Ping%d id: %d\n", ip->version, ntohs(*ping));
     }
+#endif
   if (ip->version == 4)         //IPv4 packet
     {
       if (session->peer == NULL

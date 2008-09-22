@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
   //DTLS
   ssl_verifydepth = 1;
-  ssl_cipherlist = "DEFAULT";
+  ssl_cipherlist = "3DES:AES:SHA:MD5";
   udpsrvdtls_init();
   if (udpsrvdtls_loadcerts(argv[7], argv[8], argv[9]) != 0)
     log_error("Unable to load certs.\n");
