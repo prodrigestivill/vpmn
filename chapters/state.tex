@@ -5,7 +5,7 @@ Els protocols de seguretat poden proveir part o la totalitat dels serveis de seg
 \item \textbf{Xifrar el tràfic} de manera que no pugi ser llegit per ningú més que pels destinataris originals.
 \item \textbf{Validar la integritat} per assegurar que el tràfic no ha estat modificat durant el seu recorregut.
 \item \textbf{Autenticar els extrems} per assegurar que el tràfic prové d'un extrem de confiança.
-\item \textbf{Evitar el repudi} de l'altre extrem per tal de que no pugui negar haver enviat l'informació.
+\item \textbf{Evitar el repudi} de l'altre extrem per tal de que no pugui negar haver enviat la informació.
 \item \textbf{Evitar la repetició} malintencionada de paquets (l'anti-repetició).
 \end{itemize}
 
@@ -15,7 +15,7 @@ A continuació s'analitzaran alguns protocols i programaris existents que permet
 
 IPsec va ser introduït per proporcionar serveis de seguretat tals com: xifrar el tràfic, validar la integritat, autenticar als extrems i l'anti-repetició. L'ús principal d'IPsec és el de crear VPNs en qualsevol dels dos modes, però les implicacions de seguretat són bastant diferents entre els dos modes d'operació.
 
-La majoria d'implementacions d'aquest protocol tenen problemes de compatibilitat amb les altres implementacions del mateix protocol, degut a que cada fabricant interpreta el \rfckeyword{}s i s'adapta el protocol a la seva mida.
+La majoria d'implementacions d'aquest protocol tenen problemes de compatibilitat amb les altres implementacions del mateix protocol, degut a que cada fabricant interpreta els \rfckeyword{}s i s'adapta el protocol a la seva mida.
 
 L'intercanvi de claus a escala Internet és va desenvolupar més tard i utilitza la infraestructura de clau pública universal \keyword{DNSSEC}{Domain Name System Security Extensions}, però la utilització d'aquesta tecnologia no es troba en gaires implementacions d'IPsec.
 
@@ -50,7 +50,7 @@ OpenVPN en mode pont Ethernet sempre utilitza una única interfície de xarxa en
 \begin{itemize}
 \item \textbf{p2p} (point-to-point): Utilitza una interfície de xarxa punt-a-punt al servidor per a cada client connectat, i el sistema operatiu del servidor s'encarrega de l'enrutat. Els clients només veuen el servidor i han d'utilitzar-lo com a \emph{router} per accedir a la resta de clients de la VPN. Aquest mode no és compatible amb les màquines que utilitzin Microsoft Windows.
 \item \textbf{net30}: Utilitza una interfície de xarxa al servidor per a cada client connectat. Tant els clients com el servidor en les seves interfícies, utilitzen subxarxes /30 i per tant el sistema operatiu del servidor també s'encarrega de l'enrutat. Els clients segueixen veient només al servidor i han d'utilitzar-lo com a \emph{router} per accedir a la resta de clients de la VPN. Aquest mode és compatible amb les màquines que utilitzin Microsoft Windows.
-\item \textbf{subnet}: Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en el mode Ethernet. Per tant, és l'aplicació qui s'encarrega de l'enrutat de la VPN.
+\item \textbf{subnet}: Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en el mode Ethernet. Per tant, és l'aplicació qui s'encarrega de l'enrutat de la VPN. Aquest mode també és compatible amb les màquines que utilitzin Microsoft Windows.
 \end{itemize}
 
 L'aplicació independentment de la configuració anterior té diferents modes de funcionament:

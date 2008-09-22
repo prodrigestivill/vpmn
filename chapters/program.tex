@@ -256,5 +256,5 @@ Els paquets \textbf{ID} es comproven que no siguin d'un node ja conegut i que pu
 
 Els paquets \textbf{ID Ack} anoten conforme l'altre node ha rebut satisfactòriament el paquet ID, per poder ser consultat en rebre un paquet ID.
 
-Els paquets \textbf{KA} afegeixen tota la informació dels nodes rebuda a la base de dades de nodes pendents de connectar. Cada cert temps el temporitzador del programa comprovarà aquestes dades i intentarà connectar-se a ells. Pel que fa al temporitzador dels routers NAT, aquest s'actualitza cada cop que es rep un paquet vàlid.
+Els paquets \textbf{KA} afegeixen tota la informació dels nodes rebuda a la base de dades de nodes pendents de connectar. Cada cert temps el temporitzador del programa comprovarà aquestes dades i intentarà connectar-se a ells. El temporitzador que manté oberts els ports als routers NAT, aquest s'actualitza cada cop que es rep un paquet vàlid.
 
