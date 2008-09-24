@@ -1,7 +1,30 @@
 \section{Programació}
 \subsection{Objectiu de l'aplicació}
+    \begin{frame}{Funcionament}
+        \begin{center}
+        \includegraphics[height=10em]{images/vpn-fullymeshed}
+        \end{center}
+    \end{frame}
 \subsection{Disseny del protocol}
+    \begin{frame}{Enrutament segur}
+        \begin{block}{NameConstraints (x509v3)}
+        nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
+        \end{block}
+    \end{frame}
 \subsection{Arquitectura del programa}
-\section{Tests i resultats}
-\subsection{Metodologia}
-\subsection{Anàlisi de resultats}
+    \begin{frame}{Arquitectura}
+        \begin{center}
+        \includegraphics[height=10em]{images/dia-app}
+        \end{center}
+    \end{frame}
+    \begin{frame}{UDP Server Part}
+        \begin{center}
+        \includegraphics[height=18em]{images/dia-udpsrv}
+        \end{center}
+    \end{frame}
+    \begin{frame}{TUN Server Part}
+        \begin{center}
+        \includegraphics[height=18em]{images/dia-tunsrv}
+        \end{center}
+    \end{frame}
+
