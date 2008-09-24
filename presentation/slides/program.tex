@@ -6,13 +6,68 @@
         \end{center}
     \end{frame}
 \subsection{Disseny del protocol}
-    \begin{frame}{Enrutament segur}
+    \begin{frame}{Seguretat}
         \begin{block}{NameConstraints (x509v3)}
         nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
         \end{block}
     \end{frame}
+    \begin{frame}{Fluxe}
+        \begin{center}
+        \includegraphics[height=10em]{images/dia-pktflow}
+        \end{center}
+    \end{frame}
+    \begin{frame}{Paquets Identification}
+        \begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x00 & \centering Total Lenght & \\ \hline
+32 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \cline{0-3} \noalign{\vskip 2pt} \hline
+48 & \multicolumn{4}{|c}{Network IP} & \\ \hline
+80 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
+112 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+144 & \multicolumn{4}{|c}{\ldots} & \\ \cline{0-5} \noalign{\vskip 2pt} \cline{0-5}
+=0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
++32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++80 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3}
+\multicolumn{6}{c}{~} \\
+\multicolumn{6}{c}{~} \\
+\multicolumn{6}{c}{~} \\
+\hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x01 & \centering 0x04 & \\ \hline
+\end{tabular}
+        \end{center}
+    \end{frame}
+    \begin{frame}{Paquets Keep Alive}
+        \begin{center}
+\scriptsize
+\begin{tabular}{|c|p{0.0625\linewidth}|p{0.0625\linewidth}|p{0.125\linewidth}|p{0.25\linewidth}c|}
+\hline
+bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 & \\ \hline \hline
+0 & \centering 0000 & \centering 0001 & \centering 0x02 & \centering Total Lenght & \\ \hline
+32 & \multicolumn{2}{|c|}{\# Peers} \\ \cline{0-2} \noalign{\vskip 2pt} \cline{0-3}
+40 & \multicolumn{2}{|c|}{\# Networks} & \centering \# IP-Ports & \\ \hline
+56 & \multicolumn{4}{|c}{Network IP} & \\ \hline
+88 & \multicolumn{4}{|c}{Network Netmask} & \\ \hline
+120 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+152 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+=0 & \multicolumn{4}{|c}{Host IP} & \\ \hline
++32 & \multicolumn{3}{|c|}{UDP Port} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++80 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3} \noalign{\vskip 2pt} \cline{0-3}
+=0 & \multicolumn{2}{|c|}{\ldots} & \centering \ldots & \\ \hline
++16 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++48 & \multicolumn{4}{|c}{\ldots} & \\ \hline
+=0 & \multicolumn{4}{|c}{\ldots} & \\ \hline
++32 & \multicolumn{3}{|c|}{\ldots} & \\ \cline{0-3}
+\end{tabular}
+        \end{center}
+    \end{frame}
 \subsection{Arquitectura del programa}
-    \begin{frame}{Arquitectura}
+    \begin{frame}{Processos}
         \begin{center}
         \includegraphics[height=10em]{images/dia-app}
         \end{center}
