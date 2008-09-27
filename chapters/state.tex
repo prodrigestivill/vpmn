@@ -46,7 +46,7 @@ Simula una interfície de xarxa Ethernet i crea una VPN que treballa amb trames 
 Simula una interfície de xarxa punt-a-punt i crea una VPN que treballa amb paquets de capa 3 del model OSI.
 \end{itemize}
 
-OpenVPN en mode pont Ethernet sempre utilitza una única interfície de xarxa en cada màquina per tota la VPN. Peró en el mode túnel IP pot treballar en diferents topologies internes:
+OpenVPN en mode pont Ethernet sempre utilitza una única interfície de xarxa en cada màquina per tota la VPN. Peró en el mode túnel IP pot treballar \cite{openvpn-man} en diferents topologies internes:
 \begin{itemize}
 \item \textbf{p2p} (point-to-point): Utilitza una interfície de xarxa punt-a-punt al servidor per a cada client connectat, i el sistema operatiu del servidor s'encarrega de l'enrutat. Els clients només veuen el servidor i han d'utilitzar-lo com a \emph{router} per accedir a la resta de clients de la VPN. Aquest mode no és compatible amb les màquines que utilitzin Microsoft Windows.
 \item \textbf{net30}: Utilitza una interfície de xarxa al servidor per a cada client connectat. Tant els clients com el servidor en les seves interfícies, utilitzen subxarxes /30 i per tant el sistema operatiu del servidor també s'encarrega de l'enrutat. Els clients segueixen veient només al servidor i han d'utilitzar-lo com a \emph{router} per accedir a la resta de clients de la VPN. Aquest mode és compatible amb les màquines que utilitzin Microsoft Windows.
@@ -65,12 +65,12 @@ L'aplicació independentment de la configuració anterior té diferents modes de
 \caption{Topologia d'una VPN centralitzada}
 \label{F:vpn-centralized}
 \end{figure}
-Per tant podem dir que és tracta d'una aplicació pensada per VPNs centralitzades, en la figura \ref{F:vpn-centralized} es mostra un diagrama d'aquesta topologia.
+Per tant podem dir que és tracta d'una aplicació pensada per VPNs centralitzades (en la figura \ref{F:vpn-centralized} es mostra un diagrama d'aquesta topologia).
 
 A nivell de seguretat utilitza la llibreria Open\keyword{SSL}{Secure Socket Layer (la versió 3 en convertir-se en estàndard es va anomenar TLS)} tant per \keyword{TCP}{Transmission Control Protocol} com per \keyword{UDP}{User Datagram Protocol}: en TCP utilitza l'estàndard \keyword{TLS}{Transport Layer Security (per més informació consultar l'annex \refannexdesc{})} i en UDP utilitza un protocol propi basat en TLS. Permet l'autenticació per claus secretes compartides prèviament, per certificats x509 i per usuari-contrasenya.
 
 \subsection{TincVPN}
-TincVPN és un programa de VPNs a nivell d'aplicació, que fa ús del \emph{driver} genèric i multiplataforma TUN/TAP. Mitjançant aquest \emph{driver} l'aplicació pot crear VPNs en \textbf{mode pont Ethernet} o en \textbf{mode túnel IP}, ja explicats anteriorment. L'aplicació crea una VPN mallada (figura \ref{F:vpn-meshed}) connectant-se a una llista de \emph{peers} (nodes client i servidor), i la resta de \emph{peers} de la VPN hauran de ser enrutats a través d'altres \emph{peers} per arribar als nodes que no tinguin connexió directe.
+TincVPN és un programa de VPNs a nivell d'aplicació, que fa ús del \emph{driver} genèric i multiplataforma TUN/TAP. Mitjançant aquest \emph{driver} l'aplicació pot crear VPNs en \textbf{mode pont Ethernet} o en \textbf{mode túnel IP}, ja explicats anteriorment. L'aplicació crea una VPN mallada (figura \ref{F:vpn-meshed}) connectant-se a una llista de \emph{peers} (nodes client i servidor), i la resta de \emph{peers} de la VPN hauran de ser enrutats a través d'altres \emph{peers} per arribar als nodes que no tinguin connexió directe (veure \cite{tinc-doc}).
 \begin{figure}[htb]
 \centering
 \includegraphics[height=0.5\textwidth]{images/vpn-meshed}
@@ -93,13 +93,13 @@ Wippien és un programa de missatgeria instantània amb funcionalitats de creaci
 \end{figure}
 Per tant podem dir que Wippien crea VPNs mallades i completament connectades per cada anella de confiança, amb autenticació (i assignació de les IPs) per part d'un servidor central extern (veure la figura \ref{F:vpn-externalized}).
 
-Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs que utilitzin el seu servidor \emph{mediator} pertanyen a la xarxa 5.0.0.0/8.
+Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs que utilitzin el seu servidor \emph{mediator} pertanyen a la xarxa 5.0.0.0/8 (veure \cite{wippien-web}).
 
-A nivell de seguretat utilitza un protocol propi amb l'algoritme de xifratge AES128, mitjançant un component privatiu\footnote{component privatiu: part d'un programa privatiu (per més informació consultar el concepte \emph{proprietary software} a l'annex \refannexdesc{})} anomenat \emph{wodVPN ActiveX}; aquest component és \emph{NAT friendly} (està preparat per travessar els routers NAT) i suporta tant TCP com UDP.
+A nivell de seguretat utilitza un protocol propi amb l'algoritme de xifratge AES128, mitjançant un component privatiu\footnote{component privatiu: part d'un programa privatiu (per més informació consultar el concepte \emph{proprietary software} a l'annex \refannexdesc{})} anomenat \emph{wodVPN ActiveX} \cite{wippien-comp}; aquest component és \emph{NAT friendly} (està preparat per travessar els routers NAT) i suporta tant TCP com UDP.
 
 \subsection{Hamachi}
 Hamachi és un programa privatiu de VPNs a nivell d'aplicació que suporta tant túnels IP com túnels \keyword{IPX}{Internetwork Packet Exchange}.
-El programa utilitza una connexió a un servidor central com a canal de control. En arrancar efectua el procés d'autenticació amb aquest servidor i efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT (per tant és una aplicació \emph{NAT friendly}). Finalment el servidor entrega al client la seva llista de VPNs juntament amb la llista dels membres connectats. Aquesta llista és actualitzada cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda: en el procés de superar els routers NAT, en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
+El programa utilitza una connexió a un servidor central com a canal de control (veure \cite{hamachi-web}). En arrancar efectua el procés d'autenticació amb aquest servidor i efectua el descobriment del canal del client per assegurar la connectivitat en cas d'existir routers NAT (per tant és una aplicació \emph{NAT friendly}). Finalment el servidor entrega al client la seva llista de VPNs juntament amb la llista dels membres connectats. Aquesta llista és actualitzada cada cop que aquests entren o surten de l'aplicació. Tal com s'ha dit el servidor ajuda: en el procés de superar els routers NAT, en el procés d'autenticació i en el descobriment de \emph{peers} (veure la figura \ref{F:vpn-externalized}).
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs pertanyen a la xarxa 5.0.0.0/8.
 
@@ -108,7 +108,7 @@ A nivell de seguretat la VPN utilitza un protocol propi sobre UDP.
 \subsection{ELA VPN}
 \keyword{ELA}{Everywhere Local Area network \cite{ela}} és un programa de VPN a nivell d'aplicació.
 Utilitza una topologia de nodes mallada (veure la figura \ref{F:vpn-meshed}) connectada amb un protocol propi tant amb TCP com amb UDP.
-D'aquesta tecnologia no s'ha trobat cap implementació, el \emph{paper} descriptiu~\cite{ela} es troba adjunt a l'annex \refannexpapers.
+D'aquesta tecnologia no s'ha trobat cap implementació, i el \emph{paper} descriptiu~\cite{ela} es troba adjunt a l'annex \refannexpapers.
 
 \section{Comparativa}
 Per acabar, la taula \ref{T:statecomp} fa un resum de les tecnologies analitzades en aquest capítol.
@@ -116,13 +116,13 @@ Per acabar, la taula \ref{T:statecomp} fa un resum de les tecnologies analitzade
 \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
-Nom & Lliure & Topologia & Protocol & Seguretat \\ \hline \hline
-\bf IPsec & Sí & Descentralitzada & IP & Estàndard \\ \hline
-\bf OpenVPN & Sí & Centralitzada & TCP/UDP & TLS/Propi \\ \hline
-\bf TincVPN & Sí & Mallada & TCP/UDP & Propi \\ \hline
-\bf Wippien & No & Mallada amb Servidor & TCP/UDP & Propi \\ \hline
-\bf Hamachi & No & Mallada amb Servidor & UDP & Propi \\ \hline
-\bf ELA VPN & No & Mallada Jeràrquica & TCP/UDP & Propi \\ \hline
+Nom & Lliure & Funcionament & Protocol & Seguretat \\ \hline \hline
+\bf IPsec & Sí & Descentralitzat & IP & Estàndard \\ \hline
+\bf OpenVPN & Sí & Centralitzat & TCP/UDP & TLS/Propi \\ \hline
+\bf TincVPN & Sí & Mallat & TCP/UDP & Propi \\ \hline
+\bf Wippien & No & Mallat amb Servidor & TCP/UDP & Propi \\ \hline
+\bf Hamachi & No & Mallat amb Servidor & UDP & Propi \\ \hline
+\bf ELA VPN & No & Mallat Jeràrquic & TCP/UDP & Propi \\ \hline
 \end{tabular}
 \end{center}
 \begin{center}

@@ -23,7 +23,7 @@ Per analitzar l'eficiència dels programes s'analitzen els bytes transmesos dura
 També s'analitzen els bytes transmesos durant l'enviament de paquets \keyword{ICMP}{Internet Control Message Protocol} de \emph{echo} (\emph{ping}) de 56 bytes (contant la capa IP són 84 bytes/paquet).
 Els resultats es contaran en bytes sense comptar la capa Ethernet (14 bytes/trama).
 
-En el moment d'analitzar els resultats s'ha de tenir en compte que TincVPN no intercanvia certificats durant la inicialització, en el seu lloc les claus públiques dels altres nodes s'han d'instal·lar al configurar el programari (per tenir una idea del que ocupen 2 certificats de 1024 bits: $830\cdot2=1660$ bytes).
+En el moment d'analitzar els resultats s'ha de tenir en compte que TincVPN no intercanvia certificats durant la inicialització: en el seu lloc les claus públiques dels altres nodes s'han d'instal·lar al configurar el programari (per tenir una idea del que ocupen 2 certificats de 1024 bits: $830\cdot2=1660$ bytes).
 També s'ha de tenir en compte que els diferents programes utilitzen diferents algoritmes de compressió. 
 
 \subsection{Latència}
@@ -56,7 +56,7 @@ r=P\cdot\frac{(996+28)\cdot8}{10}
 \end{equation}
 \centering
 {\scriptsize
-r: Taxa de recepció. 
+r: Taxa de recepció (bps). 
 P: Número de paquets rebuts. 
 }\\
 %Equació \ref{E:mgen}: Càlcul de la tassa de recepció del MGEN.
@@ -82,8 +82,8 @@ Com a conseqüència dels problemes esmentats, els tests d'aquesta aplicació s'
 Per analitzar els resultats cal tenir en compte que tal com s'ha descrit l'escenari, algunes aplicacions tenen un comportament diferent:
 \begin{itemize}
 \item Les aplicacions utilitzen algoritmes de compressió i xifratge diferents.
-\item El OpenVPN no realitza tasques d'enrutament intern en el node client al haver-hi una instància servidor i una client, tant el TincVPN com el VPMN realitzen aquestes tasques en ambdós nodes.
-\item El TincVPN no intercanvia certificats ni claus públiques; el seu protocol, tal com esta descrit en el capítol \ref{TincVPN-Sec}, no compleix tots els requisits per a ser un protocol segur.
+\item El OpenVPN no realitza tasques d'enrutament intern en el node client al haver-hi una instància servidor i una client: tant el TincVPN com el VPMN realitzen aquestes tasques en ambdós nodes.
+\item El TincVPN no intercanvia certificats ni claus públiques; el seu protocol, tal com està descrit en el capítol \ref{TincVPN-Sec}, no compleix tots els requisits per a ser un protocol segur.
 \end{itemize}
 
 En la taula \ref{T:efi} es compara l'\textbf{eficiència} en el tràfic.
@@ -126,7 +126,7 @@ TincVPN & 0\% & 0.136 & 0.185 & 0.911 & 0.092 \\ \hline
 \label{T:lat}
 \end{center}
 \end{table}
-La mínima latència és la del TincVPN i la màxima és la del OpenVPN. TincVPN es manté entremig però amb una desviació estàndard molt inferior a la dels altres dos programaris. La desviació estàndard major és la de OpenVPN, aquest també enregistra valors màxims molt elevats per estar en una xarxa local. Els resultats de la latència en connexió directe només donen una referència de que l'escenari utilitza una xarxa local.
+La mínima latència és la del TincVPN i la màxima és la del OpenVPN. VPMN es manté entremig però amb una desviació estàndard molt inferior a la dels altres dos programaris. La desviació estàndard major és la de OpenVPN, i aquest també enregistra valors màxims molt elevats per estar en una xarxa local. Els resultats de la latència en connexió directe només donen una referència de que l'escenari utilitza una xarxa local.
 
 En la taula \ref{T:tax} es compara la \textbf{taxa màxima de transferència}.
 \begin{table}[htb]
@@ -145,7 +145,7 @@ TincVPN & 133.26 & 270.77 & 78.29 \\ \hline
 \label{T:tax}
 \end{center}
 \end{table}
-L'aplicació que arriba a la màxima taxa és la OpenVPN amb tràfic UDP, és el valor més proper a la connexió directe (només superant lleugerament la meitat d'aquest valor).
+L'aplicació que arriba a la màxima taxa és la OpenVPN amb tràfic UDP: és el valor més proper a la connexió directe (només superant lleugerament la meitat d'aquest valor).
 L'aplicació TincVPN té valors molt baixos en TCP.
 El programa creat en aquest projecte (VPMN), malgrat tenir un bon resultat en TCP i MGEN, es manté en velocitats semblants tant en TCP com en UDP.
 

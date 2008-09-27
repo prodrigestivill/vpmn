@@ -19,7 +19,7 @@ L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els tú
 Per assolir aquest objectiu juntament amb el de la baixa latència s'han de realitzar connexions directes entre tots els nodes, i no es poden realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar l'adreça IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
 
 Per tant el primer que cal establir és el funcionament de l'adreçament IP. Per a fer-ho es contemplen dues possibilitats: la utilització d'un adreçament que es calculi a partir dels certificats o la incrustació de l'adreçament dins d'algun camp dels certificats.
-La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority (per més informació consultar l'annex \refannexdesc{})}.
+La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la CA.
 
 Després d'examinar els camps de les extensions x509v3 per a certificats, es va trobar una entrada anomenada \emph{nameConstraints}. Aquesta entrada permet definir múltiples tipus de permisos (tant de permetre com d'excloure, veure exemple a la taula \ref{T:nameconstraints} o \cite{nameconstraints}).
 \begin{table}[htb]
@@ -39,7 +39,6 @@ nameConstraints=excluded;email:.com
 Per a aquesta aplicació només es farà ús dels permisos de tipus IP. D'aquesta manera és la CA l'encarregada d'assegurar-se que no validi cap certificat amb una IP ja assignada prèviament, així com també de mantenir un registre de les IPs assignades.
 
 Pel disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
-\pagebreak
 \begin{itemize}
 \item La IP i port del node
 \item La IP pública i port del node
@@ -67,7 +66,7 @@ Per acabar la secció, i com a curiositat, a l'annex \refannexmail{} (veure \cit
 
 \section{Especificació del protocol}
 %Fragmentació a quin nivell.
-Les VPN encapsulen tràfic IP dins del protocol IP, de manera que la màxima informació que poden contenir els paquets IP encapsulats és menor. El protocol definit per donar seguretat permet tant el xifratge com la compressió, això complica el càlcul de la màxima informació que poden contenir els paquets; és per aquest motiu que en primera instància es forçarà que la fragmentació dels paquets la faci el sistema operatiu i els \emph{routers} d'entremig, per tant no s'implementarà cap fragmentació dinàmica dins del programa. En el futur la implementació de la fragmentació dinàmica dins del programa es faria seguint l'estàndard de IP, d'aquesta manera seria transparent al protocol del programa.
+Les VPN encapsulen tràfic IP dins del protocol IP, de manera que la màxima informació que poden contenir els paquets IP encapsulats és menor. El protocol definit per donar seguretat permet tant el xifratge com la compressió, i això complica el càlcul de la màxima informació que poden contenir els paquets; és per aquest motiu que en primera instància es forçarà que la fragmentació dels paquets la faci el sistema operatiu i els \emph{routers} d'entremig, per tant no s'implementarà cap fragmentació dinàmica dins del programa. En el futur la implementació de la fragmentació dinàmica dins del programa es faria seguint l'estàndard de IP, i d'aquesta manera seria transparent al protocol del programa.
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -106,8 +105,8 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:inpkt}
 \end{center}
 \end{table}
-Tal com es veu en la taula \ref{T:inpkt}, aquests tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, es poden diferenciar pel primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). El tercer byte, que en IP està destinat a \keyword{ToS}{Type of Service}, en els paquets de senyalització servirà per definir el tipus de paquet intern.
-Els tipus de paquets són: paquets \emph{identification} (ID), paquets \emph{identification acknowledgment} (ID ACK) i paquets \emph{keep alive} (KA). El seu ús dins de la comunicació es mostra en la figura \ref{F:dia-pktflow}.
+Tal com es veu en la taula \ref{T:inpkt}, aquests tenen un format que està inspirat en els 4 primers bytes de la capçalera IP, i es poden diferenciar pel primer byte que en IP defineix la versió del protocol i la longitud de les capçaleres (HLen). El tercer byte, que en IP està destinat a \keyword{ToS}{Type of Service}, en els paquets de senyalització servirà per definir el tipus de paquet intern.
+Els tipus de paquets són: paquets \emph{identification} (ID), paquets \emph{identification acknowledgment} (ID ACK) i paquets \emph{keep alive} (KA). El seu ús dins de la comunicació es mostra en la figura \ref{F:dia-pktflow} i s'expliquen a continuació.
 \begin{figure}[htb]
 \centering
 \includegraphics[scale=0.5]{images/dia-pktflow}
@@ -200,7 +199,7 @@ El primer objectiu fa que enviar aquest paquet només sigui necessari quan no s'
 
 Per tal de complir el segon objectiu fa falta afegir informació dels altres nodes de la VPN dins del paquet, la informació necessària és la mateixa que la continguda al paquet ID.
 En el paquet (taula \ref{T:pktka}), primer s'envia el nombre de nodes que es descriuran. Tot seguit s'enviara el mateix contingut dels paquets ID un darrera l'altre.
-Per tant aquest paquet, porta la informació suficient per a poder establir una connexió amb cada un dels nodes que descriu tot mantenint el canal obert pels routers NAT, fent així la funció de \emph{hole punching} (aquest concepte es troba definit en un \emph{paper} a l'annex \refannexpapers).
+Per tant aquest paquet, porta la informació suficient per a poder establir una connexió amb cada un dels nodes que descriu tot mantenint el canal obert pels routers NAT, fent així la funció de \emph{hole punching} (aquest concepte es troba definit en un \emph{paper} \cite{p2p} a l'annex \refannexpapers).
 Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x02$.
 
 \section{Arquitectura del programa}
