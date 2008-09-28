@@ -2,6 +2,31 @@
 \section{Objectiu de l'aplicació}
 L'objectiu de l'aplicació és ser capaç de crear xarxes privades virtuals que no depenguin de cap servidor central, superar els routers NAT i proporcionar una baixa latència.
 
+\subsection{Funcionament per l'usuari}
+L'aplicació d'aquest projecte des del punt de vista del usuari corre com un servei que només proveeix una interfície de xarxa. L'usuari no disposa de cap interfície gràfica i els missatges de l'aplicació es guarden en un fitxer sense aparèixer per pantalla.
+
+A continuació s'exposa el procediment que l'usuari ha de realitzar inicialment per preparar l'aplicació:
+\begin{enumerate}
+\item Aconseguir un certificat firmat i un rang IP.
+\item Configurar l'aplicació per utilitzar el certificat i una IP del rang assignat.
+\item Demanar la llista de nodes coneguts a algun membre (o a l'administrador de la VPN).
+\item Instal·lar la llista de nodes coneguts aconseguida.
+\item Arrancar l'aplicació.
+\end{enumerate}
+Una vegada realitzat aquest procediment inicial l'usuari pot fer ús dels serveis de dins de la VPN. Les pròximes vegades que l'usuari vulgui tornar a accedir a la VPN només necessitarà arrancar l'aplicació.
+
+Com aclariment, seguidament s'explica un exemple del primer pas del procediment anterior (aconseguir el certificat firmat):
+\begin{enumerate}
+\item L'\textbf{usuari} demana accedir a la VPN a la \keyword{CA}{Certificate Authority (per més informació consultar l'annex \refannexdesc{})}.
+\item La \textbf{CA} li assigna temporalment una IP.
+\item La \textbf{CA} informa a l'usuari del procediment per generar una petició de certificat amb la IP assignada.
+\item L'\textbf{usuari} genera la petició de certificat amb: la IP assignada, el seu nom, etc.
+\item L'\textbf{usuari} s'identifica a la CA (mitjançant alguna documentació oficial) i li entrega la petició de certificat.
+\item La \textbf{CA} comprova la identificació verificant que pot accedir a la VPN.
+\item La \textbf{CA} li assigna definitivament la IP.
+\item La \textbf{CA} entrega al usuari el certificat firmat.
+\end{enumerate}
+
 \subsection{Funcionament de l'aplicació}
 L'aplicació d'aquest projecte, en arrancar, es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvia la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets. Per tal que el NAT no tanqui el port d'entrada, cal que l'aplicació no pari d'enviar paquets a tots el nodes. Aquests paquets es poden aprofitar per informar dels altres nodes coneguts, per així garantir una malla completament connectada (veure figura \ref{F:vpn-fullymeshed}).
 \begin{figure}[htb]
@@ -119,8 +144,6 @@ Els paquets \emph{Identification} (ID) descriuen al node que l'envia. Per descri
 \item Xarxes que publica el node: fa d'identificador del node.
 \item Agrupacions de IP i port: altres vies per comunicar-se amb el node.
 \end{itemize}
-En el paquet (taula \ref{T:pktid}), primer s'envien el número d'entrades que contenen els dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
-Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x00$.
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -144,6 +167,8 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:pktid}
 \end{center}
 \end{table}
+En el paquet (taula \ref{T:pktid}), primer s'envien el número d'entrades que contenen els dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
+Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x00$.
 \subsection{Paquet Identification Acknowledgment}
 Els paquets \emph{Identification Acknowledgment} (ID ACK) confirmen haver rebut el paquet ID. El paquet (taula \ref{T:pktidack}) no conté cap més informació addicional tal com es pot veure en la seva estructura.
 Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x01$.
