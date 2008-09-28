@@ -2,30 +2,8 @@
 \section{Objectiu de l'aplicació}
 L'objectiu de l'aplicació és ser capaç de crear xarxes privades virtuals que no depenguin de cap servidor central, superar els routers NAT i proporcionar una baixa latència.
 
-\subsection{Funcionament per l'usuari}
-L'aplicació d'aquest projecte des del punt de vista del usuari corre com un servei que només proveeix una interfície de xarxa. L'usuari no disposa de cap interfície gràfica i els missatges de l'aplicació es guarden en un fitxer sense aparèixer per pantalla.
-
-A continuació s'exposa el procediment que l'usuari ha de realitzar inicialment per preparar l'aplicació:
-\begin{enumerate}
-\item Aconseguir un certificat firmat i un rang IP.
-\item Configurar l'aplicació per utilitzar el certificat i una IP del rang assignat.
-\item Demanar la llista de nodes coneguts a algun membre (o a l'administrador de la VPN).
-\item Instal·lar la llista de nodes coneguts aconseguida.
-\item Arrancar l'aplicació.
-\end{enumerate}
-Una vegada realitzat aquest procediment inicial l'usuari pot fer ús dels serveis de dins de la VPN. Les pròximes vegades que l'usuari vulgui tornar a accedir a la VPN només necessitarà arrancar l'aplicació.
-
-Com aclariment, seguidament s'explica un exemple del primer pas del procediment anterior (aconseguir el certificat firmat):
-\begin{enumerate}
-\item L'\textbf{usuari} demana accedir a la VPN a la \keyword{CA}{Certificate Authority (per més informació consultar l'annex \refannexdesc{})}.
-\item La \textbf{CA} li assigna temporalment una IP.
-\item La \textbf{CA} informa a l'usuari del procediment per generar una petició de certificat amb la IP assignada.
-\item L'\textbf{usuari} genera la petició de certificat amb: la IP assignada, el seu nom, etc.
-\item L'\textbf{usuari} s'identifica a la CA (mitjançant alguna documentació oficial) i li entrega la petició de certificat.
-\item La \textbf{CA} comprova la identificació verificant que pot accedir a la VPN.
-\item La \textbf{CA} li assigna definitivament la IP.
-\item La \textbf{CA} entrega al usuari el certificat firmat.
-\end{enumerate}
+L'aplicació d'aquest projecte s'ha d'executar com un servei i proveir només una interfície virtual de xarxa. Per tant l'usuari no disposa de cap interfície gràfica, però els missatges de l'aplicació quedaran guardats en un fitxer al disc per tal de ser consultats en cas necessari.
+Tant la gestió dels certificats com la obtenció del llistat inicial de nodes coneguts (també pot ser només un sol node) no formen part de l'aplicació i són tasques de gestió que s'han de realitzar manualment.
 
 \subsection{Funcionament de l'aplicació}
 L'aplicació d'aquest projecte, en arrancar, es posa en contacte amb els nodes que té prèviament configurats com a coneguts. Per cada node s'intercanvia la informació necessària per tal de crear el canal segur i poder-se identificar i enrutar els paquets. Per tal que el NAT no tanqui el port d'entrada, cal que l'aplicació no pari d'enviar paquets a tots el nodes. Aquests paquets es poden aprofitar per informar dels altres nodes coneguts, per així garantir una malla completament connectada (veure figura \ref{F:vpn-fullymeshed}).
@@ -35,6 +13,7 @@ L'aplicació d'aquest projecte, en arrancar, es posa en contacte amb els nodes q
 \caption{Topologia d'una VPN mallada completament connectada}
 \label{F:vpn-fullymeshed}
 \end{figure}
+
 Una vegada creada la malla l'aplicació ja pot enrutar directament a cada node el tràfic que li correspon, sense haver de passar per cap altre node i permetent així una baixa latència. Per evitar afegir més capçaleres de les necessàries (\emph{overhead}) l'aplicació enviarà directament els paquets IP enlloc de les trames Ethernet.
 
 \section{Disseny del protocol}
@@ -44,7 +23,7 @@ L'objectiu a nivell de seguretat és que tots els nodes puguin realitzar els tú
 Per assolir aquest objectiu juntament amb el de la baixa latència s'han de realitzar connexions directes entre tots els nodes, i no es poden realitzar agregacions de nodes com típicament es fa en xarxes \keyword{P2P}{Peer to peer} mitjançant nodes \emph{relay}. Fer agregacions posaria la informació en mans d'altres membres de la VPN, els quals no tenen perquè ser de confiança pels dos interessats en la comunicació. També és necessari un mecanisme de validació de les rutes que cada node ofereix (o comparteix), de manera que cap node no pugui canviar l'adreça IP per una que pertanyi a un altre node. Aquesta última necessitat si no es vol dependre de cap servidor \emph{mediator} (que faci de DHCP) obligarà a fixar un adreçament IP estàtic.
 
 Per tant el primer que cal establir és el funcionament de l'adreçament IP. Per a fer-ho es contemplen dues possibilitats: la utilització d'un adreçament que es calculi a partir dels certificats o la incrustació de l'adreçament dins d'algun camp dels certificats.
-La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la CA.
+La primera opció consisteix en definir una distribució de direccions IP, en la que a partir d'un certificat es pugui assignar una única IP. Això facilita la generació de certificats ja que es poden utilitzar certificats genèrics, però en canvi es corre el risc de que l'algoritme esmentat tingui col·lisions i per tant hi hagi conflictes d'IPs compartides. Per seguretat s'optarà per la segona opció malgrat que aquesta sigui més costosa pels administradors dels certificats. Aquesta consistirà en utilitzar algun camp dels certificats per emmagatzemar les polítiques d'assignació d'IPs de forma que els administradors de la VPN la validin al signar el certificat des de la \keyword{CA}{Certificate Authority (per més informació consultar l'annex \refannexdesc{})}.
 
 Després d'examinar els camps de les extensions x509v3 per a certificats, es va trobar una entrada anomenada \emph{nameConstraints}. Aquesta entrada permet definir múltiples tipus de permisos (tant de permetre com d'excloure, veure exemple a la taula \ref{T:nameconstraints} o \cite{nameconstraints}).
 \begin{table}[htb]
@@ -61,6 +40,7 @@ nameConstraints=excluded;email:.com
 \label{T:nameconstraints}
 \end{center}
 \end{table}
+
 Per a aquesta aplicació només es farà ús dels permisos de tipus IP. D'aquesta manera és la CA l'encarregada d'assegurar-se que no validi cap certificat amb una IP ja assignada prèviament, així com també de mantenir un registre de les IPs assignades.
 
 Pel disseny del protocol es necessita un identificador únic per cada node. Es va pensar i valorar per a aquesta aplicació les següents opcions:
@@ -144,6 +124,8 @@ Els paquets \emph{Identification} (ID) descriuen al node que l'envia. Per descri
 \item Xarxes que publica el node: fa d'identificador del node.
 \item Agrupacions de IP i port: altres vies per comunicar-se amb el node.
 \end{itemize}
+En el paquet (taula \ref{T:pktid}), primer s'envien el número d'entrades que contenen els dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
+Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x00$.
 \begin{table}[htb]
 \begin{center}
 \scriptsize
@@ -167,8 +149,6 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:pktid}
 \end{center}
 \end{table}
-En el paquet (taula \ref{T:pktid}), primer s'envien el número d'entrades que contenen els dos blocs d'informació, tot seguit s'envia el primer bloc amb totes les xarxes que el node publica i desprès, en el segon bloc, totes les agrupacions de IP i port.
-Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x00$.
 \subsection{Paquet Identification Acknowledgment}
 Els paquets \emph{Identification Acknowledgment} (ID ACK) confirmen haver rebut el paquet ID. El paquet (taula \ref{T:pktidack}) no conté cap més informació addicional tal com es pot veure en la seva estructura.
 Aquest tipus de paquet utilitza com a identificador de paquet intern el valor hexadecimal $0x01$.
@@ -188,6 +168,9 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \end{table}
 \subsection{Paquet Keep Alive}
 Els routers NAT s'utilitzen generalment per compartir una mateixa IP entre màquines diferents. El router desa cada connexió en memòria per tal de reutilitzar els mateixos paràmetres en travessar més dades per la connexió. Tots els routers NAT assignen un temps de vida a la informació guardada en memòria i el renoven a mesura que circulen dades de la connexió. En el moment que caduca el temps de vida, la connexió es perd sense que cap dels participants se n'adonin, és per això que és important assegurar-se de que el router no arribi a esgotar aquest temps de vida.
+
+El paquet \emph{Keep Alive} (KA) té dos objectius: mantenir el canal obert i ajudar a mallar la VPN.
+El primer objectiu fa que enviar aquest paquet només sigui necessari quan no s'ha enviat cap altre informació al canal, en canvi el segon objectiu fa que sigui necessari enviar-lo cada cert temps. D'aquesta manera es defineixen dos temps configurables que s'anomenaran $t_{min}$ i $t_{max}$. La política d'enviament resultant consisteix en enviar un paquet KA cada $t_{min}$ des de l'últim paquet transmès pel canal, i en cas de no haver-se enviat cap paquet d'aquests durant $t_{max}$ es forçaria l'enviament malgrat no fos necessari pel primer objectiu.
 
 \begin{table}[htb]
 \begin{center}
@@ -218,10 +201,6 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \label{T:pktka}
 \end{center}
 \end{table}
-
-El paquet \emph{Keep Alive} (KA) té dos objectius: mantenir el canal obert i ajudar a mallar la VPN.
-El primer objectiu fa que enviar aquest paquet només sigui necessari quan no s'ha enviat cap altre informació al canal, en canvi el segon objectiu fa que sigui necessari enviar-lo cada cert temps. D'aquesta manera es defineixen dos temps configurables que s'anomenaran $t_{min}$ i $t_{max}$. La política d'enviament resultant consisteix en enviar un paquet KA cada $t_{min}$ des de l'últim paquet transmès pel canal, i en cas de no haver-se enviat cap paquet d'aquests durant $t_{max}$ es forçaria l'enviament malgrat no fos necessari pel primer objectiu.
-
 Per tal de complir el segon objectiu fa falta afegir informació dels altres nodes de la VPN dins del paquet, la informació necessària és la mateixa que la continguda al paquet ID.
 En el paquet (taula \ref{T:pktka}), primer s'envia el nombre de nodes que es descriuran. Tot seguit s'enviara el mateix contingut dels paquets ID un darrera l'altre.
 Per tant aquest paquet, porta la informació suficient per a poder establir una connexió amb cada un dels nodes que descriu tot mantenint el canal obert pels routers NAT, fent així la funció de \emph{hole punching} (aquest concepte es troba definit en un \emph{paper} \cite{p2p} a l'annex \refannexpapers).
@@ -240,6 +219,8 @@ Per altre banda hi ha un temporitzador que s'encarrega de llançar els esdevenim
 
 Els paquets que les aplicacions envien a través de l'adaptador virtual són enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual i a la màquina de destí. Aquest dos s'han implementat mitjançant threads i són capaços d'enrutar i xifrar o desxifrar múltiples paquets simultàniament.
 
+Per la realització d'aquesta aplicació, és necessari programar tots els components del diagrama (figura \ref{F:dia-app}) a excepció del DTLS, que tal com s'ha especificat anteriorment, s'utilitzarà la implementació de la llibreria OpenSSL.
+
 Pel desenvolupament d'aquesta aplicació s'ha escollit el llenguatge C per ser un lleguatge de baix nivell (permetent treballar el més proper possible als bits) i poder optimitzar-la per aconseguir baixes latències. També s'ha decidit utilitzar la llibreria de threads de \keyword{POSIX}{Portable Operating System Interface} per la seva potència i la compatibilitat amb altres sistemes operatius.
 
 L'elecció d'aquest llenguatge juntament amb la utilització de threads ha comportat múltiples dificultats en la gestió dels recursos compartits entre els diferents threads, però el resultat hauria d'aprofitar millor els recursos de les màquines node.
@@ -247,13 +228,6 @@ L'elecció d'aquest llenguatge juntament amb la utilització de threads ha compo
 \subsection{Interfície TUN}
 L'aplicació fa ús del \emph{driver} genèric TUN/TAP. S'ha escollit aquest \emph{driver} ja que està disponible per la majoria de sistemes operatius i facilitarà la possible futura adaptació de l'aplicació.
 El \emph{driver} TUN/TAP és un \emph{driver} de \emph{kernel} d'una targeta de xarxa virtual, i per tant no depèn de cap targeta real física.
-\begin{figure}[htb]
-\centering
-\includegraphics[scale=0.5]{images/dia-tunsrv}
-\caption{Diagrama de flux del thread TUN}
-\label{F:dia-tunsrv}
-\end{figure}
-
 Aquest \emph{driver} es separa en dos \emph{sub-drivers}:
 \begin{itemize}
 \item \emph{Driver} \textbf{TAP} simula una interfície de xarxa Ethernet i treballa amb trames de capa 2 del model OSI.
@@ -261,6 +235,12 @@ Aquest \emph{driver} es separa en dos \emph{sub-drivers}:
 \end{itemize}
 En aquestes targetes virtuals els paquets enviats pel sistema operatiu al \emph{driver} són passats a l'aplicació que treballa fora del \emph{kernel} i del \emph{driver}. Els paquets que l'aplicació entrega al \emph{driver} són passats directament al sistema operatiu per a ser tractats pel \emph{stack} de protocols del \emph{kernel}.
 
+\begin{figure}[htb]
+\centering
+\includegraphics[scale=0.5]{images/dia-tunsrv}
+\caption{Diagrama de flux del thread TUN}
+\label{F:dia-tunsrv}
+\end{figure}
 El diagrama d'aquesta part de l'aplicació està en la figura \ref{F:dia-tunsrv}.
 El primer que fa el node en rebre un paquet de la interfície TUN és comprovar que el paquet provingui d'una adreça IP que els altres nodes reconeguin com a pròpia d'ell, desprès busca el node a qui va destinat i li envia pel canal xifrat. En el cas de no complir algun dels requisits es descarta el paquet sense notificar-ho.
 
@@ -282,3 +262,34 @@ Els paquets \textbf{ID Ack} anoten conforme l'altre node ha rebut satisfactòria
 
 Els paquets \textbf{KA} afegeixen tota la informació dels nodes rebuda a la base de dades de nodes pendents de connectar. Cada cert temps el temporitzador del programa comprovarà aquestes dades i intentarà connectar-se a ells. El temporitzador que manté oberts els ports als routers NAT, aquest s'actualitza cada cop que es rep un paquet vàlid.
 
+\section{Gestió de la VPN}
+Tal com s'ha comentat a principis d'aquest capítol, certes tasques són externes al programari creat i s'han de realitzar manualment. D'aquestes tasques, algunes són exclusives de l'administrador de la VPN, però d'altres les ha de realitzar el mateix usuari.
+En la figura \ref{F:dia-case} es mostren les diferents tasques necessàries per tal de poder gestionar la VPN. En ella la part blava fa referencia a tasques de gestió, la groga a comunicacions, la taronja a l'utilització de eines externes i la verda al propi programa creat.
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\textwidth]{images/dia-case}
+\caption{Diagrama de casos d'ús}
+\label{F:dia-case}
+\end{figure}
+
+A continuació s'exposa el procediment que l'usuari ha de realitzar inicialment per preparar l'aplicació:
+\begin{enumerate}
+\item Aconseguir un certificat firmat i un rang IP.
+\item Configurar l'aplicació per utilitzar el certificat i una IP del rang assignat.
+\item Demanar la llista de nodes coneguts a algun membre (o a l'administrador de la VPN).
+\item Instal·lar la llista de nodes coneguts aconseguida.
+\item Arrancar l'aplicació.
+\end{enumerate}
+Una vegada realitzat aquest procediment inicial l'usuari pot fer ús dels serveis de dins de la VPN. Les pròximes vegades que l'usuari vulgui tornar a accedir a la VPN només necessitarà arrancar l'aplicació.
+
+Com aclariment, seguidament s'explica un exemple del primer pas del procediment anterior (aconseguir el certificat firmat per la CA):
+\begin{enumerate}
+\item L'\textbf{usuari} demana accedir a la VPN a l'administrador.
+\item L'\textbf{administrador} li assigna temporalment una IP.
+\item L'\textbf{administrador} informa a l'usuari del procediment per generar una petició de certificat amb la IP assignada.
+\item L'\textbf{usuari} genera la petició de certificat amb: la IP assignada, el seu nom, etc.
+\item L'\textbf{usuari} s'identifica a l'administrador (mitjançant alguna documentació oficial) i li entrega la petició de certificat.
+\item L'\textbf{administrador} comprova la identificació verificant que està autoritzat a accedir a la VPN.
+\item L'\textbf{administrador} li assigna definitivament la IP.
+\item L'\textbf{administrador} entrega al usuari el certificat firmat per la CA.
+\end{enumerate}

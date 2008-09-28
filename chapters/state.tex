@@ -85,13 +85,13 @@ A nivell de seguretat utilitza un protocol propi tant en TCP com en UDP. Pot tre
 
 \subsection{Wippien}
 Wippien és un programa de missatgeria instantània amb funcionalitats de creació de VPNs a nivell d'aplicació. Utilitza \keyword{XMPP}{Extensible Messaging and Presence Protocol} com a missatgeria instantània. Una vegada connectat al servidor XMPP, l'aplicació mostra a l'usuari la seva llista de contactes per tal que esculli amb quins contactes vol crear la VPN. Per crear-la negocia els paràmetres de la VPN (com la IP pública, el port i el protocol) a través d'XMPP. També utilitza HTTP cap a un servidor anomenat \emph{mediator}, que fa la funció de \keyword{DHCP}{Dynamic Host Configuration Protocol} assignant una IP única per sessió a cada \emph{peer} de la VPN; d'aquesta manera es garanteix que no hi hagi conflictes d'IPs.
+Per tant podem dir que Wippien crea VPNs mallades i completament connectades per cada anella de confiança, amb autenticació (i assignació de les IPs) per part d'un servidor central extern (veure la figura \ref{F:vpn-externalized}).
 \begin{figure}[htb]
 \centering
 \includegraphics[height=0.5\textwidth]{images/vpn-externalized}
 \caption{Topologia d'una VPN amb autenticació externa}
 \label{F:vpn-externalized}
 \end{figure}
-Per tant podem dir que Wippien crea VPNs mallades i completament connectades per cada anella de confiança, amb autenticació (i assignació de les IPs) per part d'un servidor central extern (veure la figura \ref{F:vpn-externalized}).
 
 Utilitza una única interfície de xarxa en cada màquina per tota la VPN, com en la topologia interna \emph{subnet} de OpenVPN. Per tant, és cada \emph{peer} qui s'encarrega de l'enrutat de la VPN a nivell d'aplicació. Totes les IPs de les VPNs que utilitzin el seu servidor \emph{mediator} pertanyen a la xarxa 5.0.0.0/8 (veure \cite{wippien-web}).
 

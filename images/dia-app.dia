@@ -638,13 +638,13 @@ server#</dia:string>
         <dia:point val="3.48593,-12.9915"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="3.43593,-13.0415;5.14715,-11.2563"/>
+        <dia:rectangle val="3.43593,-13.0415;5.0875,-11.6312"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="3.48593,-12.9915"/>
-        <dia:point val="3.48593,-12.1438"/>
-        <dia:point val="4.64715,-12.1438"/>
-        <dia:point val="4.64715,-11.3063"/>
+        <dia:point val="3.48593,-12.5781"/>
+        <dia:point val="4.5875,-12.5781"/>
+        <dia:point val="4.5875,-11.6812"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -672,13 +672,13 @@ server#</dia:string>
         <dia:point val="7.63413,-12.9915"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="5.67215,-13.0415;8.13413,-11.2438"/>
+        <dia:rectangle val="5.9875,-13.0415;8.13413,-11.6687"/>
       </dia:attribute>
       <dia:attribute name="orth_points">
         <dia:point val="7.63413,-12.9915"/>
         <dia:point val="7.63413,-12.1438"/>
-        <dia:point val="6.17215,-12.1438"/>
-        <dia:point val="6.17215,-11.2938"/>
+        <dia:point val="6.0375,-12.1438"/>
+        <dia:point val="6.0375,-11.7187"/>
       </dia:attribute>
       <dia:attribute name="orth_orient">
         <dia:enum val="1"/>
@@ -697,28 +697,19 @@ server#</dia:string>
       <dia:attribute name="start_arrow_width">
         <dia:real val="0.5"/>
       </dia:attribute>
-      <dia:attribute name="end_arrow">
-        <dia:enum val="12"/>
-      </dia:attribute>
-      <dia:attribute name="end_arrow_length">
-        <dia:real val="0.5"/>
-      </dia:attribute>
-      <dia:attribute name="end_arrow_width">
-        <dia:real val="0.5"/>
-      </dia:attribute>
       <dia:connections>
         <dia:connection handle="0" to="O10" connection="1"/>
       </dia:connections>
     </dia:object>
     <dia:object type="SDL - Task" version="0" id="O13">
       <dia:attribute name="obj_pos">
-        <dia:point val="3.87743,-11.3236"/>
+        <dia:point val="3.87743,-11.6924"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="3.82743,-11.3736;6.78778,-9.66649"/>
+        <dia:rectangle val="3.82743,-11.7424;6.78778,-10.0352"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="3.87743,-11.3236"/>
+        <dia:point val="3.87743,-11.6924"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="2.8603482073040665"/>
@@ -754,7 +745,7 @@ server#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="5.3076,-10.52"/>
+            <dia:point val="5.3076,-10.8888"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -773,13 +764,13 @@ server#</dia:string>
     </dia:object>
     <dia:object type="SDL - Task" version="0" id="O14">
       <dia:attribute name="obj_pos">
-        <dia:point val="4.11493,-11.1186"/>
+        <dia:point val="4.11493,-11.4874"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="4.06493,-11.1686;7.04569,-9.46149"/>
+        <dia:rectangle val="4.06493,-11.5374;7.04569,-9.83024"/>
       </dia:attribute>
       <dia:attribute name="elem_corner">
-        <dia:point val="4.11493,-11.1186"/>
+        <dia:point val="4.11493,-11.4874"/>
       </dia:attribute>
       <dia:attribute name="elem_width">
         <dia:real val="2.8807584764831833"/>
@@ -815,7 +806,7 @@ server#</dia:string>
             <dia:real val="0.80000000000000004"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="5.55531,-10.1725"/>
+            <dia:point val="5.55531,-10.5413"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
