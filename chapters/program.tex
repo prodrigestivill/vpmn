@@ -2,7 +2,7 @@
 \section{Objectiu de l'aplicació}
 L'objectiu de l'aplicació és ser capaç de crear xarxes privades virtuals que no depenguin de cap servidor central, superar els routers NAT i proporcionar una baixa latència.
 
-L'aplicació d'aquest projecte s'ha d'executar com un servei i proveir només una interfície virtual de xarxa. Per tant l'usuari no disposa de cap interfície gràfica, però els missatges de l'aplicació quedaran guardats en un fitxer al disc per tal de ser consultats en cas necessari.
+L'aplicació d'aquest projecte s'ha d'executar com un servei i proveir només una interfície virtual de xarxa. Per tant l'usuari no disposa de cap interfície gràfica, però els missatges de l'aplicació queden guardats en un fitxer al disc per tal de ser consultats en cas necessari.
 Tant la gestió dels certificats com la obtenció del llistat inicial de nodes coneguts (també pot ser només un sol node) no formen part de l'aplicació i són tasques de gestió que s'han de realitzar manualment.
 
 \subsection{Funcionament de l'aplicació}
@@ -219,7 +219,7 @@ Per altre banda hi ha un temporitzador que s'encarrega de llançar els esdevenim
 
 Els paquets que les aplicacions envien a través de l'adaptador virtual són enrutats i enviats de servidor UDP a servidor UDP on retornen a un altre adaptador virtual i a la màquina de destí. Aquest dos s'han implementat mitjançant threads i són capaços d'enrutar i xifrar o desxifrar múltiples paquets simultàniament.
 
-Per la realització d'aquesta aplicació, és necessari programar tots els components del diagrama (figura \ref{F:dia-app}) a excepció del DTLS, que tal com s'ha especificat anteriorment, s'utilitzarà la implementació de la llibreria OpenSSL.
+Per a la realització d'aquesta aplicació, és necessari programar tots els components del diagrama (figura \ref{F:dia-app}) a excepció del DTLS, on tal com s'ha especificat anteriorment, s'utilitzarà la implementació de la llibreria OpenSSL.
 
 Pel desenvolupament d'aquesta aplicació s'ha escollit el llenguatge C per ser un lleguatge de baix nivell (permetent treballar el més proper possible als bits) i poder optimitzar-la per aconseguir baixes latències. També s'ha decidit utilitzar la llibreria de threads de \keyword{POSIX}{Portable Operating System Interface} per la seva potència i la compatibilitat amb altres sistemes operatius.
 
@@ -264,7 +264,7 @@ Els paquets \textbf{KA} afegeixen tota la informació dels nodes rebuda a la bas
 
 \section{Gestió de la VPN}
 Tal com s'ha comentat a principis d'aquest capítol, certes tasques són externes al programari creat i s'han de realitzar manualment. D'aquestes tasques, algunes són exclusives de l'administrador de la VPN, però d'altres les ha de realitzar el mateix usuari.
-En la figura \ref{F:dia-case} es mostren les diferents tasques necessàries per tal de poder gestionar la VPN. En ella la part blava fa referencia a tasques de gestió, la groga a comunicacions, la taronja a l'utilització de eines externes i la verda al propi programa creat.
+En la figura \ref{F:dia-case} es mostren les diferents tasques necessàries per tal de poder gestionar la VPN. En aquesta figura la part blava fa referencia a tasques de gestió, la groga a comunicacions, la taronja a l'utilització de eines externes i la verda al propi programa creat.
 \begin{figure}[htb]
 \centering
 \includegraphics[width=\textwidth]{images/dia-case}
@@ -289,7 +289,7 @@ Com aclariment, seguidament s'explica un exemple del primer pas del procediment 
 \item L'\textbf{administrador} informa a l'usuari del procediment per generar una petició de certificat amb la IP assignada.
 \item L'\textbf{usuari} genera la petició de certificat amb: la IP assignada, el seu nom, etc.
 \item L'\textbf{usuari} s'identifica a l'administrador (mitjançant alguna documentació oficial) i li entrega la petició de certificat.
-\item L'\textbf{administrador} comprova la identificació verificant que està autoritzat a accedir a la VPN.
+\item L'\textbf{administrador} comprova la identificació, verificant que està autoritzat a accedir a la VPN.
 \item L'\textbf{administrador} li assigna definitivament la IP.
-\item L'\textbf{administrador} entrega al usuari el certificat firmat per la CA.
+\item L'\textbf{administrador} entrega a l'usuari el certificat firmat per la CA.
 \end{enumerate}
