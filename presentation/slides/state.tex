@@ -1,6 +1,21 @@
 \section{Estudi de la situació actual}
 \subsection{Protocols i programaris existents}
     \begin{frame}{IPsec}
+	\begin{exampleblock}{Pros}
+		\begin{itemize}
+\item Standard.
+\item Mandatory in IPv6 implementations.
+\item DNSSEC enable possible dynamic tunneling.
+		\end{itemize}
+	\end{exampleblock}
+	\begin{alertblock}{Contres}
+		\begin{itemize}
+\item Implementacions diferents \alert{no són compatibles}.
+\item Ha d'estar suportat en el \textem{kernel}.
+\item Un mode Only one mode supported through NAT.
+\item IP addressing authentication not centralized.
+		\end{itemize}
+	\end{alertblock}
     \end{frame}
     \begin{frame}{OpenVPN}
         \begin{center}

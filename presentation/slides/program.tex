@@ -4,17 +4,30 @@
         \begin{center}
         \includegraphics[height=10em]{images/vpn-fullymeshed}
         \end{center}
+        \begin{itemize}
+\item P
+        \end{itemize}
     \end{frame}
 \subsection{Disseny del protocol}
     \begin{frame}{Seguretat}
+        \begin{itemize}
+\item DTLS
+        \end{itemize}
         \begin{block}{NameConstraints (x509v3)}
         nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
         \end{block}
     \end{frame}
     \begin{frame}{Fluxe}
         \begin{center}
-        \includegraphics[height=10em]{images/dia-pktflow}
+        \includegraphics[height=12em]{images/dia-pktflow}
         \end{center}
+        \begin{itemize}
+\item Paquets Identification (ID)
+\item Paquets Identification Acknowledgment (ID ACK)
+\item Paquets Keep Alive (KA)
+\item Paquets Internet Protocol (IPv4)
+        \end{itemize}
+
     \end{frame}
     \begin{frame}{Paquets Identification}
         \begin{center}
@@ -69,12 +82,12 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \subsection{Arquitectura del programa}
     \begin{frame}{Processos}
         \begin{center}
-        \includegraphics[height=10em]{images/dia-app}
+        \includegraphics[height=12em]{images/dia-app}
         \end{center}
     \end{frame}
     \begin{frame}{UDP Server Part}
         \begin{center}
-        \includegraphics[height=18em]{images/dia-udpsrv}
+        \includegraphics[height=19em]{images/dia-udpsrv}
         \end{center}
     \end{frame}
     \begin{frame}{TUN Server Part}
@@ -82,4 +95,9 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
         \includegraphics[height=18em]{images/dia-tunsrv}
         \end{center}
     \end{frame}
-
+\subsection{Gestió de la VPN}
+    \begin{frame}{Casos d'ús}
+        \begin{center}
+        \includegraphics[height=18em]{images/dia-case}
+        \end{center}
+    \end{frame}
