@@ -3,17 +3,17 @@
     \begin{frame}{IPsec}
 	\begin{exampleblock}{Pros}
 		\begin{itemize}
-\item Standard.
-\item Mandatory in IPv6 implementations.
-\item DNSSEC enable possible dynamic tunneling.
+\item És estàndard.
+\item Obligatori en implementacions IPv6.
+\item Amb DNSSEC permet una creació dinàmica de túnels.
 		\end{itemize}
 	\end{exampleblock}
 	\begin{alertblock}{Contres}
 		\begin{itemize}
 \item Implementacions diferents \alert{no són compatibles}.
-\item Ha d'estar suportat en el \textem{kernel}.
-\item Un mode Only one mode supported through NAT.
-\item IP addressing authentication not centralized.
+\item Ha d'estar suportat en el \emph{kernel}.
+\item Suport NAT poc estès.
+\item Autenticació d'IPs descentralitzat i en alguns modes.
 		\end{itemize}
 	\end{alertblock}
     \end{frame}
@@ -21,6 +21,18 @@
         \begin{center}
         \includegraphics[height=10em]{images/vpn-centralized}
         \end{center}
+	\begin{exampleblock}{Pros}
+		\begin{itemize}
+\item IP configurations can be pushed
+\item Standard encryption channel
+		\end{itemize}
+	\end{exampleblock}
+	\begin{alertblock}{Contres}
+		\begin{itemize}
+\item Centralitzat, mesh alternative not easy
+\item Adreçament IP no autenticat.
+		\end{itemize}
+	\end{alertblock}
     \end{frame}
     \begin{frame}{TincVPN}
         \begin{center}
