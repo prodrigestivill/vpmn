@@ -1,72 +1,138 @@
 \section{Estudi de la situació actual}
 \subsection{Protocols i programaris existents}
     \begin{frame}{IPsec}
-	\begin{exampleblock}{Pros}
-		\begin{itemize}
+%   	\small
+%       \begin{itemize}
+%\item Modes:
+%   	\begin{itemize}
+%\item Trasport (només payload).
+%\item Túnel (paquets sencers).
+%	\end{itemize}
+%	\end{itemize}
+	\begin{exampleblock}{Pros}\small
+    	\begin{itemize}
 \item És estàndard.
 \item Obligatori en implementacions IPv6.
 \item Amb DNSSEC permet una creació dinàmica de túnels.
 		\end{itemize}
 	\end{exampleblock}
-	\begin{alertblock}{Contres}
-		\begin{itemize}
-\item Implementacions diferents \alert{no són compatibles}.
-\item Ha d'estar suportat en el \emph{kernel}.
+	\begin{alertblock}{Contres}\small
+	\begin{itemize}
+\item Problemes de compatibilitat en implementacions diferents.
+\item Suport en el \emph{kernel}.
 \item Suport NAT poc estès.
-\item Autenticació d'IPs descentralitzat i en alguns modes.
+\item Autenticació d'IPs descentralitzat i opcional.
 		\end{itemize}
 	\end{alertblock}
     \end{frame}
     \begin{frame}{OpenVPN}
-        \begin{center}
-        \includegraphics[height=10em]{images/vpn-centralized}
-        \end{center}
-	\begin{exampleblock}{Pros}
+        \begin{columns}
+        \begin{column}{0.25\textwidth}
+        \includegraphics[width=\textwidth]{images/vpn-centralized}
+        \end{column}
+        \begin{column}{0.75\textwidth}
+    	\begin{exampleblock}{Pros}\small
 		\begin{itemize}
-\item IP configurations can be pushed
-\item Standard encryption channel
+\item Configuració IP centralitzada (l'envia el server).
+\item Capa de seguretat i autenticació segura.
 		\end{itemize}
-	\end{exampleblock}
-	\begin{alertblock}{Contres}
+	    \end{exampleblock}
+	    \begin{alertblock}{Contres}\small
 		\begin{itemize}
-\item Centralitzat, mesh alternative not easy
+\item Centralitzat (mode servidor-client o punt a punt).
+\item No NAT \emph{friendly}.
 \item Adreçament IP no autenticat.
 		\end{itemize}
-	\end{alertblock}
+       	\end{alertblock}
+        \end{column}
+        \end{columns}
     \end{frame}
     \begin{frame}{TincVPN}
-        \begin{center}
-        \includegraphics[height=10em]{images/vpn-meshed}
-        \end{center}
+        \begin{columns}
+        \begin{column}{0.35\textwidth}
+        \includegraphics[width=\textwidth]{images/vpn-meshed}
+        \end{column}
+        \begin{column}{0.65\textwidth}
+    	\begin{exampleblock}{Pros}\small
+		\begin{itemize}
+\item Xarxa mallada (total o parcial).
+		\end{itemize}
+	    \end{exampleblock}
+	    \begin{alertblock}{Contres}\small
+		\begin{itemize}
+\item No pot usar únicament UDP.
+\item No NAT \emph{friendly}.
+\item Protocol propi parcialment insegur.
+\item Adreçament IP no autenticat.
+		\end{itemize}
+       	\end{alertblock}
+        \end{column}
+        \end{columns}
     \end{frame}
-    \begin{frame}{Wippien}
-        \begin{center}
-        \includegraphics[height=10em]{images/vpn-externalized}
-        \end{center}
-    \end{frame}
-    \begin{frame}{Hamachi}
-        \begin{center}
-        \includegraphics[height=10em]{images/vpn-externalized}
-        \end{center}
+    \begin{frame}{Wippien i Hamachi}
+        \begin{columns}
+        \begin{column}{0.35\textwidth}
+        \includegraphics[width=\textwidth]{images/vpn-externalized}
+        \end{column}
+        \begin{column}{0.65\textwidth}
+    	\begin{exampleblock}{Pros}\small
+		\begin{itemize}
+\item NAT \emph{friendly}.
+\item Configuració IP centralitzada.
+\item Xarxa mallada per les dades.
+		\end{itemize}
+	    \end{exampleblock}
+	    \begin{alertblock}{Contres}\small
+		\begin{itemize}
+\item Centralitzat (\emph{mediator}).
+\item Adreçament IP no autenticat.
+\item Programari privatiu.
+		\end{itemize}
+       	\end{alertblock}
+        \end{column}
+        \end{columns}
     \end{frame}
     \begin{frame}{ELA VPN}
-        \begin{center}
-        \includegraphics[height=10em]{images/vpn-meshed}
-        \end{center}
+        \begin{columns}
+        \begin{column}{0.35\textwidth}
+        \includegraphics[width=\textwidth]{images/vpn-meshed}
+        \end{column}
+        \begin{column}{0.65\textwidth}
+    	\begin{exampleblock}{Pros}\small
+		\begin{itemize}
+\item NAT \emph{friendly}.
+\item Xarxa mallada jeràrquica.
+		\end{itemize}
+	    \end{exampleblock}
+	    \begin{alertblock}{Contres}\small
+		\begin{itemize}
+\item Adreçament IP no autenticat.
+\item No existeix cap implementació disponible.
+		\end{itemize}
+       	\end{alertblock}
+        \end{column}
+        \end{columns}
     \end{frame}
 
 \subsection{Comparativa}
-    \begin{frame}{Taula}
+    \begin{frame}{Taula comparativa}
         \begin{center}
 \begin{tabular}{|l|c|c|c|c|}
 \hline
 Nom & Lliure & Funcionament & Protocol & Seguretat \\ \hline \hline
-\bf IPsec & Sí & Descentralitzat & IP & Estàndard \\ \hline
-\bf OpenVPN & Sí & Centralitzat & TCP/UDP & TLS/Propi \\ \hline
-\bf TincVPN & Sí & Mallat & TCP/UDP & Propi \\ \hline
-\bf Wippien & No & Mallat amb Servidor & TCP/UDP & Propi \\ \hline
-\bf Hamachi & No & Mallat amb Servidor & UDP & Propi \\ \hline
-\bf ELA VPN & No & Mallat Jeràrquic & TCP/UDP & Propi \\ \hline
+\bf IPsec & Sí & \bf Descentralitzat & IP & Estàndard \\ \hline
+OpenVPN & Sí & Centralitzat & TCP/UDP & TLS/Propi \\ \hline
+\bf TincVPN & Sí & \bf Mallat & TCP/UDP & \alert{Propi} \\ \hline
+Wippien & No & Mallat amb Servidor & TCP/UDP & Propi \\ \hline
+Hamachi & No & Mallat amb Servidor & UDP & Propi \\ \hline
+\bf ELA VPN & No & \bf Mallat Jeràrquic & TCP/UDP & Propi \\ \hline
 \end{tabular}
         \end{center}
+        \begin{alertblock}{}\small
+		\begin{itemize}
+\item \textbf{IPsec}: Problemes de compatibilitat, suport en el \emph{kernel}.
+\item \textbf{TincVPN}: Adreçament no autenticat, protocol no segur.
+\item \textbf{ELA VPN}: No disponible.
+		\end{itemize}
+        \end{alertblock}
     \end{frame}

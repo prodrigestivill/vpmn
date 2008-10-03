@@ -5,17 +5,26 @@
         \includegraphics[height=10em]{images/vpn-fullymeshed}
         \end{center}
         \begin{itemize}
-\item P
+\item Xarxa mallada totalment connectada.
+\item NAT \emph{friendly}.
+\item Gestió manual (externa).
         \end{itemize}
     \end{frame}
 \subsection{Disseny del protocol}
     \begin{frame}{Seguretat}
         \begin{itemize}
-\item DTLS
+\item \textbf{DTLS} (RFC 4347).
+        \begin{itemize}
+            \item Utilitza només UDP.
+            \item Basat en TLSv1.
         \end{itemize}
-        \begin{block}{NameConstraints (x509v3)}
+\item Autenticació mitjançant certificats (centralitzat).
+\item Certificats contenen els permisos d'adreçament:
+        \begin{block}{NameConstraints (x509v3)}\small\tt
         nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
         \end{block}
+\item Programat a prova d'atacs interns.
+        \end{itemize}
     \end{frame}
     \begin{frame}{Fluxe}
         \begin{center}
@@ -84,6 +93,10 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
         \begin{center}
         \includegraphics[height=12em]{images/dia-app}
         \end{center}
+		\begin{itemize}
+\item Programat en C.
+\item Programat utilitzant \emph{threads}.
+		\end{itemize}
     \end{frame}
     \begin{frame}{UDP Server Part}
         \begin{center}
@@ -101,3 +114,24 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
         \includegraphics[height=18em]{images/dia-case}
         \end{center}
     \end{frame}
+\subsection{Conclusions}
+    \begin{frame}{Disseny resultant}
+    	\begin{exampleblock}{Pros}
+        \begin{itemize}
+\item Xarxa dinàmica mallada.
+\item Adreçament IP autenticat amb certificats.
+\item Canal xifrat amb un protocol estàndard (\textbf{DTLS}).
+        \end{itemize}
+    	\end{exampleblock}
+	    \begin{alertblock}{Contres}
+        \begin{itemize}
+\item Sense enrutament intern.
+        \end{itemize}
+	    \end{alertblock}
+        \begin{block}{Pendent}
+        \begin{itemize}
+\item Fragmentació dinàmica.
+        \end{itemize}
+        \end{block}
+    \end{frame}
+
