@@ -18,11 +18,15 @@
             \item Utilitza només UDP.
             \item Basat en TLSv1.
         \end{itemize}
+        \end{itemize}
+        \begin{itemize}
 \item Autenticació mitjançant certificats (centralitzat).
 \item Certificats contenen els permisos d'adreçament:
         \begin{block}{NameConstraints (x509v3)}\small\tt
         nameConstraints=permitted;IP:192.168.0.0/255.255.0.0
         \end{block}
+        \end{itemize}
+        \begin{itemize}
 \item Programat a prova d'atacs interns.
         \end{itemize}
     \end{frame}
@@ -98,12 +102,12 @@ bits & \centering 0--3 & \centering 4--7 & \centering 8--15 & \centering 16--31 
 \item Programat utilitzant \emph{threads}.
 		\end{itemize}
     \end{frame}
-    \begin{frame}{UDP Server Part}
+    \begin{frame}{Part UDP Server}
         \begin{center}
         \includegraphics[height=19em]{images/dia-udpsrv}
         \end{center}
     \end{frame}
-    \begin{frame}{TUN Server Part}
+    \begin{frame}{Part TUN Server}
         \begin{center}
         \includegraphics[height=18em]{images/dia-tunsrv}
         \end{center}
