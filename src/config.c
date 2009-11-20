@@ -31,59 +31,123 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#define CONFIG_READ_LINE 1024
+
+int config_istrue(const char *val){
+	if (*val=='T' || *val=='t')
+		return 1;
+	if (*val=='0' || *val=='F' || *val=='f')
+		return 0;
+	return atoi(val);
+}
+
 void config_load(char *cfgfile)
 {
-  vpmnd_uid = 1000;
-  vpmnd_gid = 1000;
+	char *sslcacert_str, *sslcert_str, *sslpkey_str;
+	char buf[CONFIG_READ_LINE], *key, *val, *end;
+	FILE *fd = fopen(cfgfile, "r");
+	while(fgets(buf, CONFIG_READ_LINE, fd) != NULL){
+		if (*buf == '#' || *buf == '/')
+			continue;
+		for(key = buf;*key==' ';key++);
+		end = strchr(buf, '=');
+		for(val=end+1;*val==' ';val++);
+		*end = '\0';
+		for(end--;*end==' ';end--)
+			*end = '\0';
+		//Keys
+		if (strcmp(key, "uid") == 0){
+			vpmnd_uid = atoi(val);
+		}else
+		if (strcmp(key, "gid") == 0){
+			vpmnd_gid = atoi(val);
+		}else
+		if (strcmp(key, "daemonize") == 0){
 #ifdef DEBUG
-  daemonize = 0;
+			daemonize = 0
 #else
-  daemonize = 1;
+  		daemonize = config_istrue(val);
 #endif
-  //TUNDEV
-  tunname = "vpmn0";
-  tunmtu = 1500;
-  num_tunsrvthreads = 4;
-  num_tunsrvbuffers = 20;
-
-  char *tunaddr_ip_str = "10.0.0.5";
-  char *tunaddr_nm_str = "255.255.255.0";
-  if (inet_aton(tunaddr_ip_str, &tunaddr_ip.addr) == 0
-      || inet_aton(tunaddr_nm_str, &tunaddr_ip.netmask) == 0)
-    log_error("Unable to load IP configurations.\n");
-
-  tun_selfpeer.shared_networks = calloc(1 + 1, sizeof(struct in_network));
-  tun_selfpeer.shared_networks[0].addr.s_addr = tunaddr_ip.addr.s_addr;
-  tun_selfpeer.shared_networks[0].netmask.s_addr = 0xffffffff;
-
-  char *tunaddr_net0_ip_str = "10.1.0.5";
-  char *tunaddr_net0_nm_str = "255.255.255.0";
-  inet_aton(tunaddr_net0_ip_str, &tun_selfpeer.shared_networks[1].addr);
-  inet_aton(tunaddr_net0_nm_str, &tun_selfpeer.shared_networks[1].netmask);
-  tun_selfpeer.shared_networks[1].addr.s_addr =
-    tun_selfpeer.shared_networks[1].addr.s_addr & tun_selfpeer.
-    shared_networks[1].netmask.s_addr;
-  tun_selfpeer.shared_networks_len = 1 + 1;
-
-  //UDPSRV
-  num_udpsrvthreads = 4;
-  num_udpsrvbuffers = 20;
-  port_udp = 1090;
-  char *updsrv_ip_str = "192.168.0.2";
-  tun_selfpeer.addrs = calloc(1, sizeof(struct sockaddr_in));
-  inet_aton(updsrv_ip_str, &tun_selfpeer.addrs[0].sin_addr);
-  tun_selfpeer.addrs[0].sin_port = htons(port_udp);
-  tun_selfpeer.addrs_len = 1;
-
-  //DTLS
-  char *sslcacert_str = "../test/cacert.pem";
-  char *sslcert_str = "../test/client1cert.pem";
-  char *sslpkey_str = "../test/client1pkey.pem";
-  ssl_verifydepth = 1;
-  ssl_cipherlist = "DEFAULT";
-  udpsrvdtls_init();
-  if (udpsrvdtls_loadcerts(sslcacert_str, sslcert_str, sslpkey_str) != 0)
-    log_error("Unable to load certs.\n");
+		}else
+		if (strcmp(key, "tunname") == 0){
+			tunname = strdup(val);
+		}else
+		if (strcmp(key, "tunmtu") == 0){
+			tunmtu = atoi(val);
+		}else
+		if (strcmp(key, "num_tunsrvthreads") == 0){
+			num_tunsrvthreads = atoi(val);
+		}else
+		if (strcmp(key, "num_tunsrvbuffers") == 0){
+			num_tunsrvbuffers = atoi(val);
+		}else
+		if (strcmp(key, "tunaddr_ip") == 0){
+			if (inet_aton(val, &tunaddr_ip.addr) == 0)
+				log_error("Unable to load IP configuration.\n");
+			else{
+			tun_selfpeer.shared_networks = calloc(1, sizeof(struct in_network));
+			tun_selfpeer.shared_networks[0].addr.s_addr = tunaddr_ip.addr.s_addr;
+			tun_selfpeer.shared_networks[0].netmask.s_addr = 0xffffffff;
+			tun_selfpeer.shared_networks_len = 1
+			}
+		}else
+		if (strcmp(key, "tunaddr_nm") == 0){
+			if (inet_aton(val, &tunaddr_ip.netmask) == 0)
+				log_error("Unable to load NM configuration.\n");
+		}else
+/*
+char *tunaddr_net0_ip_str = "10.1.0.5";
+char *tunaddr_net0_nm_str = "255.255.255.0";
+inet_aton(tunaddr_net0_ip_str, &tun_selfpeer.shared_networks[1].addr);
+inet_aton(tunaddr_net0_nm_str, &tun_selfpeer.shared_networks[1].netmask);
+tun_selfpeer.shared_networks[1].addr.s_addr =
+  tun_selfpeer.shared_networks[1].addr.s_addr & tun_selfpeer.
+  shared_networks[1].netmask.s_addr;
+tun_selfpeer.shared_networks_len++;
+*/
+		if (strcmp(key, "num_udpsrvthreads") == 0){
+			num_udpsrvthreads = atoi(val);
+		}else
+		if (strcmp(key, "num_udpsrvbuffers") == 0){
+			num_udpsrvbuffers = atoi(val);
+		}else		
+		if (strcmp(key, "port_udp") == 0){
+			port_udp = atoi(val);
+		}else		
+/*
+char *updsrv_ip_str = "192.168.0.2";
+tun_selfpeer.addrs = calloc(1, sizeof(struct sockaddr_in));
+inet_aton(updsrv_ip_str, &tun_selfpeer.addrs[0].sin_addr);
+tun_selfpeer.addrs[0].sin_port = htons(port_udp);
+tun_selfpeer.addrs_len = 1;
+*/
+		if (strcmp(key, "sslcacert") == 0){
+			sslcacert_str = strdup(val);
+		}else
+		if (strcmp(key, "sslcert") == 0){
+			sslcert_str = strdup(val);
+		}else
+		if (strcmp(key, "sslpkey") == 0){
+			sslpkey_str = strdup(val);
+		}else
+		if (strcmp(key, "ssl_verifydepth") == 0){
+			ssl_verifydepth = atoi(val);
+		}else
+		if (strcmp(key, "sslpkey") == 0){
+			ssl_cipherlist = strdup(val);
+		}
+	}
+	udpsrvdtls_init();
+	if (sslcacert_str!=NULL && sslcert_str!=NULL && sslpkey_str!=NULL &&
+		 (udpsrvdtls_loadcerts(sslcacert_str, sslcert_str, sslpkey_str) != 0)){
+		log_error("Unable to load certs.\n");
+	}
+	if (sslcacert_str!=NULL)
+		free(sslcacert_str);
+	if (sslcert_str!=NULL)
+		free(sslcert_str);
+	if (sslpkey_str!=NULL)		
+		free(sslpkey_str);
 }
 
 void config_fistpeersinit()
