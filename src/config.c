@@ -43,7 +43,7 @@ int config_istrue(const char *val){
 
 void config_load(char *cfgfile)
 {
-	char *sslcacert_str, *sslcert_str, *sslpkey_str;
+	char *sslcacert_str = NULL, *sslcert_str = NULL, *sslpkey_str = NULL;
 	char buf[CONFIG_READ_LINE], *key, *val, *end;
 	FILE *fd = fopen(cfgfile, "r");
 	while(fgets(buf, CONFIG_READ_LINE, fd) != NULL){
@@ -51,9 +51,16 @@ void config_load(char *cfgfile)
 			continue;
 		for(key = buf;*key==' ';key++);
 		end = strchr(buf, '=');
+		if (end == NULL)
+			continue;
 		for(val=end+1;*val==' ';val++);
 		*end = '\0';
 		for(end--;*end==' ';end--)
+			*end = '\0';
+		for(end = &val[strlen(val)-1];
+					*end==' ' ||
+					*end=='\r' ||
+					*end=='\n'; end--)
 			*end = '\0';
 		//Keys
 		if (strcmp(key, "uid") == 0){
@@ -64,7 +71,7 @@ void config_load(char *cfgfile)
 		}else
 		if (strcmp(key, "daemonize") == 0){
 #ifdef DEBUG
-			daemonize = 0
+			daemonize = 0;
 #else
   		daemonize = config_istrue(val);
 #endif
@@ -82,13 +89,13 @@ void config_load(char *cfgfile)
 			num_tunsrvbuffers = atoi(val);
 		}else
 		if (strcmp(key, "tunaddr_ip") == 0){
-			if (inet_aton(val, &tunaddr_ip.addr) == 0)
+			if (inet_aton(val, &tunaddr_ip.addr) == 0){
 				log_error("Unable to load IP configuration.\n");
-			else{
+			}else{
 			tun_selfpeer.shared_networks = calloc(1, sizeof(struct in_network));
 			tun_selfpeer.shared_networks[0].addr.s_addr = tunaddr_ip.addr.s_addr;
 			tun_selfpeer.shared_networks[0].netmask.s_addr = 0xffffffff;
-			tun_selfpeer.shared_networks_len = 1
+			tun_selfpeer.shared_networks_len = 1;
 			}
 		}else
 		if (strcmp(key, "tunaddr_nm") == 0){
