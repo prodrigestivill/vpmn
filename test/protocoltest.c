@@ -38,19 +38,23 @@ int protocol_v1ka_len;
 int protocol_v1ka_maxlen;
 int protocol_v1ka_pos;
 
-void main()
+int main(int argc, char **argv)
 {
   int i;
-  struct peer_s *peer = peer_create();
-  config_load();
+  struct peer_s *peer;
+  if (argc<2) {
+    log_error ("I need the configuration file\n");
+    return 1;
+  }
+  peer = peer_create ();
+  config_load(argv[1]);
   protocol_init();
   for (i = 0; i < protocol_v1id_len; i++)
     log_debug("%d ", *((char *) protocol_v1id + i));
   i = protocol_processpeer(peer, &protocol_v1id->peer, protocol_v1id_len -
-                           sizeof(struct protocol_1id_s) +
-                           sizeof(struct protocol_peer_s));
+		   sizeof(struct protocol_1id_s) + sizeof(struct protocol_peer_s));
   if (i < 0)
-    return;
+    return 1;
   log_debug("\n%d\n", i);
 //peer = &tun_selfpeer;
   for (i = 0; i < peer->addrs_len; i++)
@@ -63,6 +67,7 @@ void main()
       log_info("%s:", inet_ntoa(peer->shared_networks[i].addr));
       log_info("%s\n", inet_ntoa(peer->shared_networks[i].netmask));
     }
+  return 0;
 }
 
 void udpsrvdtls_init()

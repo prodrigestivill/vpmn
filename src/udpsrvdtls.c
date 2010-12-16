@@ -129,7 +129,7 @@ int udpsrvdtls_write(const char *buffer, const int buffer_len,
                      struct udpsrvsession_s *session)
 {
   int len, retry = 0;
-  unsigned long err;
+  unsigned long err = 0;
 
   if (session == NULL)
     return -1;

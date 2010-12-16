@@ -57,4 +57,7 @@ struct udpsrvsession_s **udpsrv_firstpeers;
 char *ssl_cipherlist;
 int ssl_verifydepth;
 
+void config_load(char *cfgfile);
+void config_fistpeersinit();
+
 #endif                          /* _CONFIG_H */

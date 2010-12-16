@@ -52,6 +52,8 @@ protocoltest_SOURCES = \
 	../src/debug.h \
 	../src/peer.c \
 	../src/peer.h \
+	../src/timeout.c \
+	../src/timeout.h \
 	../src/protocol.c \
 	../src/protocol.h \
 	../src/router.c \
@@ -60,12 +62,17 @@ protocoltest_SOURCES = \
 	../src/udpsrvsession.c \
 	../src/udpsrvsession.h
 
+protocoltest_LDFLAGS = \
+	-lpthread \
+	-lssl
+
 routertest_SOURCES = \
 	../src/config.c\
 	../src/config.h \
 	../src/debug.h \
 	../src/peer.c \
 	../src/peer.h \
+	../src/timeout.c \
 	../src/router.c \
 	../src/router.h \
 	routertest.c \
@@ -89,7 +96,8 @@ tundevtest_SOURCES = \
 	../src/udpsrvsession.h
 
 tundevtest_LDFLAGS = \
-	-lpthread
+	-lpthread \
+	-lssl
 
 udpsrvsessiontest_SOURCES = \
 	udpsrvsessiontest.c\

@@ -35,6 +35,7 @@ struct peer_l
 int peer_addnew(struct peer_s *peer)
 {
   //-TODO
+  return -1;
 }
 
 int peer_add(struct peer_s *peer, struct udpsrvsession_s *session)

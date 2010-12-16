@@ -36,9 +36,12 @@ struct peer_s *addpeer(const char *ip, int port)
   struct sockaddr_in *spaddr = malloc(sizeof(struct sockaddr_in));
   inet_aton(ip, &spaddr->sin_addr);
   spaddr->sin_port = htons(port);
+  peer->udpsrvsession = NULL;
+#if 0
   peer->udpsrvsessions = calloc(1, sizeof(struct udpsrvsession *));
   peer->udpsrvsessions[0] = udpsrvsession_search(spaddr);
   peer->udpsrvsessions_len = 1;
+#endif
   return peer;
 }
 
@@ -57,10 +60,14 @@ struct peer_s *searchdst(const char *ip)
   return router_searchdst(dst);
 }
 
-void main()
+int main(int argc, char **argv)
 {
   struct peer_s *peer;
-  config_load();
+  if (argc<2) {
+    log_error ("I need the configuration file\n");
+    return 1;
+  }
+  config_load(argv[1]);
 
   peer = addpeer("10.0.5.1", 1901);
   addpeerroute(peer, "10.2.0.1", "255.255.255.255");
@@ -91,6 +98,7 @@ void main()
   log_debug("%s", test);
   log_debug("-> %d\n",
             ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
+  return 0;
 }
 
 void protocol_sendroutes(const struct peer_s *dstpeer)

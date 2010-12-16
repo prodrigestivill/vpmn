@@ -39,7 +39,7 @@ void vpmnd_signalhandler(const int sig)
         log_info("Received SIGHUP signal.\n");
         break;
       default:
-        log_info("Unhandled signal %s.\n", sig);
+        log_info("Unhandled signal %d.\n", sig);
         break;
     }
 }
@@ -100,6 +100,7 @@ int vpmnd_start()
 int vpmnd_help()
 {
   printf("vpmnd [cfgfile]\nUse the configuration file as a parameter.\n");
+  return 1;
 }
 
 int main(int argc, char *argv[])

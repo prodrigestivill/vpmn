@@ -441,7 +441,7 @@ int protocol_checknameconstraints(const struct peer_s *peer)
   X509 *cert;
   STACK_OF(X509_EXTENSION) * exts;
   X509_EXTENSION *ext;
-  X509V3_EXT_METHOD *method;
+  const X509V3_EXT_METHOD *method;
   STACK_OF(GENERAL_SUBTREE) * trees;
   GENERAL_SUBTREE *tree;
 

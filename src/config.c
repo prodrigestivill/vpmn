@@ -33,7 +33,8 @@
 
 #define CONFIG_READ_LINE 1024
 
-int config_istrue(const char *val){
+int config_istrue(const char *val)
+{
 	if (*val=='T' || *val=='t')
 		return 1;
 	if (*val=='0' || *val=='F' || *val=='f')
