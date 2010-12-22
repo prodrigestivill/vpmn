@@ -25,7 +25,7 @@
 #ifndef _DEBUG_H
 #define _DEBUG_H
 
-#define DEBUG 2
+#define DEBUG 3
 
 #include <stdio.h>
 #define log_fail(format, ...) { \

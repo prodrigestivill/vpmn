@@ -90,6 +90,7 @@ int vpmnd_start()
       log_error("Could not set UID and/or GID to the servers.\n");
       return -1;
     }
+  protocol_init();
   pthread_create(&tunsrv_thread, NULL, (void *) &tunsrv, NULL);
   pthread_create(&udpsrv_thread, NULL, (void *) &udpsrv, NULL);
   config_fistpeersinit();

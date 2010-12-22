@@ -114,7 +114,7 @@ void protocol_recvpacket(const char *buffer, const int buffer_len,
 
     if (buffer_len > 27)
     {
-      uint16_t *ping = &buffer[26];
+      uint16_t *ping = (uint16_t*) &buffer[26];
       log_debug("Ping%d id: %d\n", ip->version, ntohs(*ping));
     }
 #endif
