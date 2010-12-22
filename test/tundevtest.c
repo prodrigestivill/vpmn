@@ -83,6 +83,10 @@ void protocol_sendroutes(const struct peer_s *dstpeer)
   log_debug("Sending routes... (not implemented)");
 }
 
+int protocol_sendpacket(struct udpsrvsession_s *session, const int type){
+  log_debug("Sending packet type %d... (not implemented)", type);
+}
+
 void udpsrvdtls_init()
 {
 }
@@ -96,7 +100,7 @@ int udpsrvdtls_loadcerts(const char *cafile, const char *certfile, const char *p
   return 0;
 }
 
-struct udpsrvsession_s *udpsrvsession_search(const struct sockaddr_in *source)
+struct udpsrvsession_s *udpsrvsession_searchcreate(const struct sockaddr_in *source)
 {
   struct udpsrvsession_s *newsession = malloc(sizeof(struct udpsrvsession_s));
   newsession->addr = source;

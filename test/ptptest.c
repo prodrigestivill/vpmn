@@ -103,11 +103,11 @@ int main(int argc, char *argv[])
       peeraddr->sin_port = htons(1090);
       peeraddr->sin_family = AF_INET;
       inet_aton(argv[1], &peeraddr->sin_addr);
-      udpsrv_firstpeers = calloc(1, sizeof(struct udpsrvsession_s *));
-      udpsrv_firstpeers[0] = udpsrvsession_searchcreate(peeraddr);
-      if (udpsrv_firstpeers[0]->peer == NULL)
-        udpsrv_firstpeers[0]->peer = peer_create();
-      protocol_sendpacket(udpsrv_firstpeers[0], PROTOCOL1_ID);
+  		struct udpsrvsession_s *session;
+      session = udpsrvsession_searchcreate(peeraddr);
+      if (session->peer == NULL)
+        session->peer = peer_create();
+      protocol_sendpacket(session, PROTOCOL1_ID);
     }
   //Program ended
   pthread_join(tunsrv_thread, NULL);

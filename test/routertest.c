@@ -85,25 +85,29 @@ int main(int argc, char **argv)
   char *test = "10.2.0.3";
   log_debug("%s", test);
   log_debug("-> %d\n",
-            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
+            ntohs(searchdst(test)->udpsrvsession->addr->sin_port));
   test = "10.3.10.2";
   log_debug("%s", test);
   log_debug("-> %d\n",
-            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
+            ntohs(searchdst(test)->udpsrvsession->addr->sin_port));
   test = "10.5.1.250";
   log_debug("%s", test);
   log_debug("-> %d\n",
-            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
+            ntohs(searchdst(test)->udpsrvsession->addr->sin_port));
   test = "10.5.20.2";
   log_debug("%s", test);
   log_debug("-> %d\n",
-            ntohs(searchdst(test)->udpsrvsessions[0]->addr->sin_port));
+            ntohs(searchdst(test)->udpsrvsession->addr->sin_port));
   return 0;
 }
 
 void protocol_sendroutes(const struct peer_s *dstpeer)
 {
   log_debug("Sending routes... (not implemented)");
+}
+
+int protocol_sendpacket(struct udpsrvsession_s *session, const int type){
+  log_debug("Sending packet type %d... (not implemented)", type);
 }
 
 void udpsrvdtls_init()

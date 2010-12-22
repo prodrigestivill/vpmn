@@ -68,9 +68,9 @@ int main()
       bufferout_len =
         udpsrvdtls_read(buffer, buffer_len, bufferout, TUNBUFFERSIZE,
                         udpsession);
-      if (bufferout_len > 0)
+      if (bufferout_len > 0){
         log_debug("Decoded: %s \n", bufferout);
-      else
+      }else
         log_error("No decoded data.\n");
     }
 }
@@ -79,3 +79,8 @@ void protocol_sendroutes(const struct peer_s *dstpeer)
 {
   log_debug("Sending routes... (not implemented)");
 }
+
+int protocol_sendpacket(struct udpsrvsession_s *session, const int type){
+  log_debug("Sending packet type %d... (not implemented)", type);
+}
+

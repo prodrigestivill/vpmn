@@ -53,3 +53,8 @@ void protocol_sendroutes(const struct peer_s *dstpeer)
 {
   log_debug("Sending routes... (not implemented)");
 }
+
+int protocol_sendpacket(struct udpsrvsession_s *session, const int type){
+  log_debug("Sending packet type %d... (not implemented)", type);
+}
+
