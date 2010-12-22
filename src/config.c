@@ -122,6 +122,9 @@ tun_selfpeer.shared_networks_len++;
 		if (strcmp(key, "port_udp") == 0){
 			port_udp = atoi(val);
 		}else		
+		if (strcmp(key, "peer_cache") == 0){
+			peer_cache_file = strdup(val);
+		}else		
 /*
 char *updsrv_ip_str = "192.168.0.2";
 tun_selfpeer.addrs = calloc(1, sizeof(struct sockaddr_in));
@@ -141,7 +144,7 @@ tun_selfpeer.addrs_len = 1;
 		if (strcmp(key, "ssl_verifydepth") == 0){
 			ssl_verifydepth = atoi(val);
 		}else
-		if (strcmp(key, "sslpkey") == 0){
+		if (strcmp(key, "ssl_cipherlist") == 0){
 			ssl_cipherlist = strdup(val);
 		}
 	}
@@ -160,16 +163,25 @@ tun_selfpeer.addrs_len = 1;
 
 void config_fistpeersinit()
 {
-/*
   struct sockaddr_in *peeraddr;
-  char *peeraddr_str;
-  peeraddr = malloc (sizeof (struct sockaddr_in));
-  peeraddr_str = "127.0.0.1";
-  peeraddr->sin_port = htons (1091);
-  peeraddr->sin_family = AF_INET;
-  inet_aton (peeraddr_str, &peeraddr->sin_addr);
-  udpsrv_firstpeers = calloc (1, sizeof (udpsrvsession_s *));
-  udpsrv_firstpeers[0] = udpsrvsession_search (peeraddr);
-  protocol_sendpacket (udpsrv_firstpeers[0]->peer, PROTOCOL1_ID);
-*/
+  struct udpsrvsession_s *session;
+  char buf[CONFIG_READ_LINE];
+  char *ptr;
+  FILE *fd = fopen(peer_cache_file, "r");
+  while(fgets(buf, CONFIG_READ_LINE, fd) != NULL){
+	  peeraddr = malloc (sizeof (struct sockaddr_in));
+	  ptr = strchr (buf, ' ');
+	if (ptr) {
+		*ptr=0;
+		ptr+=sizeof (char);
+  	  peeraddr->sin_port = htons (atoi (ptr));
+	  peeraddr->sin_family = AF_INET;
+	  inet_aton (buf, &peeraddr->sin_addr);
+	  log_debug("added peer %s %d...\n",buf, atoi(ptr));
+	  session = udpsrvsession_searchcreate (peeraddr);
+	  protocol_sendpacket (session, PROTOCOL1_ID);
+	} else {
+		log_error ("invalid format found (%s)\n", buf);
+	}
+  }
 }

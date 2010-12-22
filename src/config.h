@@ -51,7 +51,6 @@ struct peer_s tun_selfpeer;
 int num_udpsrvthreads;
 int num_udpsrvbuffers;
 int port_udp;
-struct udpsrvsession_s **udpsrv_firstpeers;
 
 //CRYPTO
 char *ssl_cipherlist;
@@ -59,5 +58,6 @@ int ssl_verifydepth;
 
 void config_load(char *cfgfile);
 void config_fistpeersinit();
+char *peer_cache_file;
 
 #endif                          /* _CONFIG_H */
