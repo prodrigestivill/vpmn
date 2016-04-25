@@ -39,5 +39,6 @@ vpmnd_SOURCES = \
 
 vpmnd_LDFLAGS = \
 	-lpthread\
-	-lssl
+	-lssl\
+	-lcrypto
 
