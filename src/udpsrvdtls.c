@@ -44,7 +44,7 @@ void udpsrvdtls_init()
 #endif
   SSL_library_init();
   //-TODO: sactions_to_seed_PRNG();
-  udpsrvdtls_clictx = SSL_CTX_new(DTLSv1_client_method());
+  udpsrvdtls_clictx = SSL_CTX_new(DTLSv1_2_client_method());
   if (SSL_CTX_set_cipher_list(udpsrvdtls_clictx, ssl_cipherlist) != 1)
     log_error("Error setting cipher list.\n");
   SSL_CTX_set_verify(udpsrvdtls_clictx, verifymode, NULL);
@@ -52,7 +52,7 @@ void udpsrvdtls_init()
   SSL_CTX_set_options(udpsrvdtls_clictx, SSL_OP_NO_QUERY_MTU);
   SSL_CTX_set_mode(udpsrvdtls_clictx, SSL_MODE_AUTO_RETRY);
   //SSL_CTX_set_read_ahead(udpsrvdtls_clictx, 1);
-  udpsrvdtls_srvctx = SSL_CTX_new(DTLSv1_server_method());
+  udpsrvdtls_srvctx = SSL_CTX_new(DTLSv1_2_server_method());
   if (SSL_CTX_set_cipher_list(udpsrvdtls_srvctx, ssl_cipherlist) != 1)
     log_error("Error setting cipher list.\n");
   SSL_CTX_set_verify(udpsrvdtls_srvctx, verifymode, NULL);
