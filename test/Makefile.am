@@ -44,7 +44,8 @@ ptptest_SOURCES = \
 
 ptptest_LDFLAGS = \
 	-lpthread \
-	-lssl
+	-lssl \
+	-lcrypto
 
 protocoltest_SOURCES = \
 	../src/config.c\
@@ -64,7 +65,8 @@ protocoltest_SOURCES = \
 
 protocoltest_LDFLAGS = \
 	-lpthread \
-	-lssl
+	-lssl \
+	-lcrypto
 
 routertest_SOURCES = \
 	../src/config.c\
@@ -97,7 +99,8 @@ tundevtest_SOURCES = \
 
 tundevtest_LDFLAGS = \
 	-lpthread \
-	-lssl
+	-lssl \
+	-lcrypto
 
 udpsrvsessiontest_SOURCES = \
 	udpsrvsessiontest.c\
@@ -117,7 +120,8 @@ udpsrvsessiontest_SOURCES = \
 
 udpsrvsessiontest_LDFLAGS = \
 	-lpthread            \
-	-lssl
+	-lssl \
+	-lcrypto
 
 udpsrvtest_SOURCES = \
 	udpsrvtest.c \
@@ -140,5 +144,6 @@ udpsrvtest_SOURCES = \
 
 udpsrvtest_LDFLAGS = \
 	-lpthread     \
-	-lssl
+	-lssl \
+	-lcrypto
 
