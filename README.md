@@ -17,3 +17,6 @@ _Abandoned_
 
 The binaries of this program includes software developed by the [OpenSSL Project](http://www.openssl.org/) for
 use in the OpenSSL Toolkit. The OpenSSL Toolkit includes cryptographic software written by [Eric Young](mailto:eay@cryptsoft.com) and also includes software written by [Tim Hudson](mailto:tjh@cryptsoft.com).
+
+The PKI software in easyrsa3/ is covered by the GNU GPLv2. For details see the respective [LICENSE](https://github.com/fabian-z/vpmn/blob/master/easyrsa3/LICENSE)
+and [COPYING](https://github.com/fabian-z/vpmn/blob/master/easyrsa3/COPYING) files.
